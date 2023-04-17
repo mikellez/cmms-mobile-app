@@ -1,37 +1,37 @@
 import axios from 'axios';
-import { Text, Box, HStack, IconButton, StatusBar, NativeBaseProvider, Icon, Image, Pressable, Center, VStack, Flex, Container } from 'native-base';
+import { Text, Box, HStack, IconButton, StatusBar, NativeBaseProvider, Icon, Image, Pressable, Center, VStack, Flex, Container, Heading, Button } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import {  View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-interface IUser {
-  id: number;
-  allocated_plants: [];
-  name: string;
-  role_id: number;
-  role_name: string;
-}
+  interface IUser {
+    id: number;
+    allocated_plants: [];
+    name: string;
+    role_id: number;
+    role_name: string;
+  }
 
-const HomeScreen = ({navigation}) => {
+  const HomeScreen = ({navigation}) => {
 
-const [user, setUser] = useState<IUser>();
+  const [user, setUser] = useState<IUser>();
 
-const fetchUserDetail = async () => {
-  await axios.get("http://10.0.2.2:3002/api/user")
-  .then((res)=> {
-    setUser(res.data);
-  })
-  .catch((err) => {
-      console.log(err)
-      alert(err.response.data);
-  });
-};
+  const fetchUserDetail = async () => {
+    await axios.get("http://10.0.2.2:3002/api/user")
+    .then((res)=> {
+      setUser(res.data);
+    })
+    .catch((err) => {
+        console.log(err)
+        alert(err.response.data);
+    });
+  };
 
-useEffect(() => {
-  fetchUserDetail();
-}, [user]);
+  useEffect(() => {
+    fetchUserDetail();
+  }, [user]);
 
   return (
     <NativeBaseProvider>
@@ -48,9 +48,19 @@ useEffect(() => {
           </HStack>
         </HStack>
 
+        <HStack flex={1}>
+          <VStack flex={1}>
+            <HStack px="5" py="5" w="100%" justifyContent="space-between">
+              <HStack>
+                <Heading size="md" color="#C8102E">Overview</Heading>
+              </HStack>
+            </HStack>
+          </VStack>
+        </HStack>
+
         <Center>
           <HStack flex={1}>
-            <Pressable onPress={()=>navigation.navigate("Report")}>
+            {/*<Pressable onPress={()=>navigation.navigate("Report")}>
               <Center w="64" h="10" backgroundColor={"#F2F2F2"} rounded="md" shadow={3} >
                 <HStack justifyContent="space-between" w="100%">
                   <HStack alignItems="center">
@@ -62,14 +72,33 @@ useEffect(() => {
                   </HStack>
                 </HStack>
               </Center>
-            </Pressable>
+            </Pressable>*/}
           </HStack>
         </Center>
 
         <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6} >
+          <Pressable py="3" flex={1} onPress={()=>navigation.navigate("Home")}>
+            <Center>
+              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
+            </Center>
+            <Center>
+              <Text>Overview</Text>
+            </Center>
+          </Pressable>
+          <Pressable py="3" flex={1} onPress={()=>navigation.navigate("Report")}>
+            <Center>
+              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
+            </Center>
+            <Center>
+              <Text>Work Orders</Text>
+            </Center>
+          </Pressable>
           <Pressable py="3" flex={1} >
             <Center>
               <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
+            </Center>
+            <Center>
+              <Text>Assets</Text>
             </Center>
           </Pressable>
         </HStack>

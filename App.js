@@ -1,10 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
-import LoginScreen from './screens/LoginScreen';
-import HomeScreen from './screens/HomeScreen';
-import ReportScreen from './screens/ReportScreen';
-import ViewRequestScreen from './screens/Request/ViewScreen';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Report from './pages/Report';
+import ViewRequest from './pages/Request/View';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -17,10 +17,10 @@ export default function App() {
         <Login/>
       </View>*/}
       <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Report" component={ReportScreen} />
-        <Stack.Screen name="ViewRequest" component={ViewRequestScreen} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Report" component={Report} />
+        <Stack.Screen name="ViewRequest" component={ViewRequest} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -40,34 +40,6 @@ const ReportScreen = ({ navigation }) => {
   const fetchRequest = async () => {
     await axios.get("http://10.0.2.2:3002/api/request")
     .then((res)=> {
-      /*let items = res.data.map((row: CMMSRequest) => {
-          return {
-            id: row.request_id,
-            request_name: row.request_name,
-            created_date: row.created_date,
-            fullname: row.fullname,
-            fault_name: row.fault_name,
-            fault_id: row.fault_id,
-            asset_name: row.asset_name,
-            psa_id: row.psa_id,
-            req_id: row.req_id,
-            plant_name: row.plant_name,
-            plant_id: row.plant_id,
-            priority: row.priority,
-            priority_id: row.priority_id,
-            status: row.status,
-            status_id: row.status_id,
-            assigned_user_email: row.assigned_user_email,
-            assigned_user_id: row.assigned_user_id,
-            assigned_user_name: row.assigned_user_name,
-            fault_description: row.fault_description,
-            uploaded_file: row.uploaded_file,
-            requesthistory: row.requesthistory,
-            complete_comments: row.complete_comments,
-            completion_file: row.completion_file
-          };
-      })*/
-
       setRequestItems(res.data);
     })
     .catch((err) => {
@@ -105,6 +77,14 @@ const ReportScreen = ({ navigation }) => {
                   <Button w="100" padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs">
                     Filter
                   </Button>
+                </HStack>
+              </HStack>
+              <HStack px="5" py="5" w="100%" justifyContent="space-between">
+                <HStack>
+                  <Heading size="md" color="#C8102E">Request</Heading>
+                </HStack>
+                <HStack >
+                  <Heading size="md" color="#C8102E">Checklist</Heading>
                 </HStack>
               </HStack>
               <ScrollView w="100%" h="80">

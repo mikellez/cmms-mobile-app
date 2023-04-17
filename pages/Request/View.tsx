@@ -112,6 +112,11 @@ const ReportScreen = ({ route, navigation }) => {
                 <Divider w="100%" mb="3"/>
 
                 <Text>{requestItems?.fault_description}</Text>
+                <Text>{requestItems?.uploaded_file.type}</Text>
+                {/* requestItems?.uploaded_file.data ? 
+                  (<Image source={URL.createObjectURL( new Blob([ new Uint8Array(requestItems?.uploaded_file.data), ]))}/>) 
+                  : (<Text>No Image</Text>)
+                */}
 
                 <Heading size="sm" pt="3" pb="1" color="#C8102E">
                   Completion Attachment
