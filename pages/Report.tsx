@@ -8,8 +8,6 @@ import axios from "axios";
 
 import ListBox from "../components/Request/ListBox";
 import App from "./App";
-import Header from "./Header";
-import Footer from "./Footer";
 
 interface CMMSRequest {
   request_id: string;
@@ -58,8 +56,7 @@ const ReportScreen = ({ navigation }) => {
   });
 
   return (
-    <App>
-      <Header/>
+    <App navigation={navigation}>
 
       <HStack flex={1} >
         <VStack flex={1}>
@@ -106,7 +103,6 @@ const ReportScreen = ({ navigation }) => {
         </VStack>
       </HStack>
 
-      <Footer navigation={navigation}/>
     </App>
   );
 };

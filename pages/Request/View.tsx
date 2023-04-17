@@ -10,9 +10,7 @@ import moment from "moment";
 import RNFS from 'react-native-fs';
 
 import ImageComponent from "../../components/Image";
-import Header from "../Header";
 import App from "../App";
-import Footer from "../Footer";
 
 interface CMMSRequest {
   request_id: string;
@@ -67,11 +65,10 @@ const ReportScreen = ({ route, navigation }) => {
   }
 
   return (
-    <App>
-      <Header/>
+    <App navigation={navigation}>
 
       <HStack flex={1} >
-        <VStack flex={1} pl="1" pr="3">
+        <VStack flex={1} px={3} py={3}>
           <HStack w="100%" justifyContent="space-between">
             <HStack alignItems="center">
                 <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="chevron-left" color="#C8102E" />} onPress={()=>navigation.goBack()}/>
@@ -135,7 +132,6 @@ const ReportScreen = ({ route, navigation }) => {
         </VStack>
       </HStack>
       
-      <Footer navigation={navigation}/>
     </App>
   );
 };
