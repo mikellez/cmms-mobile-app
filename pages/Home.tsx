@@ -5,6 +5,9 @@ import {  View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import App from './App';
+import Header from './Header';
+import Footer from './Footer';
 
   interface IUser {
     id: number;
@@ -34,20 +37,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
   }, [user]);
 
   return (
-    <NativeBaseProvider>
-      <Flex flex={1} justifyContent="space-between" backgroundColor={"white"}>
-        <HStack bg="#D9D9D9" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%" maxW="350" borderBottomColor={'#C8102E'} borderBottomWidth={2}>
-          <HStack alignItems="center">
-            <IconButton icon={<Icon size="lg" as={MaterialIcons} name="menu" color="#C8102E" />} />
-          </HStack>
-          <HStack alignItems="center">
-            <Image size={'2xl'} style={{ resizeMode: 'contain', width: 150, height: 20 }} alt="fallback text" source={ require('../assets/keppellogo.png')} />
-          </HStack>
-          <HStack alignItems="center">
-            <IconButton icon={<Icon size="lg" as={FontAwesome} name="user-circle-o" color="#C8102E" />} />
-          </HStack>
-        </HStack>
-
+    <App>
+      <Header />
         <HStack flex={1}>
           <VStack flex={1}>
             <HStack px="5" py="5" w="100%" justifyContent="space-between">
@@ -75,36 +66,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
             </Pressable>*/}
           </HStack>
         </Center>
-
-        <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6} >
-          <Pressable py="3" flex={1} onPress={()=>navigation.navigate("Home")}>
-            <Center>
-              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
-            </Center>
-            <Center>
-              <Text>Overview</Text>
-            </Center>
-          </Pressable>
-          <Pressable py="3" flex={1} onPress={()=>navigation.navigate("Report")}>
-            <Center>
-              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
-            </Center>
-            <Center>
-              <Text>Work Orders</Text>
-            </Center>
-          </Pressable>
-          <Pressable py="3" flex={1} >
-            <Center>
-              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
-            </Center>
-            <Center>
-              <Text>Assets</Text>
-            </Center>
-          </Pressable>
-        </HStack>
-
-      </Flex>
-    </NativeBaseProvider>
+      
+      <Footer navigation={navigation}/>
+    </App>
   );
 };
 

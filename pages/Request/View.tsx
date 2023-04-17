@@ -6,6 +6,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from "axios";
 import moment from "moment";
+//import RNFetchBlob from 'rn-fetch-blob';
+import RNFS from 'react-native-fs';
+
+import ImageComponent from "../../components/Image";
+import Header from "../Header";
+import App from "../App";
+import Footer from "../Footer";
 
 interface CMMSRequest {
   request_id: string;
@@ -50,6 +57,7 @@ const ReportScreen = ({ route, navigation }) => {
     });
   };
 
+
   useEffect(() => {
     fetchRequest();
   });
@@ -59,96 +67,76 @@ const ReportScreen = ({ route, navigation }) => {
   }
 
   return (
-    <NativeBaseProvider>
-      <Flex flex={1} justifyContent="space-between" backgroundColor={"white"}>
-        <HStack bg="#D9D9D9" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%" maxW="350" borderBottomColor={'#C8102E'} borderBottomWidth={2}>
-          <HStack alignItems="center">
-            <IconButton icon={<Icon size="lg" as={MaterialIcons} name="menu" color="#C8102E" />} />
+    <App>
+      <Header/>
+
+      <HStack flex={1} >
+        <VStack flex={1} pl="1" pr="3">
+          <HStack w="100%" justifyContent="space-between">
+            <HStack alignItems="center">
+                <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="chevron-left" color="#C8102E" />} onPress={()=>navigation.goBack()}/>
+              <Heading size="md" color="#C8102E">Case ID: {requestItems?.request_id}</Heading>
+            </HStack>
+            <HStack alignItems="center">
+              <Heading size="sm">{requestItems?.status}</Heading>
+            </HStack>
           </HStack>
-          <HStack alignItems="center">
-            <Image size={'2xl'} style={{ resizeMode: 'contain', width: 150, height: 20 }} alt="fallback text" source={ require('../../assets/keppellogo.png')} />
-          </HStack>
-          <HStack alignItems="center">
-            <IconButton icon={<Icon size="lg" as={FontAwesome} name="user-circle-o" color="#C8102E" />} />
-          </HStack>
-        </HStack>
-
-          <HStack flex={1} >
-            <VStack flex={1} pl="1" pr="3">
-              <HStack w="100%" justifyContent="space-between">
-                <HStack alignItems="center">
-                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="chevron-left" color="#C8102E" />} />
-                  <Heading size="md" color="#C8102E">Case ID: {requestItems?.request_id}</Heading>
-                </HStack>
-                <HStack alignItems="center">
-                  <Heading size="md">{requestItems?.status}</Heading>
-                </HStack>
-              </HStack>
-              <HStack flexDirection="row-reverse">
-                <HStack alignItems="center">
-                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="chevron-up" color="#C8102E" />} />
-                  <Text>Priority</Text>
-                </HStack>
-              </HStack>
-
-              <ScrollView w="100%" h="80">
-
-                <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date }</Text>
-                <Text><Heading size="xs">Reported By:</Heading>{ requestItems?.assigned_user_name }</Text>
-                <Text><Heading size="xs">Assigned To:</Heading>{ requestItems?.assigned_user_name }</Text>
-
-                <Heading size="sm" pt="3" pb="1" color="#C8102E">
-                  Fault Description
-                </Heading>
-
-                <Divider w="100%" mb="3"/>
-
-                <Text>{requestItems?.fault_description}</Text>
-
-                <Heading size="sm" pt="3" pb="1" color="#C8102E">
-                  Attachment
-                </Heading>
-
-                <Divider w="100%" mb="3"/>
-
-                <Text>{requestItems?.fault_description}</Text>
-                <Text>{requestItems?.uploaded_file.type}</Text>
-                {/* requestItems?.uploaded_file.data ? 
-                  (<Image source={URL.createObjectURL( new Blob([ new Uint8Array(requestItems?.uploaded_file.data), ]))}/>) 
-                  : (<Text>No Image</Text>)
-                */}
-
-                <Heading size="sm" pt="3" pb="1" color="#C8102E">
-                  Completion Attachment
-                </Heading>
-
-                <Divider w="100%" mb="3"/>
-
-                <Text>{requestItems?.fault_description}</Text>
-
-                <Heading size="sm" pt="3" pb="1" color="#C8102E">
-                  Completion Comment
-                </Heading>
-
-                <Divider w="100%" mb="3"/>
-
-                <Text>{requestItems?.complete_comments ?? 'No Text'}</Text>
-
-              </ScrollView>
-
-            </VStack>
+          <HStack flexDirection="row-reverse">
+            <HStack alignItems="center">
+              <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="chevron-up" color="#C8102E" />} />
+              <Text>{ requestItems?.priority }</Text>
+            </HStack>
           </HStack>
 
-        <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6} >
-          <Pressable py="3" flex={1} >
-            <Center>
-              <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
-            </Center>
-          </Pressable>
-        </HStack>
+          <ScrollView w="100%" h="80">
 
-      </Flex>
-    </NativeBaseProvider>
+            <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date }</Text>
+            <Text><Heading size="xs">Reported By:</Heading>{ requestItems?.assigned_user_name }</Text>
+            <Text><Heading size="xs">Assigned To:</Heading>{ requestItems?.assigned_user_name }</Text>
+
+            <Heading size="sm" pt="3" pb="1" color="#C8102E">
+              Fault Description
+            </Heading>
+
+            <Divider w="100%" mb="3"/>
+
+            <Text>{requestItems?.fault_description ?? 'No text'}</Text>
+
+            <Heading size="sm" pt="3" pb="1" color="#C8102E">
+              Attachment
+            </Heading>
+
+            <Divider w="100%" mb="3"/>
+
+            { requestItems?.uploaded_file?.data ? 
+              (<ImageComponent bufferData={requestItems?.uploaded_file.data}/>) : (<Text>No Image</Text>)
+            }
+
+            <Heading size="sm" pt="3" pb="1" color="#C8102E">
+              Completion Attachment
+            </Heading>
+
+            <Divider w="100%" mb="3"/>
+
+            { requestItems?.completion_file?.data ? 
+              (<ImageComponent bufferData={requestItems?.completion_file.data}/>) : (<Text>No Image</Text>)
+            }
+
+            <Heading size="sm" pt="3" pb="1" color="#C8102E">
+              Completion Comment
+            </Heading>
+
+            <Divider w="100%" mb="3"/>
+
+            <Text>{requestItems?.complete_comments ?? 'No Text'}</Text>
+
+          </ScrollView>
+
+        </VStack>
+      </HStack>
+      
+      <Footer navigation={navigation}/>
+    </App>
   );
 };
 
