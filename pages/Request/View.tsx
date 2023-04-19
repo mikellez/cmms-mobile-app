@@ -85,7 +85,7 @@ const ReportScreen = ({ route, navigation }) => {
             </HStack>
           </HStack>
 
-          <ScrollView w="100%" h="80">
+          <ScrollView w="100%" h="200" px={3}>
 
             <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date }</Text>
             <Text><Heading size="xs">Reported By:</Heading>{ requestItems?.assigned_user_name }</Text>

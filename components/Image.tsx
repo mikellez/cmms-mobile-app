@@ -20,11 +20,7 @@ const ImageComponent = ({ bufferData }) => {
 
   return (
     <>
-    <Image
-      source={{ uri: imageUri }}
-      style={{ width: 200, height: 200 }}
-      alt='Test'
-    />
+    {imageUri && <Image source={{ uri: imageUri }} style={{ width: '100%', height: 200 }} alt='Test' /> }
     </>
   );
 };

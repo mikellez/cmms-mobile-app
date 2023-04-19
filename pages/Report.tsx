@@ -94,7 +94,7 @@ const ReportScreen = ({ navigation }) => {
 
           {requestItems.map((item) =>{
               return (
-                <ListBox key={item.request_id} item={item} navigation={navigation} />
+                <ListBox item={item} navigation={navigation} />
               );
             } 
           )

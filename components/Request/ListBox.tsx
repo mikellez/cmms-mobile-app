@@ -2,10 +2,10 @@ import { HStack, Heading, Text, Box, Center, IconButton, Icon, Pressable, VStack
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const ListBox = ({ key, item, navigation }) => {
+const ListBox = ({ item, navigation }) => {
   return (
-    <Box px="1" py="1" m="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderColor='#C8102E'>
-      <HStack  key={item.request_id} justifyContent="space-between" flex={1}>
+    <Box key={item.request_id} px="1" py="1" m="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderColor='#C8102E'>
+      <HStack justifyContent="space-between" flex={1}>
         <Pressable onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}>
           <HStack justifyContent="space-between" w="100%">
             <HStack alignItems="center" px={3}>
