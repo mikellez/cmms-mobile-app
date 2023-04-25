@@ -18,11 +18,11 @@ import {
   Image, 
   Pressable} from 'native-base';
 import App from '../App';
-import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
+import instance from '../../axios.config';
 
 type FormValues = {
   requestTypeID: number;
@@ -64,7 +64,7 @@ const CreateRequest = ({ navigation }) => {
     console.log('formData', formData);
     //setFormData(formData);
 
-    return await axios
+    return await instance
       .post("http://10.0.2.2:3002/api/request/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
@@ -128,7 +128,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchFaultTypes = async () => {
-    await axios.get(`${process.env.API_URL}/api/fault/types`)
+    await instance.get(`/api/fault/types`)
     .then((res)=> {
       setFaultTypes(res.data);
     })
@@ -139,7 +139,7 @@ const CreateRequest = ({ navigation }) => {
   };
 
   const fetchRequestTypes = async () => {
-    await axios.get(`${process.env.API_URL}/api/request/types`)
+    await instance.get(`/api/request/types`)
     .then((res)=> {
       setRequestTypes(res.data);
     })
@@ -150,7 +150,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchPlants = async () => {
-    await axios.get(`${process.env.API_URL}/api/getPlants`)
+    await instance.get(`/api/getPlants`)
     .then((res)=> {
       setPlants(res.data);
     })
@@ -161,7 +161,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchAssetTag = async (id: string) => {
-    await axios.get(`${process.env.API_URL}/api/asset/${id}`)
+    await instance.get(`/api/asset/${id}`)
     .then((res)=> {
       setAssetTags(res.data);
     })

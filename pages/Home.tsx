@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Text, Box, HStack, IconButton, StatusBar, NativeBaseProvider, Icon, Image, Pressable, Center, VStack, Flex, Container, Heading, Button } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import {  View } from 'react-native';
@@ -6,6 +5,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import App from './App';
+import instance from '../axios.config';
+
 
   interface IUser {
     id: number;
@@ -20,7 +21,7 @@ import App from './App';
   const [user, setUser] = useState<IUser>();
 
   const fetchUserDetail = async () => {
-    await axios.get(`${process.env.API_URL}/api/user`)
+    await instance.get(`/api/user`)
     .then((res)=> {
       setUser(res.data);
     })

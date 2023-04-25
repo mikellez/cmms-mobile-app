@@ -4,7 +4,7 @@ import { Flex, HStack, Icon, IconButton, NativeBaseProvider, Image, Center, Pres
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import axios from "axios";
+import instance from "../../axios.config";
 import moment from "moment";
 //import RNFetchBlob from 'rn-fetch-blob';
 import RNFS from 'react-native-fs';
@@ -45,7 +45,7 @@ const ReportScreen = ({ route, navigation }) => {
 
   const fetchRequest = async () => {
     const { id } = route.params;
-    await axios.get(`${process.env.API_URL}/api/request/${id}`)
+    await instance.get(`/api/request/${id}`)
     .then((res)=> {
       setRequestItems(res.data);
     })

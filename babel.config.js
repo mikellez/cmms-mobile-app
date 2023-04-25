@@ -2,6 +2,20 @@ module.exports = function(api) {
   api.cache(false);
   return {
     presets: ['babel-preset-expo'],
-    plugins: ['transform-inline-environment-variables'],
+    plugins: [
+      'transform-inline-environment-variables',
+      ["module:react-native-dotenv", {
+        "envName": "APP_ENV",
+        "moduleName": "@env",
+        "path": ".env",
+        // "blocklist": null,
+        // "allowlist": null,
+        // "blacklist": null, // DEPRECATED
+        // "whitelist": null, // DEPRECATED
+        // "safe": false,
+        // "allowUndefined": true,
+        // "verbose": false
+      }]
+    ],
   };
 };

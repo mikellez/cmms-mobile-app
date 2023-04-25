@@ -4,8 +4,7 @@ import { Flex, HStack, Icon, IconButton, NativeBaseProvider, Image, Center, Pres
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import axios from "axios";
-
+import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
 import App from "./App";
 
@@ -42,7 +41,7 @@ const ReportScreen = ({ navigation }) => {
 
   const fetchRequest = async () => {
 
-    await axios.get(`${process.env.API_URL}/api/request`)
+    await instance.get(`/api/request`)
     .then((res)=> {
       setRequestItems(res.data);
     })

@@ -6,8 +6,8 @@ import {
     TouchableOpacity,
     Dimensions,
 } from 'react-native';
-import axios from 'axios';
 import { Text, Box, Center, FormControl, Input, NativeBaseProvider, Stack, WarningOutlineIcon, Image, Button, VStack, Heading, Link, HStack } from 'native-base';
+import instance from '../axios.config';
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState<string>('Username');
@@ -18,7 +18,8 @@ const Login = ({ navigation }) => {
   });
 
   const handleLogin = async () => {
-    await axios.post(`${process.env.API_URL}/api/login`, {username, password})
+
+    await instance.post(`/api/login`, {username, password})
     .then((res)=> {
         navigation.navigate('Home');
     })
@@ -28,7 +29,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleLoginTest = async () => {
-    await axios.post(`${process.env.API_URL}/api/login`, {username, password})
+    await instance.post(`/api/login`, {username, password})
     .then((res)=> {
         alert(res.data);
         console.log(res.data);
@@ -39,7 +40,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleUser = async () => {
-    await axios.get(`${process.env.API_URL}/api/user`)
+    await instance.get(`/api/user`)
     .then((res)=> {
         alert(JSON.stringify(res.data));
         console.log(res.data);
@@ -51,7 +52,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleLogout = async () => {
-    await axios.post(`${process.env.API_URL}/api/logout`)
+    await instance.post(`/api/logout`)
     .then((res)=> {
         alert(res.data);
         console.log(res.data);
