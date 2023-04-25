@@ -41,7 +41,8 @@ const ReportScreen = ({ navigation }) => {
   const [requestItems, setRequestItems] = useState<CMMSRequest[]>([]);
 
   const fetchRequest = async () => {
-    await axios.get("http://10.0.2.2:3002/api/request")
+
+    await axios.get(`${process.env.API_URL}/api/request`)
     .then((res)=> {
       setRequestItems(res.data);
     })

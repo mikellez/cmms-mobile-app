@@ -18,7 +18,7 @@ const Login = ({ navigation }) => {
   });
 
   const handleLogin = async () => {
-    await axios.post("http://10.0.2.2:3002/api/login", {username, password})
+    await axios.post(`${process.env.API_URL}/api/login`, {username, password})
     .then((res)=> {
         navigation.navigate('Home');
     })
@@ -28,7 +28,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleLoginTest = async () => {
-    await axios.post("http://10.0.2.2:3002/api/login", {username, password})
+    await axios.post(`${process.env.API_URL}/api/login`, {username, password})
     .then((res)=> {
         alert(res.data);
         console.log(res.data);
@@ -39,7 +39,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleUser = async () => {
-    await axios.get("http://10.0.2.2:3002/api/user")
+    await axios.get(`${process.env.API_URL}/api/user`)
     .then((res)=> {
         alert(JSON.stringify(res.data));
         console.log(res.data);
@@ -51,7 +51,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleLogout = async () => {
-    await axios.post("http://10.0.2.2:3002/api/logout")
+    await axios.post(`${process.env.API_URL}/api/logout`)
     .then((res)=> {
         alert(res.data);
         console.log(res.data);

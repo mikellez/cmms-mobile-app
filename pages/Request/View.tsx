@@ -45,7 +45,7 @@ const ReportScreen = ({ route, navigation }) => {
 
   const fetchRequest = async () => {
     const { id } = route.params;
-    await axios.get(`http://10.0.2.2:3002/api/request/${id}`)
+    await axios.get(`${process.env.API_URL}/api/request/${id}`)
     .then((res)=> {
       setRequestItems(res.data);
     })

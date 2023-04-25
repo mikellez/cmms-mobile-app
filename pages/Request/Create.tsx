@@ -128,7 +128,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchFaultTypes = async () => {
-    await axios.get(`http://10.0.2.2:3002/api/fault/types`)
+    await axios.get(`${process.env.API_URL}/api/fault/types`)
     .then((res)=> {
       setFaultTypes(res.data);
     })
@@ -139,7 +139,7 @@ const CreateRequest = ({ navigation }) => {
   };
 
   const fetchRequestTypes = async () => {
-    await axios.get(`http://10.0.2.2:3002/api/request/types`)
+    await axios.get(`${process.env.API_URL}/api/request/types`)
     .then((res)=> {
       setRequestTypes(res.data);
     })
@@ -150,7 +150,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchPlants = async () => {
-    await axios.get(`http://10.0.2.2:3002/api/getPlants`)
+    await axios.get(`${process.env.API_URL}/api/getPlants`)
     .then((res)=> {
       setPlants(res.data);
     })
@@ -161,7 +161,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   const fetchAssetTag = async (id: string) => {
-    await axios.get(`http://10.0.2.2:3002/api/asset/${id}`)
+    await axios.get(`${process.env.API_URL}/api/asset/${id}`)
     .then((res)=> {
       setAssetTags(res.data);
     })

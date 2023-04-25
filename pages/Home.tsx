@@ -20,7 +20,7 @@ import App from './App';
   const [user, setUser] = useState<IUser>();
 
   const fetchUserDetail = async () => {
-    await axios.get("http://10.0.2.2:3002/api/user")
+    await axios.get(`${process.env.API_URL}/api/user`)
     .then((res)=> {
       setUser(res.data);
     })
