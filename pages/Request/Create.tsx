@@ -172,7 +172,6 @@ const CreateRequest = ({ navigation }) => {
   }
 
   useEffect(() => {
-    console.log('test')
     fetchFaultTypes();
     fetchRequestTypes();
     fetchPlants();
