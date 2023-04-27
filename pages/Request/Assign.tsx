@@ -22,8 +22,12 @@ import * as ImagePicker from 'expo-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 import instance from '../../axios.config';
 import Form from '../../components/Request/Form';
+import axios from 'axios';
 
 type FormValues = {
   requestTypeID: number;
@@ -34,7 +38,42 @@ type FormValues = {
   image: any
 };
 
-const CreateRequest = ({ navigation }) => {
+interface CMMSRequest {
+  request_id: string;
+  request_name?: string;
+  created_date: string;
+  fullname: string;
+  fault_name: string;
+  fault_id?: number;
+  asset_name: string;
+  psa_id?: number;
+  req_id?: number;
+  plant_name: string;
+  plant_id?: number;
+  priority: string;
+  priority_id: number;
+  status: string;
+  status_id?: number;
+  assigned_user_email: string;
+  assigned_user_id: number;
+  assigned_user_name: string;
+  fault_description?: string;
+  uploaded_file?: any;
+  requesthistory?: string;
+  complete_comments?: string;
+  completion_file?: any;
+  rejection_comments: string;
+}
+
+export interface CMMSRequestPriority {
+  p_id?: number;
+  priority?: string;
+}
+
+const AssignRequest = ({ route, navigation }) => {
+  const [prioritySelected, setPrioritySelected] = useState({});
+  const [assignUserSelected, setAssignUserSelected] = useState({});
+  const [requestItems, setRequestItems] = useState<CMMSRequest>();
   const [selectedImage, setSelectedImage] = useState(null);
   //const [formData, setFormData] = useState(new FormData());
   const [formState, setFormState] = useState<FormValues>({
@@ -50,10 +89,21 @@ const CreateRequest = ({ navigation }) => {
   const [faultTypes, setFaultTypes] = useState([]);
   const [plants, setPlants] = useState([]);
   const [assetTags, setAssetTags] = useState([]);
+  const [priorities, setPriorities] = useState([]);
+  const [assignUsers, setAssignUsers] = useState([]);
 
-  const handleSubmit = async () => {
-    //console.log('formState', formState);
+  const getData = async (key) => {
+    try {
+      const data = await AsyncStorage.getItem(key)
+      return data != null ? JSON.parse(data) : null;
 
+    } catch(err) {
+      console.log(err)
+      // error reading value
+    }
+  }
+
+  const createRequest = async () => {
     const formData = new FormData();
     formData.append("description", formState.description);
     formData.append("faultTypeID", formState.faultTypeID.toString());
@@ -82,8 +132,46 @@ const CreateRequest = ({ navigation }) => {
 
   }
 
+  const updateRequest = async () => {
+    const { id } = route.params;
+    return await instance
+      .patch(`/api/request/${id}`, { 
+        priority: prioritySelected, 
+        assignedUser: assignUserSelected
+      })
+      .then((response) => {
+        alert("Request updated successfully");
+        navigation.navigate("Report");
+        return response.data;
+      })
+      .catch((e) => {
+        console.log("error updating request");
+        console.log(e);
+        return null;
+      });
+  }
+
+
+  const handleSubmit = async () => {
+    //console.log('formState', formState);
+    updateRequest();
+
+  }
+
   const handleChange = (name: string, value: number) => {
     setFormState({...formState, [name]: value});
+  }
+
+  const handlePriorityChange = (value: string) => {
+    const selectedItem = priorities.find((item) => item.p_id === value);
+    console.log(value)
+    console.log(selectedItem)
+    setPrioritySelected({ p_id: selectedItem.p_id, priority: selectedItem.priority });
+  }
+
+  const handleAssignUserChange = (value: string) => {
+    const selectedItem = assignUsers.find((item) => item.id === value);
+    setAssignUserSelected({ value: selectedItem.id, label: selectedItem.name + ' | ' + selectedItem.email });
   }
 
   const handleImagePicker = async () => {
@@ -163,10 +251,63 @@ const CreateRequest = ({ navigation }) => {
     });
   }
 
+  const fetchPriority = async () => {
+    await instance.get(`/api/request/priority`)
+    .then((res)=> {
+      setPriorities(res.data);
+    })
+    .catch((err)=> {
+      console.log(err)
+    })
+  }
+
+  const fetchAssignUser = async () => {
+    try {
+      const user = getData('@user');
+      console.log(user)
+
+      await instance.get(`/api/getAssignedUsers/4`)
+      .then((res)=> {
+        setAssignUsers(res.data);
+      })
+      .catch((err)=> {
+        console.log(err)
+      })
+    } catch(err) {
+      console.log(err)
+      // error reading value
+    }
+
+  }
+
+  const fetchRequest = async () => {
+    const { id } = route.params;
+    await instance.get(`/api/request/${id}`)
+    .then((res)=> {
+      setRequestItems(res.data);
+    })
+    .catch((err) => {
+        console.log(err)
+    });
+  };
+
+
   useEffect(() => {
-    fetchFaultTypes();
-    fetchRequestTypes();
-    fetchPlants();
+    if(requestItems) {
+      fetchAssetTag(requestItems?.plant_id.toString());
+    }
+  }, [requestItems?.plant_id]);
+
+
+  useEffect(() => {
+    console.log('test')
+    //fetchFaultTypes();
+    //fetchRequestTypes();
+    //fetchPlants();
+    Promise.all([fetchFaultTypes(), fetchRequestTypes(), fetchPlants(), fetchPriority(), fetchAssignUser()])
+    .then(() => {
+      fetchRequest();
+    })
 
   }, [])
 
@@ -184,7 +325,9 @@ const CreateRequest = ({ navigation }) => {
           <ScrollView w="100%" h="200" p="5">
 
             <Form 
-              action="create"
+              action="assign"
+
+              requestItems={requestItems}
 
               requestTypes={requestTypes}
               onRequestTypeChange={value=>handleChange("requestTypeID", parseInt(value))}
@@ -203,6 +346,14 @@ const CreateRequest = ({ navigation }) => {
               imageSource={selectedImage}
               onImagePicker={handleImagePicker}
 
+              prioritySelected={prioritySelected}
+              priorities={priorities}
+              onPriorityChange={handlePriorityChange}
+
+              assignUserSelected={assignUserSelected}
+              assignUsers={assignUsers}
+              onAssignUserChange={handleAssignUserChange}
+
               onSubmit={handleSubmit}
             />
 
@@ -217,4 +368,4 @@ const CreateRequest = ({ navigation }) => {
   )
 }
 
-export default CreateRequest;
+export default AssignRequest;

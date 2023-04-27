@@ -47,7 +47,6 @@ const ReportScreen = ({ navigation }) => {
     })
     .catch((err) => {
         console.log(err)
-        alert(err.response.data);
     });
   };
 

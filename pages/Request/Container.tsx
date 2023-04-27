@@ -23,7 +23,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
 import instance from '../../axios.config';
-import Form from '../../components/Request/Form';
 
 type FormValues = {
   requestTypeID: number;
@@ -34,7 +33,7 @@ type FormValues = {
   image: any
 };
 
-const CreateRequest = ({ navigation }) => {
+const RequestContainer = ({ navigation }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   //const [formData, setFormData] = useState(new FormData());
   const [formState, setFormState] = useState<FormValues>({
@@ -80,10 +79,15 @@ const CreateRequest = ({ navigation }) => {
         return null;
       });
 
-  }
+    /*await axios.post(`http://10.0.2.2:3002/api/request`, {params: formState})
+    .then((res)=> {
+      console.log(res.data) 
+    })
+    .catch((err) => {
+        console.log(err)
+        alert(err.response.data);
+    });*/
 
-  const handleChange = (name: string, value: number) => {
-    setFormState({...formState, [name]: value});
   }
 
   const handleImagePicker = async () => {
@@ -164,6 +168,7 @@ const CreateRequest = ({ navigation }) => {
   }
 
   useEffect(() => {
+    console.log('test')
     fetchFaultTypes();
     fetchRequestTypes();
     fetchPlants();
@@ -183,28 +188,84 @@ const CreateRequest = ({ navigation }) => {
 
           <ScrollView w="100%" h="200" p="5">
 
-            <Form 
-              action="create"
+            <FormControl isRequired >
+              <FormControl.Label>Request Type</FormControl.Label>
+              <Radio.Group 
+                name="request_type" 
+                defaultValue="1" 
+                accessibilityLabel="pick a size" 
+                onChange={value=>setFormState({...formState, requestTypeID: parseInt(value)})}>
 
-              requestTypes={requestTypes}
-              onRequestTypeChange={value=>handleChange("requestTypeID", parseInt(value))}
+                <HStack flex={1} justifyContent="space-between" w="100%" flexWrap={'wrap'}> 
+                  {requestTypes.map((requestType) => (
+                    <Radio key={requestType.req_id} value={requestType.req_id} colorScheme="red" size="sm" my={1}>{requestType.request}</Radio>
+                  ))}
 
-              faultTypes={faultTypes}
-              onFaultTypeChange={value=>handleChange("faultTypeID", parseInt(value))}
+                </HStack>
+              </Radio.Group>
+            </FormControl>
 
-              onFaultDescriptionChange={value=>handleChange("description", value)}
+            <FormControl isRequired >
+              <FormControl.Label>Fault Type</FormControl.Label>
+              <Select 
+                accessibilityLabel="Choose Fault Type" 
+                placeholder="Choose Fault Type" 
+                _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }} 
+                mt="1" 
+                onValueChange={value=>setFormState({...formState, faultTypeID: parseInt(value)})}>
 
-              plants={plants}
-              onPlantLocationChange={value=>handlePlantLocationChange(value)}
+                {faultTypes.map((faultType) => (
+                  <Select.Item key={faultType.fault_id} label={faultType.fault_type} value={faultType.fault_id} />
+                ))}
 
-              assetTags={assetTags}
-              onAssetTagChange={value=>handleChange("taggedAssetID", parseInt(value))}
+              </Select>
+            </FormControl>
 
-              imageSource={selectedImage}
-              onImagePicker={handleImagePicker}
+            <FormControl isRequired >
+              <FormControl.Label>Fault Description</FormControl.Label>
+              <TextArea h={20} placeholder=""  numberOfLines={4} autoCompleteType={true} onChangeText={value=>setFormState({...formState, description: value})}/>
+            </FormControl>
 
-              onSubmit={handleSubmit}
-            />
+            <FormControl isRequired >
+              <FormControl.Label>Plant Location</FormControl.Label>
+              <Select 
+                accessibilityLabel="Choose Plant Location" 
+                placeholder="Choose Plant Location" 
+                _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }} 
+                mt="1" 
+                onValueChange={value=>handlePlantLocationChange(value)}>
+
+                {plants.map((plant) => (
+                  <Select.Item key={plant.plant_id} label={plant.plant_name} value={plant.plant_id} />
+                ))}
+
+              </Select>
+            </FormControl>
+
+            <FormControl isRequired >
+              <FormControl.Label>Asset's Tags</FormControl.Label>
+              <Select 
+                accessibilityLabel="Choose Asset Tag" 
+                placeholder="Choose Asset Tag" 
+                _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }} 
+                mt="1" 
+                onValueChange={value=>setFormState({...formState, taggedAssetID: parseInt(value)})}>
+
+                {assetTags.map((assetTag) => (
+                  <Select.Item key={assetTag.psa_id} label={assetTag.asset_name} value={assetTag.psa_id} />
+                ))}
+
+              </Select>
+            </FormControl>
+
+            <FormControl isRequired >
+              <FormControl.Label>Image</FormControl.Label>
+              <Pressable onPress={handleImagePicker}>
+                <ImagePreview source={{ uri : selectedImage }} alt="test"/>
+              </Pressable>
+            </FormControl>
+
+            <Button bgColor="#C8102E" mt={5} mb={10} onPress={handleSubmit}>Submit</Button>
 
           </ScrollView>
 
@@ -217,4 +278,4 @@ const CreateRequest = ({ navigation }) => {
   )
 }
 
-export default CreateRequest;
+export default RequestContainer;
