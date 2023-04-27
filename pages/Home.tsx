@@ -27,7 +27,6 @@ import instance from '../axios.config';
     })
     .catch((err) => {
         console.log(err)
-        alert(err.response.data);
     });
   };
 

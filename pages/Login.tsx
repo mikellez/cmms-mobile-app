@@ -7,7 +7,10 @@ import {
     Dimensions,
 } from 'react-native';
 import { Text, Box, Center, FormControl, Input, NativeBaseProvider, Stack, WarningOutlineIcon, Image, Button, VStack, Heading, Link, HStack } from 'native-base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import instance from '../axios.config';
+import { API_URL } from '@env';
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState<string>('Username');
@@ -17,15 +20,26 @@ const Login = ({ navigation }) => {
 
   });
 
-  const handleLogin = async () => {
+  const setData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (err) {
+      console.log(err)
+    }
+  };
 
+  const handleLogin = async () => {
     await instance.post(`/api/login`, {username, password})
-    .then((res)=> {
-        navigation.navigate('Home');
-    })
     .catch((err) => {
-        console.log(err)
+      console.log(err)
     });
+
+    await instance.get(`/api/user`)
+    .then(async (res)=>{
+      await setData('@user', JSON.stringify(res.data));
+      navigation.navigate('Home');
+    });
+
   };
 
   const handleLoginTest = async () => {
