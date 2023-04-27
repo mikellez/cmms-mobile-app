@@ -1,12 +1,8 @@
-import React from 'react'; 
-import { Text } from 'native-base';
+import RequestContainer from "../../components/Request/RequestContainer";
 
-import App from '../App';
-
-const CompleteRequest = ({ navigation }) => {
+const CompleteRequest = ({ route, navigation }) => {
   return (
-    <App navigation={navigation}>
-      </App>
+    <RequestContainer route={route} navigation={navigation} action="complete"/>
   )
 }
 
