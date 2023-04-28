@@ -6,6 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
+import { ModuleHeader, ModuleScreen } from "../components/ModuleLayout";
 import App from "./App";
 
 interface CMMSRequest {
@@ -55,54 +56,47 @@ const ReportScreen = ({ navigation }) => {
   });
 
   return (
-    <App navigation={navigation}>
+    <ModuleScreen navigation={navigation}>
 
-      <HStack flex={1} >
-        <VStack flex={1}>
-          <HStack px="5" py="5" w="100%" justifyContent="space-between">
-            <HStack>
-              <Heading size="md" color="#C8102E">Report</Heading>
-            </HStack>
-            <HStack >
-              <Button w="100" padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs">
-                Filter
-              </Button>
-            </HStack>
-          </HStack>
+      <ModuleHeader header="Report">
+        <HStack >
+          <Button w="100" padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs">
+            Filter
+          </Button>
+        </HStack>
+      </ModuleHeader>
 
-          <Box backgroundColor="#F9F7F7" px="1" py="1" m="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
-            <Center>
-              <Pressable onPress={()=>navigation.navigate("CreateRequest")}>
-                <HStack alignItems={'center'}>
-                  <IconButton icon={<Icon size="sm" as={MaterialCommunityIcons} name="plus" color="#C8102E" />} />
-                  <Text color="#C8102E">Add new request</Text>
-                </HStack>
-              </Pressable>
-            </Center>
-          </Box>
-
-          <HStack px="5" py="5" w="100%" justifyContent="space-between">
-            <HStack>
-              <Heading size="md" color="#C8102E">Request</Heading>
+      <Box backgroundColor="#F9F7F7" px="1" py="1" m="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
+        <Center>
+          <Pressable onPress={()=>navigation.navigate("CreateRequest")}>
+            <HStack alignItems={'center'}>
+              <IconButton icon={<Icon size="sm" as={MaterialCommunityIcons} name="plus" color="#C8102E" />} />
+              <Text color="#C8102E">Add new request</Text>
             </HStack>
-            <HStack >
-              <Heading size="md" color="#C8102E">Checklist</Heading>
-            </HStack>
-          </HStack>
-          <ScrollView w="100%" h="80">
+          </Pressable>
+        </Center>
+      </Box>
 
-          {requestItems.map((item) =>{
-              return (
-                <ListBox item={item} navigation={navigation} />
-              );
-            } 
-          )
-          }
-          </ScrollView>
-        </VStack>
+      <HStack px="5" py="5" w="100%" justifyContent="space-between">
+        <HStack>
+          <Heading size="md" color="#C8102E">Request</Heading>
+        </HStack>
+        <HStack >
+          <Heading size="md" color="#C8102E">Checklist</Heading>
+        </HStack>
       </HStack>
+      <ScrollView w="100%" h="80">
 
-    </App>
+      {requestItems.map((item) =>{
+          return (
+            <ListBox item={item} navigation={navigation} />
+          );
+        } 
+      )
+      }
+      </ScrollView>
+
+    </ModuleScreen>
   );
 };
 

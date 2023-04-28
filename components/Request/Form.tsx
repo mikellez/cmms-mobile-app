@@ -22,6 +22,8 @@ const Form = ({
   assignUserSelected,
   assignUsers,
   onAssignUserChange,
+  onCompletionImagePicker,
+  onCompletionCommentChange,
   onSubmit
 }) => {
   return (
@@ -67,12 +69,12 @@ const Form = ({
           placeholder="Fault description" 
           autoCompleteType={true} 
           onChangeText={onFaultDescriptionChange} 
-          isDisabled={true} 
-          isReadOnly={true}
+          isDisabled={action !== "create" ?? false} 
+          isReadOnly={action !== "create" ?? false}
           _disabled={{
             bg: "muted.100",
           }}
-          value={requestItems?.description || '-'}
+          value={action !== "create" ? requestItems?.description || 'NIL' : ''}
           />
       </FormControl>
       
@@ -163,6 +165,26 @@ const Form = ({
           ))}
 
         </Select>
+      </FormControl>
+      }
+
+      { action === "complete" &&
+        <FormControl isRequired>
+          <FormControl.Label>Completion Image</FormControl.Label>
+            <Pressable onPress={onCompletionImagePicker}>
+              <ImagePreview source={{ uri: imageSource }} alt="test" />
+            </Pressable>
+        </FormControl>
+      }
+
+      { action === "complete" &&
+      <FormControl isRequired>
+        <FormControl.Label>Completion Comments</FormControl.Label>
+        <TextArea 
+          placeholder="Completion Comments" 
+          autoCompleteType={true} 
+          onChangeText={onCompletionCommentChange} 
+          />
       </FormControl>
       }
       
