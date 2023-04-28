@@ -1,9 +1,9 @@
-import axios from 'axios';
-import { API_URL } from '@env';
-import * as RootNavigation from './RootNavigation.js';
+import axios from "axios";
+import { API_URL } from "@env";
+import * as RootNavigation from "./RootNavigation.js";
 
 const instance = axios.create({
-        baseURL: `http://${API_URL}`
+  baseURL: `http://10.0.2.2:3002`,
 });
 
 // Add an interceptor to catch errors
@@ -12,10 +12,10 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-        console.log(error);
+    console.log(error);
     if (!error.response) {
       // Network error, redirect to login
-      RootNavigation.navigate('Login');
+      RootNavigation.navigate("Login");
       return Promise.reject(error);
     }
 
@@ -23,7 +23,7 @@ instance.interceptors.response.use(
 
     if (status === 401 || status === 403) {
       // Authentication error, redirect to login
-      RootNavigation.navigate('Login');
+      RootNavigation.navigate("Login");
     }
 
     return Promise.reject(error);
