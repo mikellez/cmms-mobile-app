@@ -7,7 +7,7 @@ interface ModuleHeaderProps extends React.PropsWithChildren {
 
 const ModuleHeader = (props: ModuleHeaderProps) => {
     return (
-        <HStack px="5" py="5" w="100%" justifyContent="space-between">
+        <HStack w="100%" justifyContent="space-between">
             <HStack>
                 <Heading size="md" color="#C8102E">{props.header}</Heading>
             </HStack>
