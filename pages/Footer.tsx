@@ -1,4 +1,4 @@
-import { Center, HStack, Pressable, Icon, Text } from "native-base";
+import { Center, HStack, Icon, Text, Pressable } from "native-base";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
