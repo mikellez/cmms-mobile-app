@@ -6,13 +6,16 @@ import {
     TouchableOpacity,
     Dimensions,
 } from 'react-native';
-import { Text, Box, Center, FormControl, Input, NativeBaseProvider, Stack, WarningOutlineIcon, Image, Button, VStack, Heading, Link, HStack } from 'native-base';
+import { Text, Box, Center, FormControl, Input, NativeBaseProvider, Stack, WarningOutlineIcon, Image, Button, VStack, Heading, Link, HStack, Pressable, Icon, Alert, IconButton, CloseIcon } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import instance from '../axios.config';
 import { API_URL } from '@env';
 
 const Login = ({ navigation }) => {
+  const [errorSubmitting, setErrorSubmitting] = useState<string>("");
+  const [isError, setIsError] = useState<boolean>(false);
   const [username, setUsername] = useState<string>('Username');
   const [password, setPassword] = useState<string>('Password');
 
@@ -36,9 +39,21 @@ const Login = ({ navigation }) => {
 
     await instance.get(`/api/user`)
     .then(async (res)=>{
+      setIsError(false);
       await setData('@user', JSON.stringify(res.data));
       navigation.navigate('Home');
-    });
+    })
+    .catch((error) => {
+			console.log("error", error);
+			let reason:string = ""
+			if(error.response.status === 429)
+				reason = "Too many Login attempts. Try again later."
+			if(error.response.status === 401)
+				reason = "Username and password combination does not match."
+			
+      setIsError(true);
+			setErrorSubmitting(reason);
+		});
 
   };
 
@@ -84,7 +99,7 @@ const Login = ({ navigation }) => {
             <Image height={100} size={'2xl'} style={{ resizeMode: 'contain' }} alt="fallback text" source={ require('../assets/keppellogo.png')} />
           </Heading>
 
-          <VStack space={3} mt="5">
+          <VStack space={3} mt="20">
             <FormControl>
               <FormControl.Label>Username</FormControl.Label>
               <Input onChangeText={setUsername} _focus={{
@@ -112,9 +127,33 @@ const Login = ({ navigation }) => {
             <Button mt="2" bg="danger.700" onPress={handleLogout}>
               Test logout
             </Button>*/}
+          {isError && <Center >
+            <Alert maxW="400" status="danger" colorScheme="danger">
+              <VStack space={2} flexShrink={1} w="100%">
+                <HStack flexShrink={1} space={2} alignItems="center" justifyContent="space-between">
+                  <HStack flexShrink={1} space={2} alignItems="center">
+                    <Text fontSize="md" fontWeight="medium" color="coolGray.800">
+                      {errorSubmitting}
+                    </Text>
+                  </HStack>
+                  <IconButton variant="unstyled" _focus={{ borderWidth: 0 }} icon={<CloseIcon size="3" />} _icon={{ color: "coolGray.600" }} />
+                </HStack>
+              </VStack>
+            </Alert>
+          </Center>
+        }
+          <Pressable py="20" flex={1} onPress={()=>navigation.navigate("QRScan")}>
+            <Center>
+              <Icon mb="1" as={<MaterialCommunityIcons name="qrcode-scan" />} color="#C8102E" size="2xl" />
+            </Center>
+            <Center>
+              <Text>QR Scan</Text>
+            </Center>
+          </Pressable>
           </VStack>
         </Box>
       </Center>
+
     </NativeBaseProvider>
   );
 };

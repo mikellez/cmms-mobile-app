@@ -7,7 +7,7 @@ const Footer = ({ navigation }) => {
     <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6} >
       <Pressable py="3" flex={1} onPress={()=>navigation.navigate("Home")}>
         <Center>
-          <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
+          <Icon mb="1" as={<MaterialCommunityIcons name="view-dashboard" />} color="#C8102E" size="lg" />
         </Center>
         <Center>
           <Text>Overview</Text>
@@ -23,7 +23,7 @@ const Footer = ({ navigation }) => {
       </Pressable>
       <Pressable py="3" flex={1} >
         <Center>
-          <Icon mb="1" as={<MaterialCommunityIcons name="clipboard-clock-outline" />} color="#C8102E" size="lg" />
+          <Icon mb="1" as={<MaterialCommunityIcons name="sitemap" />} color="#C8102E" size="lg" />
         </Center>
         <Center>
           <Text>Assets</Text>

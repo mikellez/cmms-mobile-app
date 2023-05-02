@@ -81,7 +81,7 @@ const RequestContainer = ({
   navigation, 
   action 
 } : { 
-  route?: RouteProp<{ params: { id: '' } }, 'params'>;
+  route?: RouteProp<{ params: { id: '', plant: '', asset: '' } }, 'params'>;
   navigation?: any;
   action?: string;
 }) => {
@@ -91,7 +91,6 @@ const RequestContainer = ({
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCompletionImage, setSelectedCompletionImage] = useState(null);
 
-  const [completionComment, setCompletionComment] = useState("");
   const [completionImage, setCompletionImage] = useState(null);
 
   const [formState, setFormState] = useState<FormValues>({
@@ -114,6 +113,9 @@ const RequestContainer = ({
   const [assetTags, setAssetTags] = useState([]);
   const [priorities, setPriorities] = useState([]);
   const [assignUsers, setAssignUsers] = useState([]);
+
+  const [plant, setPlant] = useState(route?.params?.plant);
+  const [asset, setAsset] = useState(route?.params?.asset);
 
 
   const getData = async (key) => {
@@ -242,7 +244,8 @@ const RequestContainer = ({
       quality: 0.5,
     });
 
-    if(result.canceled) return;
+    if(result.canceled) return false;
+
     const uri = result.assets[0].uri
     const type = result.assets[0].type;
     const name = result.assets[0].fileName || 'image.jpg';
@@ -259,19 +262,24 @@ const RequestContainer = ({
   const handleImagePicker = async () => {
     const file = await NativeImagePicker();
 
-    setSelectedImage(file.oriUri);
-    setFormState({...formState, image: file});
+    if(file) {
+      setSelectedImage(file.oriUri);
+      setFormState({...formState, image: file});
+    }
   };
 
   const handleCompletionImagePicker = async () => {
     const file = await NativeImagePicker();
+    console.log(file)
 
-    setSelectedCompletionImage(file.oriUri);
-    setCompletionFormState({...completionFormState, completion_file: file});
+    if(file) {
+      setSelectedCompletionImage(file.oriUri);
+      setCompletionFormState({...completionFormState, completion_file: file});
+    }
   }
 
   const handleCompletionCommentChange = (value: string) => {
-    setCompletionComment(value);
+    console.log('completion', value)
     setCompletionFormState({...completionFormState, complete_comments: value});
   }
 
@@ -366,6 +374,9 @@ const RequestContainer = ({
     if(requestItems) {
       fetchAssetTag(requestItems?.plant_id.toString());
     }
+    if(route?.params?.plant) {
+      fetchAssetTag(route.params.plant);
+    }
   }, [requestItems?.plant_id]);
 
 
@@ -397,10 +408,13 @@ const RequestContainer = ({
             </HStack>
           </HStack>
 
-          <ScrollView w="100%" h="200" p="5">
+          <ScrollView w="100%" h="200" p="5" nestedScrollEnabled={true}>
 
             <Form 
               action={action}
+
+              plant={plant}
+              asset={asset}
 
               requestItems={requestItems}
 
@@ -429,6 +443,7 @@ const RequestContainer = ({
               assignUsers={assignUsers}
               onAssignUserChange={handleAssignUserChange}
 
+              completionImageSource={selectedCompletionImage}
               onCompletionImagePicker={handleCompletionImagePicker}
               onCompletionCommentChange={handleCompletionCommentChange}
 

@@ -4,6 +4,8 @@ import ImageComponent from "../../components/Image";
 
 const Form = ({
   action,
+  plant,
+  asset,
   requestItems,
   requestTypes,
   onRequestTypeChange,
@@ -22,6 +24,7 @@ const Form = ({
   assignUserSelected,
   assignUsers,
   onAssignUserChange,
+  completionImageSource,
   onCompletionImagePicker,
   onCompletionCommentChange,
   onSubmit
@@ -44,7 +47,9 @@ const Form = ({
 
         </HStack>
       </Radio.Group>
-    </FormControl><FormControl isRequired>
+    </FormControl>
+
+    <FormControl isRequired>
         <FormControl.Label>Fault Type</FormControl.Label>
         <Select
           accessibilityLabel="Choose Fault Type"
@@ -87,7 +92,7 @@ const Form = ({
           mt="1"
           onValueChange={onPlantLocationChange}
           isDisabled={action !== "create" ?? false}
-          selectedValue={requestItems?.plant_id || ''}
+          selectedValue={plant ? plant : (requestItems?.plant_id || '')}
           >
 
           {plants.map((plant) => (
@@ -106,7 +111,7 @@ const Form = ({
           mt="1"
           onValueChange={onAssetTagChange}
           isDisabled={action !== "create" ?? false}
-          selectedValue={requestItems?.psa_id || ''}
+          selectedValue={asset ? asset : (requestItems?.psa_id || '')}
           >
 
           {assetTags.map((assetTag) => (
@@ -172,7 +177,7 @@ const Form = ({
         <FormControl isRequired>
           <FormControl.Label>Completion Image</FormControl.Label>
             <Pressable onPress={onCompletionImagePicker}>
-              <ImagePreview source={{ uri: imageSource }} alt="test" />
+              <ImagePreview source={{ uri: completionImageSource }} alt="test" />
             </Pressable>
         </FormControl>
       }
