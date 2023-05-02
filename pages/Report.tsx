@@ -149,13 +149,15 @@ const ReportScreen = ({ navigation }) => {
                 <VStack>
                   <HStack w="100%" justifyContent="space-between">
                     <Text><Heading size="xs">Case ID:</Heading> {item.request_id}</Text>
-                    <Text><Heading size="xs" color={item.status && STATUS[item.status].color}>{item.status}</Heading></Text>
                   </HStack>
                   <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.asset_name}</Text>
                 </VStack>
               </HStack>
               <HStack alignItems="center" flex={1} marginTop={3}>
-                <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name={isActive ? 'chevron-up' : 'chevron-down'} color="#C8102E" />} />
+                <VStack>
+                  <Text fontSize="12" color={item.status && STATUS[item.status].color} bold>{item.status}</Text>
+                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name={isActive ? 'chevron-up' : 'chevron-down'} color="#C8102E" />} />
+                </VStack>
               </HStack>
             </HStack>
           {/*</Pressable>*/}
