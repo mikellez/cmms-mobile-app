@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import Report from './pages/Report';
 import ViewRequest from './pages/Request/View';
 import CreateRequest from './pages/Request/Create';
+import Maintenance from './pages/Maintenance';
+import CreateChecklist from './pages/Checklist/Create';
 import AssignRequest from './pages/Request/Assign';
 import CompleteRequest from './pages/Request/Complete';
 import QRScan from './pages/QRScan/index';
@@ -28,6 +30,8 @@ export default function App() {
         <Stack.Screen name="Report" component={Report} />
         <Stack.Screen name="ViewRequest" component={ViewRequest} />
         <Stack.Screen name="CreateRequest" component={CreateRequest} />
+        <Stack.Screen name="Maintenance" component={Maintenance} />
+        <Stack.Screen name="CreateChecklist" component={CreateChecklist} />
         <Stack.Screen name="AssignRequest" component={AssignRequest} />
         <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
         <Stack.Screen name="QRScan" component={QRScan} />
