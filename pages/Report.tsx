@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
 import Constants from 'expo-constants';
@@ -114,6 +115,20 @@ const ReportScreen = ({ navigation }) => {
   };
 
   const renderHeader = (item, _, isActive) => {
+    const STATUS = {
+      "PENDING": { color: "rgb(179, 6, 236);"},
+      "ASSIGNED": { color: "#0000FC"},
+      "COMPLETED": {color: "rgb(14, 189, 5);"},
+      "REJECTED": {color: "#ff0000"},
+      "APPROVED": {color: "color: rgb(14, 189, 5);"},
+    };
+
+    const PRIORITY = {
+      "HIGH": { color: "#C8102E", icon: "arrowup" },
+      "MEDIUM": { color: "#FFB300", icon: "minus" },
+      "LOW": {color: "#76B82A", icon: "arrowdown" }
+    };
+
     return (
       <Animatable.View
         duration={100}
@@ -124,17 +139,17 @@ const ReportScreen = ({ navigation }) => {
         <HStack justifyContent="space-between" flex={1}>
           {/*<Pressable onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}>*/}
             <HStack justifyContent="space-between" w="100%">
-              <HStack alignItems="center" px={3}>
-                <VStack>
-                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="clipboard-clock-outline" color="#C8102E" />} />
-                  <Text fontSize="10">{item.priority}</Text>
+              <HStack alignItems="center" px={2}>
+                <VStack alignItems="center">
+                  <IconButton icon={<Icon size="md" as={AntDesign} name={item.priority && PRIORITY[item.priority].icon} color={item.priority && PRIORITY[item.priority].color} />} />
+                  <Text fontSize="10" color={item.priority && PRIORITY[item.priority].color}>{item.priority}</Text>
                 </VStack>
               </HStack>
               <HStack alignItems="center" flex={3}>
                 <VStack>
                   <HStack w="100%" justifyContent="space-between">
                     <Text><Heading size="xs">Case ID:</Heading> {item.request_id}</Text>
-                    <Text><Heading size="xs">{item.status}</Heading></Text>
+                    <Text><Heading size="xs" color={item.status && STATUS[item.status].color}>{item.status}</Heading></Text>
                   </HStack>
                   <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.asset_name}</Text>
                 </VStack>
