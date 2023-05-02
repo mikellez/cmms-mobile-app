@@ -32,7 +32,7 @@ import instance from '../axios.config';
 
   useEffect(() => {
     fetchUserDetail();
-  }, [user]);
+  }, []);
 
   return (
     <App navigation={navigation}>
