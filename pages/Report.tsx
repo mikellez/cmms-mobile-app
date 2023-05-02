@@ -191,7 +191,7 @@ const ReportScreen = ({ navigation }) => {
         </HStack>
       </ModuleHeader>
 
-      <Box backgroundColor="#F9F7F7" px="1" py="1" m="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
+      <Box backgroundColor="#F9F7F7" px="1" py="1" marginTop="10" marginBottom="10" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
         <Center>
           <Pressable onPress={()=>navigation.navigate("CreateRequest")}>
             <HStack alignItems={'center'}>
@@ -263,8 +263,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#fff',
-    margin: 10,
-    marginBottom: 0,
+    marginBottom: 10,
     borderWidth: 1,
     borderRadius: 5,
     borderColor: '#C8102E'
@@ -276,14 +275,12 @@ const styles = StyleSheet.create({
   },
   content: {
     backgroundColor: '#fff',
-    paddingTop: 10,
     paddingRight:10,
     paddingLeft: 10,
     paddingBottom: 10,
-    marginLeft:10,
-    marginRight: 10,
     borderWidth: 1,
     borderRadius: 5,
+    marginBottom: 10,
     borderColor: '#D9D9D9',
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
