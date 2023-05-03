@@ -42,11 +42,12 @@ import {
     ModuleDivider,
 } from "../components/ModuleLayout";
 import axios from "axios";
-import { shortDate } from "../helper";
+import { shortDate, shortDateWithDash } from "../helper";
 import CalendarEventList from "../components/Calendar/CalendarEventList";
-import { CMMSChecklist } from "../types/interfaces";
+import { CMMSChecklist, CMMSSchedule } from "../types/interfaces";
+import { CMMSChangeOfParts } from "../types/interfaces";
 
-export interface ScheduleInfo {
+export interface ChecklistScheduleInfo {
     assigned_fnames: string[];
     assigned_lnames: string[];
     assigned_roles: string[];
@@ -72,9 +73,22 @@ export interface ScheduleInfo {
     status?: number;
 }
 
-const getSchedules = async (id: number) => {
+const getChecklistSchedules = async (plantId: number) => {
     try {
-        const response = await instance.get<ScheduleInfo[]>(`/api/schedule/${id}`);
+        const response = await instance.get<ChecklistScheduleInfo[]>(`/api/schedule/${plantId}`);
+        return response.data;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const getCOPSchedules = async (plantId: number) => {
+    try {
+        var apiURL = "/api/changeOfParts";
+        if (plantId != 0) {
+            apiURL += `/${plantId}`;
+        }
+        const response = await instance.get<CMMSChangeOfParts[]>(apiURL);
         return response.data;
     } catch (err) {
         console.log(err);
@@ -82,33 +96,31 @@ const getSchedules = async (id: number) => {
 };
 
 const CalendarTab = ({ navigation }) => {
-    const [items, setItems] = useState({});
+    const [items, setItems] = useState([{}, {}]);
     const [selectedPlant, setSelectedPlant] = useState<number>(0);
     const [isReady, setIsReady] = useState<boolean>(false);
     let markedDates = {};
     const [markedDatesProp, setMarkedDatesProp] = useState({});
     const [selectDatesProp, setSelectDatesProp] = useState({});
-    const [checklistItems, setChecklistItems] = useState<CMMSChecklist[]>([]);
+    const [checklistItems, setChecklistItems] = useState<CMMSSchedule[]>([]);
+    const [COPItems, setCOPItems] = useState<CMMSChangeOfParts[]>([]);
 
     const addItems = async () => {
-        return await getSchedules(selectedPlant).then((results) => {
+        await getChecklistSchedules(selectedPlant).then((results) => {
             results.forEach((result) => {
-                // console.log(result);
-                result.calendar_dates.forEach((day) => {
-                    markedDates[day] = { marked: true };
-
-                    // console.log(day);
+                result.calendar_dates.forEach((date) => {
+                    markedDates[date] = { marked: true };
                     var newItems = items;
-                    if (!newItems[day]) {
-                        newItems[day] = [];
+                    if (!newItems[0][date]) {
+                        newItems[0][date] = [];
                     }
-                    newItems[day].push({
+                    newItems[0][date].push({
                         scheduleId: result.schedule_id,
                         checklistId: result.checklist_id,
                         checklistName: result.checklist_name,
                         plantName: result.plant,
                         plantId: result.plantId,
-                        date: day,
+                        date: date,
                         startDate: result.start_date,
                         endDate: result.end_date,
                         period: result.period,
@@ -117,138 +129,56 @@ const CalendarTab = ({ navigation }) => {
                         remarks: result.remarks,
                     });
                     setItems(newItems);
-                    // 02-05-2023 : [{obj1},{obj2}]
-
-                    // 2nd
-                    // setItems((prev) => {
-                    //     if (!prev[day]) {
-                    //         return {
-                    //             ...prev,
-                    //             day: [
-                    //                 {
-                    //                     name: result.checklist_id,
-                    //                     day: day,
-                    //                 },
-                    //             ],
-                    //         };
-                    //     } else {
-                    //         var newItems = prev;
-                    //         newItems[day].push({
-                    //             name: result.checklist_id,
-                    //             day: day,
-                    //         });
-                    //         return newItems;
-                    //     }
-                    // });
                 });
+            });
+        });
+        await getCOPSchedules(selectedPlant).then((results) => {
+            results.forEach((result) => {
+                const date = result.changedDate
+                    ? new Date(result.changedDate).toISOString().split("T")[0]
+                    : new Date(result.scheduledDate).toISOString().split("T")[0];
+                markedDates[date] = { marked: true };
+                var newItems = items;
+                if (!newItems[1][date]) {
+                    newItems[1][date] = [];
+                }
+                newItems[1][date].push({
+                    copId: result.copId,
+                    psaId: result.psaId,
+                    asset: result.asset,
+                    plant: result.plant,
+                    plantId: result.plantId,
+                    changedDate: result.changedDate,
+                    scheduledDate: result.scheduledDate,
+                    description: result.description,
+                    assignedUserId: result.assignedUserId,
+                    assignedUser: result.assignedUser,
+                });
+                setItems(newItems);
             });
         });
     };
 
     useEffect(() => {
         setIsReady(false);
-        setItems({});
+        // setItems({});
         // console.log(selectedPlant);
         addItems().then(() => {
             setMarkedDatesProp(markedDates);
             setSelectDatesProp(markedDates);
             setIsReady(true);
+            console.log("completed");
         });
     }, [selectedPlant]);
 
-    function timeToString(time: number) {
-        const date = new Date(time);
-        return date.toISOString().split("T")[0];
-    }
-
-    // const loadItems = (day: DateData) => {
-    //     console.log(day);
-    //     setTimeout(() => {
-    //         for (let i = -15; i < 20000; i++) {
-    //             const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-    //             const strTime = timeToString(time);
-
-    //             if (!items[strTime]) {
-    //                 items[strTime] = [];
-
-    //                 const numItems = Math.floor(Math.random() * 3 + 1);
-    //                 for (let j = 0; j < numItems; j++) {
-    //                     items[strTime].push({
-    //                         name: "Item for " + strTime + " #" + j,
-    //                         height: Math.max(50, Math.floor(Math.random() * 150)),
-    //                         day: strTime,
-    //                     });
-    //                 }
-    //             }
-    //         }
-    //     });
-    //     // console.log(items);
-    // };
-
-    const renderPress = (day: DateData) => {
-        console.log(items[day.dateString]);
-        console.log(day.dateString);
-        setChecklistItems(items[day.dateString]);
+    const dayPress = (day: DateData) => {
+        setChecklistItems(items[0][day.dateString]);
+        setCOPItems(items[1][day.dateString]);
         setSelectDatesProp({
             ...markedDatesProp,
             [day.dateString]: { marked: true, selected: true },
         });
     };
-
-    const renderItem = (item) => {
-        return (
-            <TouchableOpacity
-                style={{
-                    backgroundColor: "white",
-                    flex: 1,
-                    borderRadius: 5,
-                    padding: 10,
-                    marginRight: 10,
-                    marginTop: 30,
-                    height: 320,
-                }}
-            >
-                {/* // <Card> */}
-                <View
-                    style={{
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        height: 300,
-                    }}
-                >
-                    <Text> Schedule ID: {item.scheduleId}</Text>
-                    <Text> Checklist ID: {item.checklistId}</Text>
-                    <Text> Plant: {item.plant}</Text>
-                    <Text> Date: {shortDate(new Date(item.date))}</Text>
-                    <Text> Start Date: {shortDate(new Date(item.startDate))}</Text>
-                    <Text> End Date:{shortDate(new Date(item.endDate))}</Text>
-                    <Text> Recurring Period: {item.period}</Text>
-                    <Text> Assigned To: {item.assignedUsers}</Text>
-                    <Text> Remarks: {item.remarks}</Text>
-                </View>
-                {/* // </Card> */}
-            </TouchableOpacity>
-        );
-    };
-    // const renderEmptyDate = () => {
-    //     return (
-    //         <TouchableOpacity style={{ marginRight: 10, marginTop: 30, height: 300 }}>
-    //             <Card>
-    //                 <View>
-    //                     <Text> No EVENTS </Text>
-    //                 </View>
-    //             </Card>
-    //         </TouchableOpacity>
-    //     );
-    // };
-
-    // const pressButton = () => {
-    //     console.log(items);
-    // };
-
-    // if (isReady) {
-    //     console.log(items);
-    // }
 
     return (
         <ModuleScreen navigation={navigation}>
@@ -266,25 +196,16 @@ const CalendarTab = ({ navigation }) => {
             </ModuleHeader>
 
             <ModuleDivider />
-            {/* <CalendarProvider date="2023-05-02" showTodayButton> */}
-            {/* <WeekCalendar /> */}
-            {/* <AgendaList
-                    sections={items}
-                    // renderItem={renderItem}
-                    // scrollToNextEvent
-                    // sectionStyle={styles.section}
-                    // dayFormat={'yyyy-MM-d'}
-                /> */}
-            {/* </CalendarProvider> */}
+
             {isReady && (
                 <View>
-                    <Calendar markedDates={selectDatesProp} onDayPress={renderPress} />
+                    <Calendar markedDates={selectDatesProp} onDayPress={dayPress} />
                     <ModuleDivider />
                 </View>
             )}
             {isReady && (
                 <ScrollView>
-                    <CalendarEventList COPItems={[]} ChecklistItems={checklistItems} />
+                    <CalendarEventList COPItems={COPItems} ChecklistItems={checklistItems} />
                 </ScrollView>
             )}
         </ModuleScreen>
@@ -292,9 +213,3 @@ const CalendarTab = ({ navigation }) => {
 };
 
 export default CalendarTab;
-
-const styles = StyleSheet.create({
-    calendarWrapper: {
-        height: 10,
-    },
-});

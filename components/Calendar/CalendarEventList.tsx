@@ -22,6 +22,8 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { ModuleCardContainer } from "../ModuleLayout";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import ScheduleChecklistEvent from "./ScheduleChecklistEvent";
+import ScheduleCOPEvent from "./ScheduleCOPEvent";
 
 interface CalendarEventListProps {
     COPItems?: CMMSChangeOfParts[];
@@ -29,48 +31,23 @@ interface CalendarEventListProps {
 }
 
 const CalendarEventList = (props: CalendarEventListProps) => {
-    const COPElements = props.COPItems.map((item) => {
-        return <Text key={item.copId}> {item.copId} </Text>;
-    });
-
-    const ChecklistElements = props.ChecklistItems.map((item) => {
-        return (
-            <ModuleCardContainer key={item.scheduleId}>
-                <TouchableOpacity>
-                    <HStack>
-                        <VStack>
-                            <HStack>
-                                <Icon
-                                    mb="1"
-                                    as={<MaterialCommunityIcons name="clipboard-clock-outline" />}
-                                    color="#C8102E"
-                                    size="8"
-                                />
-                                <Text fontSize={14} fontWeight={600}>
-                                    {item.checklistName}
-                                </Text>
-                            </HStack>
-
-                            <HStack alignItems="center">
-                                <Icon as={EntypoIcon} name="location-pin" size="sm"></Icon>
-
-                                <Text fontSize={12} style={{ color: "#454545" }}>
-                                    {item.plantName}
-                                </Text>
-                            </HStack>
-
-                            <Text>Remarks: {item.remarks}</Text>
-                        </VStack>
-                    </HStack>
-                </TouchableOpacity>
-            </ModuleCardContainer>
-        );
-    });
+    var COPElements;
+    var ChecklistElements;
+    if (props.COPItems) {
+        COPElements = props.COPItems.map((item) => {
+            return <ScheduleCOPEvent key={item.copId} COPSchedule={item} />;
+        });
+    }
+    if (props.ChecklistItems) {
+        ChecklistElements = props.ChecklistItems.map((item) => {
+            return <ScheduleChecklistEvent key={item.scheduleId} checklistSchedule={item} />;
+        });
+    }
     return (
         <ScrollView>
             <VStack space={3}>
-                {/* {COPElements} */}
                 {ChecklistElements}
+                {COPElements}
             </VStack>
         </ScrollView>
     );

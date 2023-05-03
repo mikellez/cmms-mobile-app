@@ -10,8 +10,11 @@ const shortDate = (date: Date): string => {
     return date.toLocaleDateString("en-GB", options);
 };
 
-
+const shortDateWithDash = (date: Date) : string => {
+    return shortDate(date).replaceAll("/","-")
+}
 
 export {
     shortDate,
+    shortDateWithDash
 };
