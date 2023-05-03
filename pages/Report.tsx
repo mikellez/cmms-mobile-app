@@ -7,14 +7,35 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import EntypoIcon from 'react-native-vector-icons/Entypo';
+
 import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
 import Constants from 'expo-constants';
 
 import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
-import { ModuleHeader, ModuleScreen } from "../components/ModuleLayout";
+import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen } from "../components/ModuleLayout";
 import App from "./App";
+
+const requestlistViews: ModuleActionSheetItem[] = [
+  {
+    label: "Pending",
+    value: "pending"
+  },
+  {
+    label: "Assigned",
+    value: "assigned"
+  },
+  {
+    label: "For Review",
+    value: "review"
+  },
+  {
+    label: "Approved",
+    value: "approved"
+  },
+];
 
 export type ItemData = {
   request_id: number;
@@ -52,63 +73,33 @@ interface CMMSRequest {
   //rejection_comments: string;
 }
 
-const BACON_IPSUM =
-  'Bacon ipsum dolor amet chuck turducken landjaeger tongue spare ribs. Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ';
-
-const CONTENT = [
-  {
-    title: 'First',
-    content: BACON_IPSUM,
-  },
-  {
-    title: 'Second',
-    content: BACON_IPSUM,
-  },
-  {
-    title: 'Third',
-    content: BACON_IPSUM,
-  },
-  {
-    title: 'Fourth',
-    content: BACON_IPSUM,
-  },
-  {
-    title: 'Fifth',
-    content: BACON_IPSUM,
-  },
-];
-
-
 const ReportScreen = ({ navigation }) => {
   const [requestItems, setRequestItems] = useState([]);
+  const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
 
-  const fetchRequest = async () => {
+  const fetchRequest = async (viewType) => {
 
-    await instance.get(`/api/request/filter/0/0/date/all`)
-    .then((res)=> {
-      setRequestItems(res.data.rows);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+    const response = await instance.get(`/api/request/${viewType}`)
+
+    try {
+      return response.data.rows;
+    } catch (e) {
+      console.log(e)
+    }
+    
   };
 
   useEffect(() => {
-    fetchRequest();
-  }, []);
+    fetchRequest(viewType)
+    .then((res)=> setRequestItems(res))
+  }, [viewType]);
 
 
   const [state, setState] = useState({
     activeSections: [],
-    collapsed: true,
-    multipleSelect: false,
   });
 
-  const { multipleSelect, activeSections } = state;
-
-  const toggleExpanded = () => {
-    setState({ collapsed: !state.collapsed });
-  };
+  const { activeSections } = state;
 
   const setSections = (sections) => {
     setState({ activeSections: sections.includes(undefined) ? [] : sections, });
@@ -178,7 +169,10 @@ const ReportScreen = ({ navigation }) => {
         {/*<Animatable.Text animation={isActive ? 'bounceIn' : undefined}>*/}
           {/*<Box key={`${item.request_id}_2`} py="2" px="2" mx="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderColor='#C8102E'>*/}
             <VStack >
-              <Text><Heading size="xs">Location:</Heading> {item.plant_name}</Text>
+              <HStack alignItems="center">
+                  <Icon as={EntypoIcon} color={'#C8102E'} name="location-pin" size="md"></Icon>
+                  <Text >{item.plant_name}</Text>
+              </HStack>
               <Text><Heading size="xs">Asset Name:</Heading> {item.asset_name}</Text>
               <Text><Heading size="xs">Requested By:</Heading> {item?.request_name ?? 'NIL'}</Text>
               <HStack justifyContent="center" w="100%" flex={1}>
@@ -208,6 +202,12 @@ const ReportScreen = ({ navigation }) => {
         </HStack>
       </ModuleHeader>
 
+      <ModuleActionSheet 
+          items={requestlistViews}
+          value={viewType}
+          setValue={setViewType}
+      />
+
       <Box backgroundColor="#F9F7F7" px="1" py="1" marginTop="10" marginBottom="10" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
         <Center>
           <Pressable onPress={()=>navigation.navigate("CreateRequest")}>
@@ -223,7 +223,6 @@ const ReportScreen = ({ navigation }) => {
         activeSections={activeSections}
         sections={requestItems}
         touchableComponent={TouchableOpacity}
-        expandMultiple={multipleSelect}
         renderHeader={renderHeader}
         renderContent={renderContent}
         duration={100}
