@@ -18,22 +18,9 @@ import {
 } from "native-base";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import App from "./App";
-import {
-    Agenda,
-    DateData,
-    AgendaEntry,
-    AgendaSchedule,
-    CalendarProvider,
-    WeekCalendar,
-    AgendaList,
-    Calendar,
-} from "react-native-calendars";
+import { DateData, Calendar } from "react-native-calendars";
 import instance from "../axios.config";
-import { TouchableOpacity } from "react-native";
 import {
     ModuleHeader,
     ModuleScreen,
@@ -41,11 +28,8 @@ import {
     ModuleActionSheetItem,
     ModuleDivider,
 } from "../components/ModuleLayout";
-import axios from "axios";
-import { shortDate, shortDateWithDash } from "../helper";
 import CalendarEventList from "../components/Calendar/CalendarEventList";
-import { CMMSChecklist, CMMSSchedule } from "../types/interfaces";
-import { CMMSChangeOfParts } from "../types/interfaces";
+import { CMMSChangeOfParts, CMMSSchedule } from "../types/interfaces";
 
 export interface ChecklistScheduleInfo {
     assigned_fnames: string[];
@@ -104,6 +88,7 @@ const CalendarTab = ({ navigation }) => {
     const [selectDatesProp, setSelectDatesProp] = useState({});
     const [checklistItems, setChecklistItems] = useState<CMMSSchedule[]>([]);
     const [COPItems, setCOPItems] = useState<CMMSChangeOfParts[]>([]);
+    const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
 
     const addItems = async () => {
         await getChecklistSchedules(selectedPlant).then((results) => {
@@ -161,7 +146,7 @@ const CalendarTab = ({ navigation }) => {
 
     useEffect(() => {
         setIsReady(false);
-        // setItems({});
+        setItems([{}, {}]);
         // console.log(selectedPlant);
         addItems().then(() => {
             setMarkedDatesProp(markedDates);
@@ -180,10 +165,45 @@ const CalendarTab = ({ navigation }) => {
         });
     };
 
+    const toggleCalendarView = () => {
+        setIsCalendarView((prev) => !prev);
+    };
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Calendar">
                 <HStack>
+                    {isCalendarView && (
+                        <Button
+                            w="30"
+                            padding={2}
+                            bg="#C8102E"
+                            leftIcon={
+                                <Icon
+                                    as={MaterialCommunityIcons}
+                                    name="calendar-import"
+                                    size="sm"
+                                />
+                            }
+                            size="xs"
+                            onPress={toggleCalendarView}
+                        ></Button>
+                    )}
+                    {!isCalendarView && (
+                        <Button
+                            w="30"
+                            padding={2}
+                            bg="#C8102E"
+                            leftIcon={
+                                <Icon
+                                    as={MaterialCommunityIcons}
+                                    name="calendar-export"
+                                    size="sm"
+                                />
+                            }
+                            size="xs"
+                            onPress={toggleCalendarView}
+                        ></Button>
+                    )}
                     <Button
                         w="30"
                         padding={2}
@@ -197,7 +217,7 @@ const CalendarTab = ({ navigation }) => {
 
             <ModuleDivider />
 
-            {isReady && (
+            {isReady && isCalendarView && (
                 <View>
                     <Calendar markedDates={selectDatesProp} onDayPress={dayPress} />
                     <ModuleDivider />

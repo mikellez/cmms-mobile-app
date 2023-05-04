@@ -49,6 +49,7 @@ const CalendarEventList = (props: CalendarEventListProps) => {
                 {ChecklistElements}
                 {COPElements}
             </VStack>
+            {!ChecklistElements && !COPElements && <Text> There are no events on this day</Text>}
         </ScrollView>
     );
 };
