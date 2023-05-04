@@ -89,66 +89,84 @@ const CalendarTab = ({ navigation }) => {
     const [checklistItems, setChecklistItems] = useState<CMMSSchedule[]>([]);
     const [COPItems, setCOPItems] = useState<CMMSChangeOfParts[]>([]);
     const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
+    const [dateSelected, setDateSelected] = useState<DateData>();
 
-    const addItems = async () => {
-        await getChecklistSchedules(selectedPlant).then((results) => {
-            results.forEach((result) => {
-                result.calendar_dates.forEach((date) => {
+    const addItems = async (plantId) => {
+        setItems([{}, {}]);
+        // item = [
+        //         { date: [checklistdata1, checklistdata2],
+        //           date2: [{}]
+        //         } ,
+        //         { date: [copdata1, data2]
+        //         }
+
+        //         ]
+
+        await getChecklistSchedules(plantId).then((results) => {
+            if (results) {
+                results.forEach((result) => {
+                    result.calendar_dates.forEach((date) => {
+                        markedDates[date] = { marked: true };
+                        var newItems = items;
+                        if (!newItems[0][date]) {
+                            newItems[0][date] = [];
+                        }
+                        newItems[0][date].push({
+                            scheduleId: result.schedule_id,
+                            checklistId: result.checklist_id,
+                            checklistName: result.checklist_name,
+                            plantName: result.plant,
+                            plantId: result.plantId,
+                            date: date,
+                            startDate: result.start_date,
+                            endDate: result.end_date,
+                            period: result.period,
+                            assignedIds: result.assigned_ids,
+                            assignedUsers: result.assigned_usernames,
+                            remarks: result.remarks,
+                        });
+                        setItems(newItems);
+                    });
+                });
+            }
+        });
+        await getCOPSchedules(plantId).then((results) => {
+            if (results) {
+                results.forEach((result) => {
+                    const date = result.changedDate
+                        ? new Date(result.changedDate).toISOString().split("T")[0]
+                        : new Date(result.scheduledDate).toISOString().split("T")[0];
                     markedDates[date] = { marked: true };
                     var newItems = items;
-                    if (!newItems[0][date]) {
-                        newItems[0][date] = [];
+                    if (!newItems[1][date]) {
+                        newItems[1][date] = [];
                     }
-                    newItems[0][date].push({
-                        scheduleId: result.schedule_id,
-                        checklistId: result.checklist_id,
-                        checklistName: result.checklist_name,
-                        plantName: result.plant,
+                    newItems[1][date].push({
+                        copId: result.copId,
+                        psaId: result.psaId,
+                        asset: result.asset,
+                        plant: result.plant,
                         plantId: result.plantId,
-                        date: date,
-                        startDate: result.start_date,
-                        endDate: result.end_date,
-                        period: result.period,
-                        assignedIds: result.assigned_ids,
-                        assignedUsers: result.assigned_usernames,
-                        remarks: result.remarks,
+                        changedDate: result.changedDate,
+                        scheduledDate: result.scheduledDate,
+                        description: result.description,
+                        assignedUserId: result.assignedUserId,
+                        assignedUser: result.assignedUser,
                     });
                     setItems(newItems);
                 });
-            });
-        });
-        await getCOPSchedules(selectedPlant).then((results) => {
-            results.forEach((result) => {
-                const date = result.changedDate
-                    ? new Date(result.changedDate).toISOString().split("T")[0]
-                    : new Date(result.scheduledDate).toISOString().split("T")[0];
-                markedDates[date] = { marked: true };
-                var newItems = items;
-                if (!newItems[1][date]) {
-                    newItems[1][date] = [];
-                }
-                newItems[1][date].push({
-                    copId: result.copId,
-                    psaId: result.psaId,
-                    asset: result.asset,
-                    plant: result.plant,
-                    plantId: result.plantId,
-                    changedDate: result.changedDate,
-                    scheduledDate: result.scheduledDate,
-                    description: result.description,
-                    assignedUserId: result.assignedUserId,
-                    assignedUser: result.assignedUser,
-                });
-                setItems(newItems);
-            });
+            }
         });
     };
 
     useEffect(() => {
+        // setItems([{}, {}]);
+        console.log(items);
+        console.log(selectedPlant);
         setIsReady(false);
-        setItems([{}, {}]);
+        markedDates = {};
         // console.log(selectedPlant);
-        addItems().then(() => {
+        addItems(selectedPlant).then(() => {
             setMarkedDatesProp(markedDates);
             setSelectDatesProp(markedDates);
             setIsReady(true);
@@ -159,6 +177,7 @@ const CalendarTab = ({ navigation }) => {
     const dayPress = (day: DateData) => {
         setChecklistItems(items[0][day.dateString]);
         setCOPItems(items[1][day.dateString]);
+        setDateSelected(day);
         setSelectDatesProp({
             ...markedDatesProp,
             [day.dateString]: { marked: true, selected: true },
@@ -168,6 +187,21 @@ const CalendarTab = ({ navigation }) => {
     const toggleCalendarView = () => {
         setIsCalendarView((prev) => !prev);
     };
+
+    // currently just a function to randomly select a plant between 0 and 4
+    const plantFilter = () => {
+        setItems([{}, {}]);
+        setChecklistItems([]);
+        setCOPItems([]);
+        // setIsReady(false);
+        const array = [0, 1, 2, 3, 4];
+        const randomplantid = array[Math.floor(Math.random() * array.length)];
+
+        setTimeout(() => {
+            setSelectedPlant(randomplantid);
+        }, 500);
+    };
+
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Calendar">
@@ -210,7 +244,7 @@ const CalendarTab = ({ navigation }) => {
                         bg="#C8102E"
                         leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm" />}
                         size="xs"
-                        // onPress={pressButton}
+                        onPress={plantFilter}
                     ></Button>
                 </HStack>
             </ModuleHeader>
@@ -223,9 +257,13 @@ const CalendarTab = ({ navigation }) => {
                     <ModuleDivider />
                 </View>
             )}
-            {isReady && (
+            {isReady && dateSelected && (
                 <ScrollView>
-                    <CalendarEventList COPItems={COPItems} ChecklistItems={checklistItems} />
+                    <CalendarEventList
+                        dateSelected={dateSelected}
+                        COPItems={COPItems}
+                        ChecklistItems={checklistItems}
+                    />
                 </ScrollView>
             )}
         </ModuleScreen>
