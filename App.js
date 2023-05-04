@@ -11,15 +11,17 @@ import Calendar from "./pages/Calendar";
 import CreateChecklist from "./pages/Checklist/Create";
 import AssignRequest from "./pages/Request/Assign";
 import CompleteRequest from "./pages/Request/Complete";
+import QRScan from "./pages/QRScan/index";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./RootNavigation";
+import { linking } from "./linking";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
     return (
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer ref={navigationRef} linking={linking}>
             {/*<View style={styles.container}>
         <Login/>
       </View>*/}
@@ -34,6 +36,7 @@ export default function App() {
                 <Stack.Screen name="CreateChecklist" component={CreateChecklist} />
                 <Stack.Screen name="AssignRequest" component={AssignRequest} />
                 <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
+                <Stack.Screen name="QRScan" component={QRScan} />
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -5,18 +5,11 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 const Footer = ({ navigation }) => {
     return (
         <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6}>
-            <Pressable
-                py="3"
-                flex={1}
-                onPress={() => {
-                    console.log("Navigating to overview");
-                    navigation.navigate("Home");
-                }}
-            >
+            <Pressable py="3" flex={1} onPress={() => navigation.navigate("Home")}>
                 <Center>
                     <Icon
                         mb="1"
-                        as={<MaterialCommunityIcons name="clipboard-clock-outline" />}
+                        as={<MaterialCommunityIcons name="view-dashboard" />}
                         color="#C8102E"
                         size="lg"
                     />
@@ -25,12 +18,10 @@ const Footer = ({ navigation }) => {
                     <Text>Overview</Text>
                 </Center>
             </Pressable>
-
             <Pressable
                 py="3"
                 flex={1}
                 onPress={() => {
-                    console.log("Navigating to work order");
                     navigation.navigate("Report");
                 }}
             >
@@ -46,12 +37,10 @@ const Footer = ({ navigation }) => {
                     <Text>Work Orders</Text>
                 </Center>
             </Pressable>
-
             <Pressable
                 py="3"
                 flex={1}
                 onPress={() => {
-                    console.log("Navigating to mainenance");
                     navigation.navigate("Maintenance");
                 }}
             >
@@ -67,19 +56,11 @@ const Footer = ({ navigation }) => {
                     <Text>Maintenance</Text>
                 </Center>
             </Pressable>
-
-            <Pressable
-                py="3"
-                flex={1}
-                onPress={() => {
-                    console.log("Navigating to assets");
-                    // navigation.navigate("Assets");
-                }}
-            >
+            <Pressable py="3" flex={1}>
                 <Center>
                     <Icon
                         mb="1"
-                        as={<MaterialCommunityIcons name="clipboard-clock-outline" />}
+                        as={<MaterialCommunityIcons name="sitemap" />}
                         color="#C8102E"
                         size="lg"
                     />
@@ -93,7 +74,6 @@ const Footer = ({ navigation }) => {
                 py="3"
                 flex={1}
                 onPress={() => {
-                    console.log("Navigating to calendar");
                     navigation.navigate("Calendar");
                 }}
             >
