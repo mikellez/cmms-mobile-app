@@ -27,7 +27,9 @@ const Form = ({
   completionImageSource,
   onCompletionImagePicker,
   onCompletionCommentChange,
-  onSubmit
+  onSubmit,
+  onStatusAction,
+  onRejectionCommentChange
 }) => {
   return (
     <>
@@ -38,7 +40,8 @@ const Form = ({
         defaultValue="1"
         accessibilityLabel="pick a size"
         onChange={onRequestTypeChange}
-        value={requestItems?.req_id || ''} >
+        {...(action !== 'create' && { value: requestItems?.req_id ?? ''})}
+        >
 
         <HStack flex={1} justifyContent="space-between" w="100%" flexWrap={'wrap'}>
           {requestTypes.map((requestType) => (
@@ -58,7 +61,7 @@ const Form = ({
           mt="1"
           onValueChange={onFaultTypeChange}
           isDisabled={action !== "create" ?? false}
-          selectedValue={requestItems?.fault_id || ''}
+          {...(action !== 'create' && { selectedValue: requestItems?.fault_id || ''})}
           >
 
           {faultTypes.map((faultType) => (
@@ -79,7 +82,7 @@ const Form = ({
           _disabled={{
             bg: "muted.100",
           }}
-          value={action !== "create" ? requestItems?.description || 'NIL' : ''}
+          {...(action !== 'create' && { value: requestItems?.description || 'NIL'})}
           />
       </FormControl>
       
@@ -91,8 +94,8 @@ const Form = ({
           _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }}
           mt="1"
           onValueChange={onPlantLocationChange}
-          isDisabled={action !== "create" ?? false}
-          selectedValue={plant ? plant : (requestItems?.plant_id || '')}
+          isDisabled={(action !== "create" || (action === 'create' && plant)) ?? false}
+          {...((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (requestItems?.plant_id || '')})}
           >
 
           {plants.map((plant) => (
@@ -110,8 +113,8 @@ const Form = ({
           _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }}
           mt="1"
           onValueChange={onAssetTagChange}
-          isDisabled={action !== "create" ?? false}
-          selectedValue={asset ? asset : (requestItems?.psa_id || '')}
+          isDisabled={(action !== "create" || (action === 'create' && asset)) ?? false}
+          {...((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (requestItems?.psa_id || '')})}
           >
 
           {assetTags.map((assetTag) => (
@@ -173,27 +176,56 @@ const Form = ({
       </FormControl>
       }
 
-      { action === "complete" &&
+      { ["complete", "manage"].includes(action) &&
         <FormControl isRequired>
           <FormControl.Label>Completion Image</FormControl.Label>
-            <Pressable onPress={onCompletionImagePicker}>
-              <ImagePreview source={{ uri: completionImageSource }} alt="test" />
-            </Pressable>
+            { requestItems?.completion_file?.data
+              ? <ImageComponent bufferData={requestItems?.completion_file.data}/> 
+              : 
+              <Pressable onPress={onCompletionImagePicker}>
+                <ImagePreview source={{ uri: completionImageSource }} alt="test" />
+              </Pressable>
+            }
         </FormControl>
       }
 
-      { action === "complete" &&
+      { ["complete", "manage"].includes(action) &&
       <FormControl isRequired>
         <FormControl.Label>Completion Comments</FormControl.Label>
         <TextArea 
           placeholder="Completion Comments" 
           autoCompleteType={true} 
           onChangeText={onCompletionCommentChange} 
+          isDisabled={action === "manage"} 
+          isReadOnly={action === "manage"}
+          _disabled={{
+            bg: "muted.100",
+          }}
+          {...(action !== 'complete' && { value: requestItems?.complete_comments || 'NIL' })}
           />
       </FormControl>
       }
-      
-      <Button bgColor="#C8102E" mt={5} mb={10} onPress={onSubmit}>Submit</Button>
+
+      { action === 'manage' &&
+      <FormControl isRequired>
+        <FormControl.Label>Comments</FormControl.Label>
+        <TextArea 
+          placeholder="Comments" 
+          autoCompleteType={true} 
+          onChangeText={onRejectionCommentChange} 
+          />
+      </FormControl>
+      }
+
+      { action === 'manage' &&
+        <HStack justifyContent="center">
+          <Button bgColor="rgb(14, 189, 5);" mr={5} mt={5} mb={10} onPress={()=>onStatusAction(4)}>Approve</Button>
+          <Button bgColor="#C8102E" ml={5} mt={5} mb={10} onPress={()=>onStatusAction(5)}>Reject</Button>
+        </HStack>
+
+      } 
+
+      { action !== 'manage' && <Button bgColor="#C8102E" mt={5} mb={10} onPress={onSubmit}>Submit</Button>}
 
     </>
 
