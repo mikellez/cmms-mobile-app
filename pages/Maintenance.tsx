@@ -80,7 +80,7 @@ const Maintenance = ({ navigation }) => {
                             <Icon as={AntDesign} name="addfile" size="sm"/>
                         } 
                         size="xs"
-                        onPress={() => navigation.navigate("CreateChecklist")}
+                        onPress={() => navigation.navigate("CreateChecklistFormPage")}
                     ></Button>
                 </HStack>
             </ModuleHeader>

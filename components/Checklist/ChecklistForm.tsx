@@ -2,6 +2,7 @@ import React from "react";
 import { VStack, Input, TextArea } from "native-base";
 import { PlantSelect, AssetSelect, PersonSelect } from "../General";
 import { CMMSChecklist } from "../../types/interfaces";
+import ChecklistCreator from "./ChecklistCreator";
 
 interface ChecklistFormProps {
     checklist: CMMSChecklist,
@@ -63,6 +64,8 @@ const ChecklistForm = (props: ChecklistFormProps) => {
                 plantId={props.checklist.plant_id}
                 placeholder="Sign Off By"
             />
+
+            <ChecklistCreator checklist={props.checklist} setChecklist={props.setChecklist} />
         </VStack>
     );
 };
