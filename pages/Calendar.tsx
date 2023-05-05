@@ -30,6 +30,7 @@ import {
 } from "../components/ModuleLayout";
 import CalendarEventList from "../components/Calendar/CalendarEventList";
 import { CMMSChangeOfParts, CMMSSchedule } from "../types/interfaces";
+import { PlantSelect } from "../components/General";
 
 export interface ChecklistScheduleInfo {
     assigned_fnames: string[];
@@ -188,24 +189,21 @@ const CalendarTab = ({ navigation }) => {
         setIsCalendarView((prev) => !prev);
     };
 
-    // currently just a function to randomly select a plant between 0 and 4
-    const plantFilter = () => {
+    const plantFilter = (plantId) => {
         setItems([{}, {}]);
         setChecklistItems([]);
         setCOPItems([]);
-        // setIsReady(false);
-        const array = [0, 1, 2, 3, 4];
-        const randomplantid = array[Math.floor(Math.random() * array.length)];
+        setDateSelected(null);
 
         setTimeout(() => {
-            setSelectedPlant(randomplantid);
+            setSelectedPlant(plantId);
         }, 500);
     };
 
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Calendar">
-                <HStack>
+                <HStack style={{ gap: 2, height: 25, minWidth: 150 }}>
                     {isCalendarView && (
                         <Button
                             w="30"
@@ -238,14 +236,11 @@ const CalendarTab = ({ navigation }) => {
                             onPress={toggleCalendarView}
                         ></Button>
                     )}
-                    <Button
-                        w="30"
-                        padding={2}
-                        bg="#C8102E"
-                        leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm" />}
-                        size="xs"
-                        onPress={plantFilter}
-                    ></Button>
+                    <PlantSelect
+                        onChange={(value) => plantFilter(+value)}
+                        accessControl
+                        selectAllPlants
+                    />
                 </HStack>
             </ModuleHeader>
 
