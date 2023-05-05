@@ -1,0 +1,50 @@
+import React, { useState, useEffect } from "react";
+import { Select } from "native-base";
+import instance from "../../axios.config";
+
+interface PlantSelectProps {
+    accessControl?: boolean,
+    value?: string,
+    onChange: (itemValue: string) => void
+};
+
+const fetchPlants = async (url: string) => {
+    try {
+        const response = await instance.get(url);
+        return response.data;
+    }
+    catch (err) {
+        console.log(err);
+    }
+    instance.get("")
+}
+
+const PlantSelect = (props: PlantSelectProps) => {
+    const [plants, setPlants] = useState([]);
+
+    useEffect(() => {
+        const url = props.accessControl ? "/api/getUserPlants" : "/api/getPlants";
+        fetchPlants(url).then(result => {
+            setPlants(result);
+        });
+    }, []);
+
+    const options = plants.map(plant => {
+        return (
+            <Select.Item key={plant.plant_id} label={plant.plant_name} value={plant.plant_id.toString()} />
+        );
+    });
+
+
+    return (
+        <Select
+            placeholder="Select Plant" 
+            selectedValue={props.value ? props.value : null}
+            onValueChange={props.onChange}
+        >
+            {options}
+        </Select>
+    );
+};
+
+export { PlantSelect };
