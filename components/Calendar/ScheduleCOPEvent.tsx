@@ -16,17 +16,25 @@ import {
     Button,
     Card,
 } from "native-base";
-import React from "react";
+import React, { useState } from "react";
 import { CMMSChangeOfParts } from "../../types/interfaces";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { ModuleCardContainer } from "../ModuleLayout";
+import { ModuleCardContainer, ModuleSimpleModal } from "../ModuleLayout";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { shortDateWithDay } from "../../helper";
 
 const ScheduleCOPEvent = ({ COPSchedule }: { COPSchedule: CMMSChangeOfParts }) => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const renderModal = () => {
+        setIsModalOpen(true);
+        console.log(COPSchedule);
+    };
+
     return (
         <ModuleCardContainer>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={renderModal}>
                 <HStack>
                     <VStack>
                         <HStack>
@@ -53,6 +61,24 @@ const ScheduleCOPEvent = ({ COPSchedule }: { COPSchedule: CMMSChangeOfParts }) =
                     </VStack>
                 </HStack>
             </TouchableOpacity>
+            <ModuleSimpleModal
+                title={`Change of Parts for ${COPSchedule.asset}`}
+                isOpen={isModalOpen}
+                setOpen={setIsModalOpen}
+            >
+                <Text>Change of Parts ID: {COPSchedule.copId}</Text>
+                <Text>Plant: {COPSchedule.plant}</Text>
+                <Text>Asset Name: {COPSchedule.asset}</Text>
+                <Text>Description: {COPSchedule.description}</Text>
+                <Text>
+                    Date:{" "}
+                    {COPSchedule.changedDate
+                        ? shortDateWithDay(new Date(COPSchedule.changedDate))
+                        : shortDateWithDay(new Date(COPSchedule.scheduledDate))}
+                </Text>
+                <Text>Assigned To: {COPSchedule.assignedUser}</Text>
+                <Text>Status: {COPSchedule.changedDate ? "Completed" : "Scheduled"}</Text>
+            </ModuleSimpleModal>
         </ModuleCardContainer>
     );
 };

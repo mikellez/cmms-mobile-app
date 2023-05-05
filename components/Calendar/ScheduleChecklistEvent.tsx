@@ -16,17 +16,24 @@ import {
     Button,
     Card,
 } from "native-base";
-import React from "react";
+import React, { useState } from "react";
 import { CMMSSchedule } from "../../types/interfaces";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { ModuleCardContainer } from "../ModuleLayout";
+import { ModuleCardContainer, ModuleSimpleModal } from "../ModuleLayout";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { shortDate, shortDateWithDay } from "../../helper/";
 
 const ScheduleChecklistEvent = ({ checklistSchedule }: { checklistSchedule: CMMSSchedule }) => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const renderModal = () => {
+        setIsModalOpen(true);
+    };
+
     return (
         <ModuleCardContainer>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={renderModal}>
                 <HStack>
                     <VStack>
                         <HStack>
@@ -53,6 +60,21 @@ const ScheduleChecklistEvent = ({ checklistSchedule }: { checklistSchedule: CMMS
                     </VStack>
                 </HStack>
             </TouchableOpacity>
+            <ModuleSimpleModal
+                title={checklistSchedule.checklistName}
+                isOpen={isModalOpen}
+                setOpen={setIsModalOpen}
+            >
+                <Text>Schedule ID: {checklistSchedule.scheduleId}</Text>
+                <Text>Checklist ID: {checklistSchedule.checklistId}</Text>
+                <Text>Plant: {checklistSchedule.plantName}</Text>
+                <Text>Date: {shortDateWithDay(new Date(checklistSchedule.date))}</Text>
+                <Text>Start Date: {shortDateWithDay(new Date(checklistSchedule.startDate))}</Text>
+                <Text>End Date: {shortDateWithDay(new Date(checklistSchedule.endDate))}</Text>
+                <Text>Recurring Period: {checklistSchedule.recurringPeriod}</Text>
+                <Text>Assigned To: {checklistSchedule.assignedUsers}</Text>
+                <Text>Remarks: {checklistSchedule.remarks}</Text>
+            </ModuleSimpleModal>
         </ModuleCardContainer>
     );
 };

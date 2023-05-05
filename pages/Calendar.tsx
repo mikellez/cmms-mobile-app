@@ -120,7 +120,7 @@ const CalendarTab = ({ navigation }) => {
                             date: date,
                             startDate: result.start_date,
                             endDate: result.end_date,
-                            period: result.period,
+                            recurringPeriod: result.period,
                             assignedIds: result.assigned_ids,
                             assignedUsers: result.assigned_usernames,
                             remarks: result.remarks,
