@@ -12,6 +12,7 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
 import Constants from 'expo-constants';
+import { useIsFocused } from '@react-navigation/native';
 
 import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
@@ -74,6 +75,8 @@ interface CMMSRequest {
 }
 
 const ReportScreen = ({ navigation }) => {
+  const isFocused = useIsFocused();
+
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
 
@@ -90,9 +93,11 @@ const ReportScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    fetchRequest(viewType)
-    .then((res)=> setRequestItems(res))
-  }, [viewType]);
+    if(isFocused) {
+      fetchRequest(viewType)
+      .then((res)=> setRequestItems(res))
+    }
+  }, [isFocused, viewType]);
 
 
   const [state, setState] = useState({
@@ -144,10 +149,10 @@ const ReportScreen = ({ navigation }) => {
                   <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.asset_name}</Text>
                 </VStack>
               </HStack>
-              <HStack alignItems="center" flex={1} marginTop={3}>
-                <VStack>
+              <HStack alignItems="center" flex={1} marginTop={3} marginBottom={3}>
+                <VStack alignItems={'center'}>
                   <Text fontSize="12" color={item.status && STATUS[item.status].color} bold>{item.status}</Text>
-                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name={isActive ? 'chevron-up' : 'chevron-down'} color="#C8102E" />} />
+                  <Icon size="lg" as={MaterialCommunityIcons} name={isActive ? 'chevron-up' : 'chevron-down'} color="#C8102E" />
                 </VStack>
               </HStack>
             </HStack>
@@ -180,6 +185,10 @@ const ReportScreen = ({ navigation }) => {
                   {
                     ['PENDING', 'ASSIGNED'].includes(item.status)
                     && <IconButton icon={<Icon size="lg" as={AntDesign} name="adduser" color="#C8102E" />} onPress={()=>navigation.navigate("AssignRequest", { id: item.request_id })}/>
+                  }
+                  {
+                    ['COMPLETED', 'REJECTED'].includes(item.status)
+                    && <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="sticker-check-outline" color="#C8102E" />} onPress={()=>navigation.navigate("ManageRequest", { id: item.request_id })}/>
                   }
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="check" color="#C8102E" />} onPress={()=>navigation.navigate("CompleteRequest", { id: item.request_id })}/>
               </HStack>
