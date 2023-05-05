@@ -9,6 +9,8 @@ interface PlantSelectProps {
     value?: string;
     onChange: (itemValue: string) => void;
     selectAllPlants?: boolean;
+    maxHeight?: number;
+    style?: StyleProp<ViewStyle>;
 }
 
 const fetchPlants = async (url: string) => {
@@ -46,6 +48,9 @@ const PlantSelect = (props: PlantSelectProps) => {
             placeholder="Select Plant"
             selectedValue={props.value ? props.value : null}
             onValueChange={props.onChange}
+            minW={110}
+            maxH={props.maxHeight}
+            style={props.style}
         >
             {props.selectAllPlants && <Select.Item key={0} label={"View All Plants"} value={"0"} />}
             {options}

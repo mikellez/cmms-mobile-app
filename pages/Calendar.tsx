@@ -240,6 +240,8 @@ const CalendarTab = ({ navigation }) => {
                         onChange={(value) => plantFilter(+value)}
                         accessControl
                         selectAllPlants
+                        maxHeight={25}
+                        style={{ height: 40 }}
                     />
                 </HStack>
             </ModuleHeader>
