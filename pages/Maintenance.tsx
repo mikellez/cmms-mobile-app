@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View } from "react-native";
-import { ScrollView, HStack, Button, Icon, VStack, Actionsheet, useDisclose, Text, ChevronDownIcon, Modal } from "native-base";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet } from "react-native";
+import { ScrollView, HStack, Button, Icon, VStack, Text, IconButton } from "native-base";
+import MaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import { ModuleHeader, ModuleScreen, ModuleActionSheet, ModuleActionSheetItem, ModuleDivider, ModuleFullPageModal, ModuleSimpleModal, ModalIcons } from "../components/ModuleLayout";
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
@@ -52,28 +53,39 @@ const Maintenance = ({ navigation }) => {
     const checklistElements = checklists.length > 0 ? checklists.map(cl => {
         return (
             <ListBox key={cl.checklist_id} checklist={cl} />
+
         );
     }) : <Text>No Checklist Found</Text>;
 
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Maintenance">
-                <HStack>
+                <HStack space={2}>
                     <Button 
                         w="30" 
                         padding={2} 
                         bg="#C8102E" 
                         leftIcon={
-                            <Icon as={MaterialCommunityIcons} name="filter" size="sm"/>
+                            <Icon as={MaterialCommunity} name="filter" size="sm"/>
                         } 
                         size="xs"
                         onPress={() => setFilterOpen(true)}
                     ></Button>
+
+                    <Button 
+                        w="30" 
+                        padding={2} 
+                        bg="#C8102E" 
+                        leftIcon={
+                            <Icon as={AntDesign} name="addfile" size="sm"/>
+                        } 
+                        size="xs"
+                        onPress={() => navigation.navigate("CreateChecklist")}
+                    ></Button>
                 </HStack>
             </ModuleHeader>
 
-            
-
+        
             <ModuleActionSheet 
                 items={checklistViews}
                 value={viewType}
@@ -95,8 +107,6 @@ const Maintenance = ({ navigation }) => {
                 isOpen={isFilterOpen}
                 setOpen={setFilterOpen}
             >
-
-
             </ModuleFullPageModal>
 
         </ModuleScreen>

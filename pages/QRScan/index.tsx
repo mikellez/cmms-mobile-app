@@ -3,8 +3,11 @@ import { Button, Text, View, StyleSheet } from "react-native";
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { ModuleScreen } from "../../components/ModuleLayout";
 import instance from "../../axios.config";
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QRScanIndex = ({ route, navigation }) => {
+  const [isConnected, setIsConnected] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
@@ -27,7 +30,7 @@ const QRScanIndex = ({ route, navigation }) => {
     .catch((err) => {
       console.log(err)
     });
-    navigation.navigate("CreateRequest", {plant, asset});
+    navigation.navigate("GuestCreateRequest", {plant, asset});
   };
 
   if (hasPermission === null) {

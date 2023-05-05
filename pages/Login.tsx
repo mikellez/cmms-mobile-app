@@ -9,6 +9,7 @@ import {
 import { Text, Box, Center, FormControl, Input, NativeBaseProvider, Stack, WarningOutlineIcon, Image, Button, VStack, Heading, Link, HStack, Pressable, Icon, Alert, IconButton, CloseIcon } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import NetInfo from '@react-native-community/netinfo';
 
 import instance from '../axios.config';
 import { API_URL } from '@env';
@@ -19,9 +20,139 @@ const Login = ({ navigation }) => {
   const [username, setUsername] = useState<string>('Username');
   const [password, setPassword] = useState<string>('Password');
 
-  useEffect(() => {
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [requestTypes, setRequestTypes] = useState([]);
+  const [faultTypes, setFaultTypes] = useState([]);
+  const [plants, setPlants] = useState([]);
+  const [assets, setAssets] = useState([]);
 
-  });
+  const _storeData = async (key, value) => {
+    if(typeof value === 'object') value = JSON.stringify(value);
+
+    try {
+      await AsyncStorage.setItem(
+        '@'+key,
+        value,
+      );
+    } catch (err) {
+      // Error saving data
+      console.log(err)
+    } 
+  }
+
+  const _retrieveData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem('@'+key);
+      if (value !== null) {
+        return value;
+      }
+    } catch (err) {
+      // Error retrieving data
+      console.log(err)
+    }
+  }
+
+  const fetchFaultTypes = async () => {
+    if(isConnected) {
+
+      await instance.get(`/api/fault/types`)
+        .then(async (res)=> {
+          _storeData('faultTypes', res.data);
+          setFaultTypes(res.data);
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+
+    } else {
+      const value = await _retrieveData('faultTypes');
+      if(value) setFaultTypes(JSON.parse(value));
+
+    }
+  };
+
+  const fetchRequestTypes = async () => {
+    if(isConnected) {
+      await instance.get(`/api/request/types`)
+      .then((res)=> {
+        _storeData('requestTypes', res.data);
+        setRequestTypes(res.data);
+      })
+      .catch((err) => {
+        console.log(err)
+      });
+
+    } else {
+      const value = await _retrieveData('requestTypes');
+      if(value) setRequestTypes(JSON.parse(value));
+    }
+  }
+
+  const fetchPlants = async () => {
+    if(isConnected) {
+      await instance.get(`/api/plants`)
+      .then((res)=> {
+        _storeData('plants', res.data);
+        setPlants(res.data);
+      })
+      .catch((err) => {
+        alert(1)
+          console.log(err)
+      });
+    } else {
+      const value = await _retrieveData('plants');
+      if(value) setPlants(JSON.parse(value));
+    }
+  }
+
+  const fetchAssets = async () => {
+    if(isConnected) {
+      await instance.get(`/api/assets`)
+      .then((res)=> {
+        _storeData('assetTags', res.data);
+        setAssets(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+      });
+
+    } else {
+      const value = await _retrieveData('assetTags');
+      if(value) setAssets(JSON.parse(value));
+    }
+  }
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setIsConnected(netInfoState.isConnected);
+    };
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    const fetchData = async () => {
+      try {
+        await checkConnection();
+        // Do something else that depends on the network status
+        fetchFaultTypes();
+        fetchRequestTypes();
+        fetchPlants();
+        fetchAssets();
+
+      } catch (error) {
+        console.log('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      unsubscribe();
+    };
+
+  }, [isConnected])
 
   const setData = async (key, value) => {
     try {
@@ -33,16 +164,15 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     await instance.post(`/api/login`, {username, password})
-    .catch((err) => {
-      console.log(err)
-    });
-
-    await instance.get(`/api/user`)
-    .then(async (res)=>{
-      setIsError(false);
-      await setData('@user', JSON.stringify(res.data));
-      navigation.navigate('Home');
+    .then(async (res)=> {
+      await instance.get(`/api/user`)
+      .then(async (res)=>{
+        setIsError(false);
+        await setData('@user', JSON.stringify(res.data));
+        navigation.navigate('Home');
+      })
     })
+
     .catch((error) => {
 			console.log("error", error);
 			let reason:string = ""
@@ -54,6 +184,7 @@ const Login = ({ navigation }) => {
       setIsError(true);
 			setErrorSubmitting(reason);
 		});
+
 
   };
 
