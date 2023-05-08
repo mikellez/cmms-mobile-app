@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Box, Input, HStack, IconButton, VStack, Row } from "native-base";
 import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistCreatorRow from "./ChecklistCreatorRow";
 import ChecklistRow from "./classes/ChecklistRow";
+import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
+import { setReadable } from "react-native-fs";
 
-const ChecklistCreatorSection = ({section, setSections} : {
+const ChecklistCreatorSection = ({section} : {
     section: ChecklistSection,
-    setSections: React.Dispatch<React.SetStateAction<ChecklistSection[]>>,
 }) => {
 
     const [rows, setRows] = useState<ChecklistRow[]>([]);
+    const { setSections, level, setLevel } = useContext(ChecklistFormContext);
 
     useEffect(() => {
         if (section.rows) {
@@ -35,32 +37,44 @@ const ChecklistCreatorSection = ({section, setSections} : {
 
     const addRow = (sectionId: string) => {
         const newRow = new ChecklistRow();
-
         setRows(prev => [...prev, newRow]);
-
-        setSections(prev => {
-            const newSections = [...prev];
-            for (let i = 0; i < prev.length; i++) {
-                if (prev[i].getId() === sectionId) {
-                    newSections[i].rows.push(newRow);
-                }
-            }
-            return newSections;
-        });
     };
 
-        const handleTextChange = (text: string, sectionId: string) => {
-        setSections(prev => {
-            const newSections = [...prev];
-            for (let i = 0; i < prev.length; i++) {
-                if (prev[i].getId() === sectionId) {
+    const handleTextChange = (text: string, sectionId: string) => {
+        setSections(prevSections => {
+            const newSections = [...prevSections];
+            for (let i = 0; i < prevSections.length; i++) {
+                if (prevSections[i].getId() === sectionId) {
                     newSections[i].description = text;
                 }
             }
             return newSections;
         });
     };
-    
+
+    const appendRows = (section: ChecklistSection) => {
+        section.removeAllRows();
+
+        rows.forEach(row => {
+            // console.log(row)
+            section.addRow(row);
+        });
+    };
+
+    if (level === 2) {
+        setSections(prevSections => {
+            const newSections = [...prevSections];
+            for (let i = 0; i < prevSections.length; i++) {
+                if (prevSections[i].getId() === section.getId()) {
+                    appendRows(newSections[i]);
+                }
+            }
+            return newSections;
+        });
+
+        setLevel(1);
+    }
+
     return (
         <Box
             py={1}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, createContext } from "react";
 import { View } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
@@ -6,21 +6,30 @@ import { Input, Icon, TextArea, VStack, Button, IconButton, ScrollView } from "n
 import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistForm from "../../components/Checklist/ChecklistForm";
+import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
+import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
 
+const ChecklistFormContext = createContext(null);
 
 const CreateChecklistFormPage = ({ navigation }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
     const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
     const [successModal, setSuccessModal] = useState<boolean>(false);
+    const [sections, setSections] = useState<ChecklistSection[]>([]);
+    const [level, setLevel] = useState<number>(0);
     
 
     const handleSubmit = () => {
-        if (!validateChecklistFormData(checklist)) {
-            setIncompleteModal(true);
-        } else {
-            setSuccessModal(true);
-            navigation.navigate("Maintenance");
-        }
+        setLevel(3)
+        const datajson = sections.map(section => section.toJSON());
+        // console.log(datajson)
+
+        // if (!validateChecklistFormData(checklist)) {
+        //     setIncompleteModal(true);
+        // } else {
+        //     setSuccessModal(true);
+        //     navigation.navigate("Maintenance");
+        // }
     };
 
     const validateChecklistFormData = (checklist) => {
@@ -43,7 +52,11 @@ const CreateChecklistFormPage = ({ navigation }) => {
             </ModuleHeader>
             <ScrollView>
                 <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
-
+                
+                <ChecklistFormContext.Provider value={{ sections, setSections, level, setLevel }}>
+                    <ChecklistCreator />
+                </ChecklistFormContext.Provider>
+                
                 <IconButton  
                     _icon={{
                         as: Feather,
@@ -68,3 +81,4 @@ const CreateChecklistFormPage = ({ navigation }) => {
 };
 
 export default CreateChecklistFormPage;
+export { ChecklistFormContext }

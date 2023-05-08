@@ -3,7 +3,7 @@ import { API_URL } from '@env';
 import * as RootNavigation from './RootNavigation.js';
 
 const instance = axios.create({
-        baseURL: `http://localhost:3002`
+        baseURL: `http://localhost:3001`
 });
 
 // Add an interceptor to catch errors

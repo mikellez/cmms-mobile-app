@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { VStack, Input, TextArea } from "native-base";
 import { PlantSelect, AssetSelect, PersonSelect } from "../General";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistCreator from "./ChecklistCreator";
+import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
+
 
 interface ChecklistFormProps {
     checklist: CMMSChecklist,
@@ -10,6 +12,7 @@ interface ChecklistFormProps {
 }
 
 const ChecklistForm = (props: ChecklistFormProps) => {
+    const [sections, setSections] = useState<ChecklistSection[]>([]);
 
     const updateChecklist = (value: string | number | Date, field: string) => {
         props.setChecklist(prev => {
@@ -64,8 +67,6 @@ const ChecklistForm = (props: ChecklistFormProps) => {
                 plantId={props.checklist.plant_id}
                 placeholder="Sign Off By"
             />
-
-            <ChecklistCreator checklist={props.checklist} setChecklist={props.setChecklist} />
         </VStack>
     );
 };

@@ -15,6 +15,21 @@ class ChecklistRow {
     getId() {
         return this._id;
     };
+
+    toJSON() {
+        return {
+            "description": this.description,
+            "checks": [],
+        };
+    };
+
+    addCheck(check: CheckType) {
+        this.checks.push(check);
+    };
+
+    removeAllChecks() {
+        this.checks = [];
+    };
 };
 
 export default ChecklistRow;

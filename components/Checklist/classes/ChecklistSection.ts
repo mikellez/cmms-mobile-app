@@ -17,10 +17,21 @@ class ChecklistSection {
         return this._id;
     };
 
-    // toJSON() {
-        
-    // };
+    toJSON() {
+        return {
+            "description": this.description,
+            "rows": this.rows.map(row => row.toJSON()),
+        };
+    };
 
+    addRow(row?: ChecklistRow) {
+        const newRow = row ? row : new ChecklistRow();
+        this.rows.push(newRow);
+    };
+    
+    removeAllRows() {
+        this.rows = [];
+    };
     // static fromJSON(json: string) {
 
     // };

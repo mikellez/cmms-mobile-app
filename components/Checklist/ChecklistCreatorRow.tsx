@@ -1,42 +1,136 @@
-import React from "react";
-import { Box, HStack, IconButton, Input } from "native-base";
+import React, { useCallback, useContext, useState } from "react";
+import { Box, HStack, IconButton, Input, Actionsheet, useDisclose, VStack } from "native-base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ChecklistRow from "./classes/ChecklistRow";
+import { SingleChoiceType } from "./Checks";
+import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
+import CheckType from "./classes/CheckType";
+import { View } from "react-native";
+
+const Choices = [
+    "SingleChoice",
+    "MultiChoice",
+];
 
 const ChecklistCreatorRow = ({row, setRows} : {
     row: ChecklistRow,
     setRows: React.Dispatch<React.SetStateAction<ChecklistRow[]>>
 }) => {
 
+    const { isOpen, onOpen, onClose } = useDisclose();
+    const [checks, setChecks] = useState<CheckType[]>([]);
+    const { level, setLevel } = useContext(ChecklistFormContext);
+
     const deleteRow = (rowId: string) => {
         setRows(prev => prev.filter(item => item.getId() != rowId));
+    };
+
+    const handleTextChange = (text: string, rowId: string) => {
+        setRows(prevRows => {
+            const newRows = [...prevRows];
+            for (let i = 0; i < prevRows.length; i++) {
+                if (prevRows[i].getId() === rowId) {
+                    newRows[i].description = text;
+                }
+            }
+            return newRows;
+        });
+    };
+
+    const actionSheetItems = Choices.map((choice, index) => {
+        return (
+            <Actionsheet.Item 
+                key={index}
+                onPress={() => addNewCheck(index)}
+            >{choice}</Actionsheet.Item>
+        )
+    });
+
+    const createNewCheck = useCallback((index: number) => {
+        switch(index) {
+            case 0:
+                return new SingleChoiceType();
+        };
+    }, []);
+
+    const addNewCheck = (index: number) => {
+        const newCheck = createNewCheck(index);
+        setChecks(prev => [...prev, newCheck]);
+
+        onClose();
+    };
+
+    const deleteCheck = useCallback((checkId: string) => {
+        setChecks(prevChecks => prevChecks.filter(check => check.getId() !== checkId));
+    }, []);
+
+    const checkElements = checks.map(check => {
+        return (
+            <View key={check.getId()}>
+                {check.renderCreatorForm(deleteCheck)}
+            </View>
+        );
+    });
+
+    
+
+    if (level === 3) {
+        setRows(prevRows => {
+            const newRows = [...prevRows];
+            for (let i = 0; i < prevRows.length; i++) {
+                if (prevRows[i].getId() === row.getId()) {
+                    appendChecks(newRows[i]);
+                }
+            }
+            return newRows;
+        });
+
+        setLevel(2);
+    };
+
+    const appendChecks = (row: ChecklistRow) => {
+        row.removeAllChecks();
+
+        checks.forEach(check => {
+            row.addCheck(check);
+        });
     };
     
     return (
         <Box>
-            <HStack space={2}>
-                <Input 
-                    w="80%"
-                    placeholder="Row Description"
-                />
-                <IconButton
-                    marginLeft="auto"
-                    _icon={{
-                        as: MaterialCommunityIcons,
-                        name: "dots-vertical"
-                    }}
-                    colorScheme="white"
-                />
-                <IconButton
-                    marginLeft="auto"
-                    _icon={{
-                        as: MaterialCommunityIcons,
-                        name: "delete-outline"
-                    }}
-                    colorScheme="white"
-                    onPress={() => deleteRow(row.getId())}
-                />
-            </HStack>
+            <VStack>
+                <HStack space={2}>
+                    <Input 
+                        w="80%"
+                        placeholder="Row Description"
+                        onChangeText={text => handleTextChange(text, row.getId())}
+                    />
+                    <IconButton
+                        marginLeft="auto"
+                        _icon={{
+                            as: MaterialCommunityIcons,
+                            name: "dots-vertical"
+                        }}
+                        colorScheme="white"
+                        onPress={onOpen}
+                    />
+                    <IconButton
+                        marginLeft="auto"
+                        _icon={{
+                            as: MaterialCommunityIcons,
+                            name: "delete-outline"
+                        }}
+                        colorScheme="white"
+                        onPress={() => deleteRow(row.getId())}
+                    />
+                </HStack>
+
+                {checkElements}
+                
+            </VStack>
+            <Actionsheet isOpen={isOpen} onClose={onClose}>
+                {actionSheetItems}
+            </Actionsheet>
         </Box>
     );
 };

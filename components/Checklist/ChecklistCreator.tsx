@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View } from "react-native";
 import { IconButton, ScrollView, VStack } from "native-base";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistSection from "./classes/ChecklistSection";
-import ChecklistRow from "./classes/ChecklistRow";
 import ChecklistCreatorSection from "./ChecklistCreatorSection";
+import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
 
-
-const ChecklistCreator = ({ checklist, setChecklist } : { 
-    checklist: CMMSChecklist,
-    setChecklist: React.Dispatch<React.SetStateAction<CMMSChecklist>> 
-}) => {
-
-    const [sections, setSections] = useState<ChecklistSection[]>([]);
+const ChecklistCreator = () => {
+    const { sections, setSections, level, setLevel } = useContext(ChecklistFormContext)
 
     const addSection = () => {
         const newSection = new ChecklistSection();
@@ -25,11 +19,15 @@ const ChecklistCreator = ({ checklist, setChecklist } : {
             <ChecklistCreatorSection
                 key={section.getId()}
                 section={section}
-                setSections={setSections}
             />
         );
     });
-    console.log(sections)
+
+    if (level === 1) {
+        console.log(sections);
+        setLevel(0);
+    }
+ 
     return (
         <View>
             <VStack>
