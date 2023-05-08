@@ -3,12 +3,13 @@ import App from "../../pages/App";
 import { HStack, VStack } from "native-base";
 
 interface ModuleScreenProps extends React.PropsWithChildren {
-    navigation: string
+    navigation: string;
+    layout?: string;
 };
 
 const ModuleScreen = (props: ModuleScreenProps) => {
     return (
-        <App navigation={props.navigation}>
+        <App layout={props.layout} navigation={props.navigation}>
             <HStack flex={1} px="5" py="5">
                 <VStack flex={1} alignItems="center">{props.children}</VStack>
             </HStack>

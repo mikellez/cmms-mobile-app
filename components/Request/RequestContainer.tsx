@@ -27,11 +27,14 @@ import NetInfo from '@react-native-community/netinfo';
 
 
 import instance from '../../axios.config';
-import Form from '../../components/Request/Form';
+import FormGroup from '../../components/Request/FormGroup';
 import axios from 'axios';
 import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
+import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
+import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
 
 type FormValues = {
+  name?: string;
   requestTypeID: number;
   faultTypeID: number;
   description: string;
@@ -97,11 +100,12 @@ const RequestContainer = ({
   const [completionImage, setCompletionImage] = useState(null);
 
   const [formState, setFormState] = useState<FormValues>({
+    name: "",
     requestTypeID: 0,
     faultTypeID: 0,
     description: "",
-    plantLocationID: 0,
-    taggedAssetID: 0,
+    plantLocationID: route?.params?.plant || 0,
+    taggedAssetID: route?.params?.asset || 0,
     image: null
   });
 
@@ -134,6 +138,7 @@ const RequestContainer = ({
 
   const createRequest = async () => {
     const formData = new FormData();
+    formData.append("name", formState.name);
     formData.append("description", formState.description);
     formData.append("faultTypeID", formState.faultTypeID.toString());
     formData.append("plantLocationID", formState.plantLocationID.toString());
@@ -162,20 +167,22 @@ const RequestContainer = ({
 
     } else {
       let data = await getData('offlineRequests');
+      console.log('prev offlineRequests', data)
       if(!data) {
         data = [];
       }
 
       const newRequest = {
         id: data.length + 1,
+        name: formState.name,
         description: formState.description,
         faultTypeID: formState.faultTypeID,
-        plantLocationID: formState.plantLocationID,
+        plantLocationID: plant,
         requestTypeID: formState.requestTypeID,
-        taggedAssetID: formState.taggedAssetID,
+        taggedAssetID: asset,
         image: formState.image
       }
-      console.log(newRequest)
+      console.log('newRequest', newRequest)
       data.push(newRequest);
       await _storeData('offlineRequests', data);
       navigation.navigate("OfflineRequest");
@@ -244,7 +251,6 @@ const RequestContainer = ({
     return await instance
       .patch(`/api/request/${id}/${status}`, { comments: actionComment })
       .then((response) => {
-        console.log(response.data)
         alert("Request updated successfully");
         navigation.navigate("Report");
         return response.data;
@@ -260,20 +266,22 @@ const RequestContainer = ({
     setActionComment(value);
   }
 
-  const handleChange = (name: string, value: number) => {
-    setFormState({...formState, [name]: value});
+  const handleChange = (name: string, value: any) => {
+    console.log(name, value)
+    //setFormState({...formState, [name]: value});
+    //console.log('formState1', formState)
+    setFormState((prevState) => ({...prevState, [name]: value}));
+    //console.log('formState2', formState)
   }
 
   const handlePriorityChange = (value: string) => {
     const selectedItem = priorities.find((item) => item.p_id === value);
-    console.log(value)
-    console.log(selectedItem)
     setPrioritySelected({ p_id: selectedItem.p_id, priority: selectedItem.priority });
   }
 
   const handleAssignUserChange = (value: string) => {
     const selectedItem = assignUsers.find((item) => item.id === value);
-    setAssignUserSelected({ value: selectedItem.id, label: selectedItem.name + ' | ' + selectedItem.email });
+    setAssignUserSelected({ value: selectedItem.id, label: selectedItem.detail });
   }
 
   const NativeImagePicker = async () => {
@@ -316,7 +324,6 @@ const RequestContainer = ({
 
   const handleCompletionImagePicker = async () => {
     const file = await NativeImagePicker();
-    console.log(file)
 
     if(file) {
       setSelectedCompletionImage(file.oriUri);
@@ -325,7 +332,6 @@ const RequestContainer = ({
   }
 
   const handleCompletionCommentChange = (value: string) => {
-    console.log('completion', value)
     setCompletionFormState({...completionFormState, complete_comments: value});
   }
 
@@ -334,33 +340,6 @@ const RequestContainer = ({
     setFormState({...formState, plantLocationID: value});
     fetchAssetTag(value);
     fetchAssignUser(value);
-  }
-
-  const _storeData = async (key, value) => {
-    if(typeof value === 'object') value = JSON.stringify(value);
-    console.log(value);
-
-    try {
-      await AsyncStorage.setItem(
-        '@'+key,
-        value,
-      );
-    } catch (err) {
-      // Error saving data
-      console.log(err)
-    } 
-  }
-
-  const _retrieveData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem('@'+key);
-      if (value !== null) {
-        return value;
-      }
-    } catch (err) {
-      // Error retrieving data
-      console.log(err)
-    }
   }
 
   const fetchFaultTypes = async () => {
@@ -372,7 +351,8 @@ const RequestContainer = ({
           setFaultTypes(res.data);
         })
         .catch((err) => {
-            console.log(err)
+          console.log(err)
+          console.log('Unable fetch types')
         });
 
     } else {
@@ -391,6 +371,7 @@ const RequestContainer = ({
       })
       .catch((err) => {
         console.log(err)
+        console.log('Unable fetch types')
       });
 
     } else {
@@ -408,6 +389,7 @@ const RequestContainer = ({
       })
       .catch((err) => {
           console.log(err)
+          console.log('Unable fetch plants')
       });
     } else {
       const value = await _retrieveData('plants');
@@ -423,6 +405,7 @@ const RequestContainer = ({
       })
       .catch((err) => {
           console.log(err)
+          console.log('Unable fetch assets tags')
       });
 
     } else {
@@ -443,6 +426,7 @@ const RequestContainer = ({
       })
       .catch((err)=> {
         console.log(err)
+        console.log('Unable fetch priority')
       })
     } else {
       const value = await _retrieveData('priorities');
@@ -455,14 +439,16 @@ const RequestContainer = ({
 
       await instance.get(`/api/getAssignedUsers/${plant_id}`)
       .then((res)=> {
-        setAssignUsers(res.data);
+        setAssignUsers(res.data.map(item => ({ ...item, detail: item.name + ' | ' + item.email })));
       })
       .catch((err)=> {
         console.log(err)
+        console.log('Unable fetch assign users')
       })
     } catch(err) {
       console.log(err)
       // error reading value
+      console.log('Unable fetch assign users')
     }
 
   }
@@ -475,10 +461,13 @@ const RequestContainer = ({
     })
     .catch((err) => {
         console.log(err)
+        console.log('Unable fetch requests')
     });
   };
 
   useEffect(() => {
+    console.log('test loop 1')
+
     const checkConnection = async () => {
       const netInfoState = await NetInfo.fetch();
       setIsConnected(netInfoState.isConnected);
@@ -496,6 +485,7 @@ const RequestContainer = ({
         fetchRequestTypes();
         fetchPlants();
 
+
       } catch (error) {
         console.log('Error fetching data: ', error);
       }
@@ -508,7 +498,6 @@ const RequestContainer = ({
     } else {
       Promise.all([fetchFaultTypes(), fetchRequestTypes(), fetchPlants(), fetchPriority()])
       .then(() => {
-        console.log(AsyncStorage.getAllKeys())
         fetchRequest();
       })
 
@@ -521,25 +510,28 @@ const RequestContainer = ({
   }, [isConnected])
 
   useEffect(() => {
+    console.log('test loop 2')
 
     if(requestItems) {
       fetchAssetTag(requestItems?.plant_id);
       fetchAssignUser(requestItems?.plant_id);
     }
-    if(route?.params?.plant) {
-      fetchAssetTag(route.params.plant);
+
+    // this is to default check whether there is route.params.plant pass in from previous screen
+    if(plant) {
+      fetchAssetTag(plant);
     }
 
-  }, [isConnected, requestItems?.plant_id]);
+  }, [isConnected, plant, asset, requestItems?.plant_id]);
 
 
   return (
 
 
-    <ScrollView w="100%" h="200" p="5" nestedScrollEnabled={true}>
+    <>
       { !isConnected && <Text>Offline</Text> }
 
-      <Form 
+      <FormGroup
         action={action}
 
         plant={plant}
@@ -580,9 +572,11 @@ const RequestContainer = ({
         onStatusAction={handleStatusAction}
 
         onRejectionCommentChange={handleRejectionCommentChange}
-      />
 
-    </ScrollView>
+        onNameChange={value=>handleChange("name", value)}
+      />
+      </>
+
 
   )
 }
