@@ -1,68 +1,67 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import { Input, Icon, TextArea, VStack, Button } from "native-base";
-import { ModuleScreen, ModuleHeader } from "../../components/ModuleLayout";
+import { Input, Icon, TextArea, VStack, Button, IconButton } from "native-base";
+import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
+import ChecklistForm from "../../components/Checklist/ChecklistForm";
+
 
 const CreateChecklist = ({ navigation }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
+    const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
+    const [successModal, setSuccessModal] = useState<boolean>(false);
+    
 
-    const updateChecklist = (value: string | number | Date, field: string) => {
-        setChecklist(prev => {
-            return {
-                ...prev,
-                [field]: value
-            } as CMMSChecklist
-        });
+    const handleSubmit = () => {
+        if (!validateChecklistFormData(checklist)) {
+            setIncompleteModal(true);
+        } else {
+            setSuccessModal(true);
+            navigation.navigate("Maintenance");
+        }
     };
 
-    console.log(checklist);
+    const validateChecklistFormData = (checklist) => {
+        return false;
+    };
 
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Create Checklist">
-            <Button 
-                w="30" 
-                padding={2} 
-                bg="#C8102E" 
-                leftIcon={
-                    <Icon as={AntDesign} name="filetext1" size="sm"/>
-                } 
-                size="xs"
-                // onPress={() => navigation.navigate("CreateChecklist")}
-            ></Button>
+                <Button 
+                    w="30" 
+                    padding={2} 
+                    bg="#C8102E" 
+                    leftIcon={
+                        <Icon as={AntDesign} name="filetext1" size="sm"/>
+                    } 
+                    size="xs"
+                    // onPress={() => navigation.navigate("CreateChecklist")}
+                ></Button>
             </ModuleHeader>
             
-            <VStack 
-                marginY={3}
-                space={3}
-                width="100%"
-            >
-            <Input
-                w={{
-                    md: "25%"
-                }} 
-                InputLeftElement={<Icon as={<MaterialIcons name="person" />} 
-                size={5} 
-                ml="2" 
-                color="muted.400" />} 
-                placeholder="Name" 
-                onChangeText={text => updateChecklist(text, "chl_name")}
-                value={checklist.chl_name}
-                maxLength={100}
+            <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
+
+            <IconButton  
+                _icon={{
+                    as: Feather,
+                    name: "send"
+                }}
+                colorScheme="white"
+                variant="solid"
+                backgroundColor="#C8102E"
+                onPress={handleSubmit}
             />
 
-            <TextArea 
-                h={20} 
-                placeholder="Description" 
-                onChangeText={text => updateChecklist(text, "description")}
-                value={checklist.description}
-                maxLength={200}
+            <ModuleSimpleModal
+                isOpen={incompleteModal}
+                setOpen={setIncompleteModal}
+                title="Missing Details"
+                text="Ensure that all fields have been filled"
+                icon={ModalIcons.Warning}
             />
-            </VStack>
-
         </ModuleScreen>
     );
 };
