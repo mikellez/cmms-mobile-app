@@ -42,7 +42,7 @@ const FormGroup = ({
       placeholder: "Guest Name",
       accessibilityLabel: "Guest Name",
       onChangeText: onNameChange,
-      show: action === "create" && plant
+      show: action === "create" && (plant || false)
     },
     {
       id: 1, 

@@ -202,9 +202,6 @@ const Login = ({ navigation }) => {
             <Button mt="2" backgroundColor="#C8102E" onPress={handleLogin}>
               Log in
             </Button>
-            <Button mt="2" backgroundColor="#C8102E" onPress={handleLogout}>
-              Log out
-            </Button>
             {/*<Button mt="2" bg="danger.700" onPress={handleLoginTest}>
               Test log in
             </Button>
