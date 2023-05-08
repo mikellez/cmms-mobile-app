@@ -1,27 +1,7 @@
-import {
-    Text,
-    Box,
-    HStack,
-    IconButton,
-    StatusBar,
-    NativeBaseProvider,
-    Icon,
-    Image,
-    Pressable,
-    Center,
-    VStack,
-    Flex,
-    Container,
-    Heading,
-    Button,
-    Card,
-} from "native-base";
+import { Text, VStack } from "native-base";
 import React, { useEffect, useState } from "react";
-import { CMMSChangeOfParts, CMMSChecklist, CMMSSchedule } from "../../types/interfaces";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { ModuleCardContainer } from "../ModuleLayout";
-import EntypoIcon from "react-native-vector-icons/Entypo";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { CMMSChangeOfParts, CMMSSchedule } from "../../types/interfaces";
+import { ScrollView } from "react-native";
 import ScheduleChecklistEvent from "./ScheduleChecklistEvent";
 import ScheduleCOPEvent from "./ScheduleCOPEvent";
 import { DateData } from "react-native-calendars";
@@ -59,8 +39,6 @@ const CalendarEventList = (props: CalendarEventListProps) => {
         }
     }, [props.COPItems, props.ChecklistItems, props.dateSelected]);
 
-    console.log(COPElements);
-    console.log(ChecklistElements);
     return (
         <ScrollView>
             <Text>Date selected: {props.dateSelected.dateString}</Text>

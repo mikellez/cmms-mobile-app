@@ -1,33 +1,10 @@
-import {
-    Text,
-    Box,
-    HStack,
-    IconButton,
-    StatusBar,
-    NativeBaseProvider,
-    Icon,
-    Image,
-    Pressable,
-    Center,
-    VStack,
-    Flex,
-    Container,
-    Heading,
-    Button,
-    Card,
-} from "native-base";
+import { HStack, Icon, Button } from "native-base";
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { DateData, Calendar } from "react-native-calendars";
 import instance from "../axios.config";
-import {
-    ModuleHeader,
-    ModuleScreen,
-    ModuleActionSheet,
-    ModuleActionSheetItem,
-    ModuleDivider,
-} from "../components/ModuleLayout";
+import { ModuleHeader, ModuleScreen, ModuleDivider } from "../components/ModuleLayout";
 import CalendarEventList from "../components/Calendar/CalendarEventList";
 import { CMMSChangeOfParts, CMMSSchedule } from "../types/interfaces";
 import { PlantSelect } from "../components/General";
@@ -94,14 +71,6 @@ const CalendarTab = ({ navigation }) => {
 
     const addItems = async (plantId) => {
         setItems([{}, {}]);
-        // item = [
-        //         { date: [checklistdata1, checklistdata2],
-        //           date2: [{}]
-        //         } ,
-        //         { date: [copdata1, data2]
-        //         }
-
-        //         ]
 
         await getChecklistSchedules(plantId).then((results) => {
             if (results) {
@@ -161,17 +130,12 @@ const CalendarTab = ({ navigation }) => {
     };
 
     useEffect(() => {
-        // setItems([{}, {}]);
-        console.log(items);
-        console.log(selectedPlant);
         setIsReady(false);
         markedDates = {};
-        // console.log(selectedPlant);
         addItems(selectedPlant).then(() => {
             setMarkedDatesProp(markedDates);
             setSelectDatesProp(markedDates);
             setIsReady(true);
-            console.log("completed");
         });
     }, [selectedPlant]);
 
