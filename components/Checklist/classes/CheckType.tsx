@@ -16,7 +16,26 @@ abstract class CheckType {
         return this._id;
     };
 
-    abstract renderCreatorForm(deleteCheck: Function): React.ReactNode;
+    toJSON() {
+        return {
+            "question": this.question,
+            "value": this.value,
+        }
+    }
+
+    abstract renderCreatorForm(deleteCheck: Function, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>): React.ReactNode;
+
+    static handleTextChange(text: string, id: string, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>) {
+        setChecks(prevChecks => {
+            const newChecks = [...prevChecks];
+            for (let i = 0; i < prevChecks.length; i++) {
+                if (prevChecks[i].getId() === id) {
+                    newChecks[i].question = text;
+                }
+            }
+            return newChecks;
+        });
+    };
 };
 
 export default CheckType;

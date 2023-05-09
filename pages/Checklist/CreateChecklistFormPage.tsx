@@ -22,7 +22,7 @@ const CreateChecklistFormPage = ({ navigation }) => {
     const handleSubmit = () => {
         setLevel(3)
         const datajson = sections.map(section => section.toJSON());
-        // console.log(datajson)
+        console.log(datajson)
 
         // if (!validateChecklistFormData(checklist)) {
         //     setIncompleteModal(true);

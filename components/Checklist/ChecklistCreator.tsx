@@ -24,7 +24,6 @@ const ChecklistCreator = () => {
     });
 
     if (level === 1) {
-        console.log(sections);
         setLevel(0);
     }
  

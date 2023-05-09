@@ -6,7 +6,7 @@ import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistCreatorRow from "./ChecklistCreatorRow";
 import ChecklistRow from "./classes/ChecklistRow";
 import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
-import { setReadable } from "react-native-fs";
+import { ModuleCardContainer } from "../ModuleLayout";
 
 const ChecklistCreatorSection = ({section} : {
     section: ChecklistSection,
@@ -76,12 +76,10 @@ const ChecklistCreatorSection = ({section} : {
     }
 
     return (
-        <Box
-            py={1}
-            my={2}
-        >
+        <ModuleCardContainer>
             <HStack space={2}>
                 <Input 
+                    my={2}
                     w="80%"
                     placeholder="Section Description"
                     onChangeText={text => handleTextChange(text, section.getId())}
@@ -110,7 +108,7 @@ const ChecklistCreatorSection = ({section} : {
             <VStack>
                 {rowElements}
             </VStack>
-        </Box>
+        </ModuleCardContainer>
     );
 };
 

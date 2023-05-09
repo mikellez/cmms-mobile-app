@@ -14,7 +14,7 @@ const ModuleCardContainer = (props: ModuleCardContainerProps) => {
             _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} 
             borderWidth={1} borderColor='#dee2e6'
             bg="white"
-            shadow="3"
+            // shadow="3"
         >{props.children}</Box>
     )
 };

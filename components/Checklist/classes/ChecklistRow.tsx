@@ -19,7 +19,7 @@ class ChecklistRow {
     toJSON() {
         return {
             "description": this.description,
-            "checks": [],
+            "checks": this.checks.map(check => check.toJSON()),
         };
     };
 

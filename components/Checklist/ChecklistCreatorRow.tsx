@@ -5,6 +5,7 @@ import ChecklistRow from "./classes/ChecklistRow";
 import { SingleChoiceType } from "./Checks";
 import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
 import CheckType from "./classes/CheckType";
+import { ModuleCardContainer } from "../ModuleLayout";
 import { View } from "react-native";
 
 const Choices = [
@@ -49,7 +50,7 @@ const ChecklistCreatorRow = ({row, setRows} : {
     const createNewCheck = useCallback((index: number) => {
         switch(index) {
             case 0:
-                return new SingleChoiceType();
+                return new SingleChoiceType("", "", ["Yes", "No"]);
         };
     }, []);
 
@@ -67,12 +68,11 @@ const ChecklistCreatorRow = ({row, setRows} : {
     const checkElements = checks.map(check => {
         return (
             <View key={check.getId()}>
-                {check.renderCreatorForm(deleteCheck)}
+                {check.renderCreatorForm(deleteCheck, setChecks)}
             </View>
         );
     });
 
-    
 
     if (level === 3) {
         setRows(prevRows => {
@@ -97,11 +97,12 @@ const ChecklistCreatorRow = ({row, setRows} : {
     };
     
     return (
-        <Box>
+        <ModuleCardContainer>
             <VStack>
                 <HStack space={2}>
                     <Input 
                         w="80%"
+                        my={2}
                         placeholder="Row Description"
                         onChangeText={text => handleTextChange(text, row.getId())}
                     />
@@ -131,7 +132,7 @@ const ChecklistCreatorRow = ({row, setRows} : {
             <Actionsheet isOpen={isOpen} onClose={onClose}>
                 {actionSheetItems}
             </Actionsheet>
-        </Box>
+        </ModuleCardContainer>
     );
 };
 
