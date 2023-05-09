@@ -1,38 +1,53 @@
-import { Text, Box, HStack, IconButton, StatusBar, NativeBaseProvider, Icon, Image, Pressable, Center, VStack, Flex, Container, Heading, Button } from 'native-base';
-import React, { useEffect, useState } from 'react';
-import {  View } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import App from './App';
-import instance from '../axios.config';
+import {
+  Text,
+  Box,
+  HStack,
+  IconButton,
+  StatusBar,
+  NativeBaseProvider,
+  Icon,
+  Image,
+  Pressable,
+  Center,
+  VStack,
+  Flex,
+  Container,
+  Heading,
+  Button,
+} from "native-base";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import App from "./App";
+import instance from "../axios.config";
 
+interface IUser {
+  id: number;
+  allocated_plants: [];
+  name: string;
+  role_id: number;
+  role_name: string;
+}
 
-  interface IUser {
-    id: number;
-    allocated_plants: [];
-    name: string;
-    role_id: number;
-    role_name: string;
-  }
-
-  const HomeScreen = ({navigation}) => {
-
+const HomeScreen = ({ navigation }) => {
   const [user, setUser] = useState<IUser>();
 
   const fetchUserDetail = async () => {
-    await instance.get(`/api/user`)
-    .then((res)=> {
-      setUser(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+    await instance
+      .get(`/api/user`)
+      .then((res) => {
+        setUser(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     fetchUserDetail();
-  }, [user]);
+  }, []);
 
   return (
     <App navigation={navigation}>
@@ -40,7 +55,9 @@ import instance from '../axios.config';
         <VStack flex={1}>
           <HStack px="5" py="5" w="100%" justifyContent="space-between">
             <HStack>
-              <Heading size="md" color="#C8102E">Overview</Heading>
+              <Heading size="md" color="#C8102E">
+                Overview
+              </Heading>
             </HStack>
           </HStack>
         </VStack>
@@ -63,7 +80,6 @@ import instance from '../axios.config';
           </Pressable>*/}
         </HStack>
       </Center>
-      
     </App>
   );
 };

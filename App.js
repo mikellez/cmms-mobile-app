@@ -1,18 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
 
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Report from './pages/Report';
-import ViewRequest from './pages/Request/View';
-import CreateRequest from './pages/Request/Create';
-import Maintenance from './pages/Maintenance';
-import CreateChecklist from './pages/Checklist/Create';
-import AssignRequest from './pages/Request/Assign';
-import CompleteRequest from './pages/Request/Complete';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { navigationRef } from './RootNavigation';
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Report from "./pages/Report";
+import ViewRequest from "./pages/Request/View";
+import CreateRequest from "./pages/Request/Create";
+import Maintenance from "./pages/Maintenance";
+import CreateChecklist from "./pages/Checklist/Create";
+import AssignRequest from "./pages/Request/Assign";
+import CompleteRequest from "./pages/Request/Complete";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { navigationRef } from "./RootNavigation";
+import Assets from "./pages/Assets/index";
+import Details from "./pages/Assets/Details";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +24,10 @@ export default function App() {
       {/*<View style={styles.container}>
         <Login/>
       </View>*/}
-      <Stack.Navigator initialRouteName="LoginScreen" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="LoginScreen"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Report" component={Report} />
@@ -32,6 +37,8 @@ export default function App() {
         <Stack.Screen name="CreateChecklist" component={CreateChecklist} />
         <Stack.Screen name="AssignRequest" component={AssignRequest} />
         <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
+        <Stack.Screen name="ViewAsset" component={Assets} />
+        <Stack.Screen name="AssetDetails" component={Details} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -40,8 +47,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
