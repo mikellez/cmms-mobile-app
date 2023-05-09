@@ -16,13 +16,10 @@ const CreateChecklistFormPage = ({ navigation }) => {
     const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
     const [successModal, setSuccessModal] = useState<boolean>(false);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
-    const [level, setLevel] = useState<number>(0);
+    const [level, setLevel] = useState<number>();
     
-
     const handleSubmit = () => {
         setLevel(3)
-        const datajson = sections.map(section => section.toJSON());
-        console.log(datajson)
 
         // if (!validateChecklistFormData(checklist)) {
         //     setIncompleteModal(true);
@@ -30,6 +27,15 @@ const CreateChecklistFormPage = ({ navigation }) => {
         //     setSuccessModal(true);
         //     navigation.navigate("Maintenance");
         // }
+    };
+
+    const toDataJSON = (sections: ChecklistSection[]) => {
+        return sections.map(section => section.toJSON());
+    };
+
+    if (level === 0) {
+        console.log(toDataJSON(sections))
+        setLevel(undefined);
     };
 
     const validateChecklistFormData = (checklist) => {
