@@ -7,11 +7,8 @@ import Report from "./pages/Report";
 import ViewRequest from "./pages/Request/View";
 import CreateRequest from "./pages/Request/Create";
 import GuestCreateRequest from "./pages/Request/GuestCreate";
-import Maintenance from "./pages/Maintenance";
 import Calendar from "./pages/Calendar";
-import CreateChecklist from "./pages/Checklist/Create";
 import AssignRequest from "./pages/Request/Assign";
-import CompleteRequest from "./pages/Request/Complete";
 import ManageRequest from "./pages/Request/Manage";
 import OfflineRequest from "./pages/Request/Offline";
 import QRScan from "./pages/QRScan/index";
@@ -19,6 +16,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { navigationRef } from "./RootNavigation";
 import { linking } from "./linking";
+import Maintenance from "./pages/Maintenance";
+import CompleteRequest from "./pages/Request/Complete";
+import Assets from "./pages/Assets/index";
+import Details from "./pages/Assets/Details";
 
 const Stack = createNativeStackNavigator();
 
@@ -43,16 +44,18 @@ export default function App() {
                 <Stack.Screen name="QRScan" component={QRScan} />
                 <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
                 <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
+                <Stack.Screen name="ViewAsset" component={Assets} />
+        <Stack.Screen name="AssetDetails" component={Details} />
             </Stack.Navigator>
         </NavigationContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
