@@ -67,13 +67,13 @@ const ChecklistCreatorRow = ({row, setRows} : {
         setChecks(prevChecks => prevChecks.filter(check => check.getId() !== checkId));
     }, []);
 
-    const checkElements = checks.map(check => {
-        return (
-            <View key={check.getId()}>
-                {check.renderCreatorForm(deleteCheck, setChecks)}
-            </View>
-        );
-    });
+    // const checkElements = checks.map(check => {
+    //     return (
+    //         <View key={check.getId()}>
+    //             {check.renderCreatorForm(deleteCheck, setChecks)}
+    //         </View>
+    //     );
+    // });
 
 
     if (level === 3) {
@@ -107,6 +107,7 @@ const ChecklistCreatorRow = ({row, setRows} : {
                         my={2}
                         placeholder="Row Description"
                         onChangeText={text => handleTextChange(text, row.getId())}
+                        defaultValue={row.description}
                     />
                     <IconButton
                         marginLeft="auto"
@@ -128,7 +129,7 @@ const ChecklistCreatorRow = ({row, setRows} : {
                     />
                 </HStack>
 
-                {checkElements}
+                {/* {checkElements} */}
                 
             </VStack>
             <Actionsheet isOpen={isOpen} onClose={onClose}>

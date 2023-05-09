@@ -30,6 +30,10 @@ class ChecklistRow {
     removeAllChecks() {
         this.checks = [];
     };
+
+    static fromJSON(json: any) {
+        return new ChecklistRow(json.description);
+    }
 };
 
 export default ChecklistRow;

@@ -32,9 +32,10 @@ class ChecklistSection {
     removeAllRows() {
         this.rows = [];
     };
-    // static fromJSON(json: string) {
 
-    // };
+    static fromJSON(json: any) {
+        return new ChecklistSection(json.description, json.rows.map(row => ChecklistRow.fromJSON(row)))
+    };
 };
 
 

@@ -1,25 +1,37 @@
-import React, { useState, createContext } from "react";
-import { View } from "react-native";
+import React, { useState, createContext, useEffect } from "react";
+import { View, ScrollView } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
-import { Input, Icon, TextArea, VStack, Button, IconButton, ScrollView } from "native-base";
+import { Input, Icon, TextArea, VStack, Button, IconButton, HStack } from "native-base";
 import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistForm from "../../components/Checklist/ChecklistForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
 import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
+import instance from "../../axios.config";
+
+const fetchSpecificChecklistTemplate = async (id: number): Promise<CMMSChecklist | void> => {
+    try {
+        const response = instance.get("/api/checklist/template/" + id);
+        return (await response).data;
+    }
+    catch (err) {
+        console.log(err);
+    };
+};
 
 const ChecklistFormContext = createContext(null);
 
-const CreateChecklistFormPage = ({ navigation }) => {
+const CreateChecklistFormPage = ({ navigation, route }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
     const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
     const [successModal, setSuccessModal] = useState<boolean>(false);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     const [level, setLevel] = useState<number>();
-    
+    const { checklistId } = route.params;
+
     const handleSubmit = () => {
-        setLevel(3)
+        setLevel(1)
 
         // if (!validateChecklistFormData(checklist)) {
         //     setIncompleteModal(true);
@@ -42,20 +54,35 @@ const CreateChecklistFormPage = ({ navigation }) => {
         return false;
     };
 
+    useEffect(() => {
+        if (checklistId) {
+            fetchSpecificChecklistTemplate(checklistId).then(data => {
+                if (data) {
+                    setChecklist(data);
+
+                    setSections(data.datajson.map(section => ChecklistSection.fromJSON(section)));
+                }   
+            })
+        }
+    }, [checklistId]);
+
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Create Checklist">
-                <Button 
-                    w="30" 
-                    padding={2} 
-                    bg="#C8102E" 
-                    leftIcon={
-                        <Icon as={AntDesign} name="filetext1" size="sm"/>
-                    } 
-                    size="xs"
-                    // onPress={() => navigation.navigate("CreateChecklist")}
-                ></Button>
+                <HStack space={3}>
+                    <Button 
+                        w="30" 
+                        padding={2} 
+                        bg="#CCCCCC"
+                        leftIcon={
+                            <Icon as={AntDesign} name="arrowleft" size="sm"/>
+                        } 
+                        size="xs"
+                        onPress={() => navigation.navigate("ChecklistTemplatesPage")}
+                    ></Button>
+                </HStack>
             </ModuleHeader>
+
             <ScrollView>
                 <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
                 
@@ -82,6 +109,7 @@ const CreateChecklistFormPage = ({ navigation }) => {
                 text="Ensure that all fields have been filled"
                 icon={ModalIcons.Warning}
             />
+
         </ModuleScreen>
     );
 };

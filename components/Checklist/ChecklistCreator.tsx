@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View } from "react-native";
-import { IconButton, ScrollView, VStack } from "native-base";
+import { IconButton, ScrollView, VStack, FormControl } from "native-base";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistCreatorSection from "./ChecklistCreatorSection";
@@ -28,24 +28,23 @@ const ChecklistCreator = () => {
     }
  
     return (
-        <View>
-            <VStack>
-                <IconButton 
-                    _icon={{
-                        as: Ionicons,
-                        name: "add"
-                    }}
-                    variant="solid"
-                    colorScheme="white"
-                    backgroundColor="#C8102E"
-                    size={7}
-                    onPress={addSection}
-                />
-                <ScrollView>
-                    {sectionElements}
-                </ScrollView>
+        <VStack>
+            <FormControl.Label>Checklist Content</FormControl.Label>
+            {/* <IconButton 
+                _icon={{
+                    as: Ionicons,
+                    name: "add"
+                }}
+                variant="solid"
+                colorScheme="white"
+                backgroundColor="#C8102E"
+                size={7}
+                onPress={addSection}
+            /> */}
+            <VStack space={2}>
+                {sectionElements}
             </VStack>
-        </View>
+        </VStack>
     );
 };
 

@@ -83,7 +83,7 @@ const ChecklistCreatorSection = ({section} : {
                     w="80%"
                     placeholder="Section Description"
                     onChangeText={text => handleTextChange(text, section.getId())}
-                    // value={section.description}
+                    defaultValue={section.description}
                 />
                 <IconButton
                     marginLeft="auto"
@@ -105,7 +105,7 @@ const ChecklistCreatorSection = ({section} : {
                 />
             </HStack>
 
-            <VStack>
+            <VStack space={2}>
                 {rowElements}
             </VStack>
         </ModuleCardContainer>

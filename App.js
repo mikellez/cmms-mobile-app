@@ -9,6 +9,7 @@ import CreateRequest from './pages/Request/Create';
 import GuestCreateRequest from './pages/Request/GuestCreate';
 import Maintenance from './pages/Maintenance';
 import CreateChecklistFormPage from './pages/Checklist/CreateChecklistFormPage';
+import ChecklistTemplatesPage from './pages/Checklist/ChecklistTemplatesPage';
 import AssignRequest from './pages/Request/Assign';
 import CompleteRequest from './pages/Request/Complete';
 import ManageRequest from './pages/Request/Manage';
@@ -35,6 +36,7 @@ export default function App() {
         <Stack.Screen name="CreateRequest" component={CreateRequest} />
         <Stack.Screen name="Maintenance" component={Maintenance} />
         <Stack.Screen name="CreateChecklistFormPage" component={CreateChecklistFormPage} />
+        <Stack.Screen name="ChecklistTemplatesPage" component={ChecklistTemplatesPage} />
         <Stack.Screen name="AssignRequest" component={AssignRequest} />
         <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
         <Stack.Screen name="ManageRequest" component={ManageRequest} />
