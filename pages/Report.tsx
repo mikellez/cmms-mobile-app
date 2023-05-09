@@ -18,6 +18,8 @@ import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen } from "../components/ModuleLayout";
 import App from "./App";
+import { _retrieveData } from "../helper/AsyncStorage";
+import { CMMSUser, CMMSRequest } from "../types/interfaces";
 
 const requestlistViews: ModuleActionSheetItem[] = [
   {
@@ -38,44 +40,19 @@ const requestlistViews: ModuleActionSheetItem[] = [
   },
 ];
 
-export type ItemData = {
-  request_id: number;
-  request_name: string;
-  priority: string;
-  status: string;
-  asset_name: string;
-  plant_name: string;
-};
-
-interface CMMSRequest {
-  request_id: string;
-  request_name?: string;
-  created_date: Date;
-  fullname: string;
-  fault_name: string;
-  fault_id?: number;
-  asset_name: string;
-  psa_id?: number;
-  req_id?: number;
-  plant_name: string;
-  plant_id?: number;
-  priority: string;
-  priority_id: number;
-  status: string;
-  status_id?: number;
-  assigned_user_email: string;
-  assigned_user_id: number;
-  assigned_user_name: string;
-  fault_description?: string;
-  uploaded_file?: any;
-  //requesthistory?: string;
-  //complete_comments?: string;
-  //completion_file?: any;
-  //rejection_comments: string;
-}
-
 const ReportScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
+
+  const [user, setUser] = useState<CMMSUser>({
+    id: 0,
+    role_id: 0,
+    role_name: "",
+    name: "",
+    email: "",
+    fname: "",
+    lname: "",
+    username: ""
+  });
 
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
@@ -92,10 +69,19 @@ const ReportScreen = ({ navigation }) => {
     
   };
 
+  const fetchUser = async () => {
+    const user = await _retrieveData('user');
+    setUser(JSON.parse(user));
+  }
+
   useEffect(() => {
     if(isFocused) {
+      fetchUser();
+
       fetchRequest(viewType)
       .then((res)=> setRequestItems(res))
+
+      setSections([])
     }
   }, [isFocused, viewType]);
 
@@ -165,6 +151,8 @@ const ReportScreen = ({ navigation }) => {
   };
 
   const renderContent = (item, _, isActive) => {
+    const { role_id } = user;
+
     return (
       <Animatable.View
         duration={100}
@@ -188,9 +176,14 @@ const ReportScreen = ({ navigation }) => {
                   }
                   {
                     ['COMPLETED', 'REJECTED'].includes(item.status)
+                    && [1, 2].includes(role_id)
                     && <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="sticker-check-outline" color="#C8102E" />} onPress={()=>navigation.navigate("ManageRequest", { id: item.request_id })}/>
                   }
-                  <IconButton icon={<Icon size="lg" as={AntDesign} name="check" color="#C8102E" />} onPress={()=>navigation.navigate("CompleteRequest", { id: item.request_id })}/>
+
+                  {
+                    ['ASSIGNED'].includes(item.status) &&
+                    <IconButton icon={<Icon size="lg" as={AntDesign} name="check" color="#C8102E" />} onPress={()=>navigation.navigate("CompleteRequest", { id: item.request_id })}/>
+                  }
               </HStack>
 
             </VStack>

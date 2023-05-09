@@ -267,7 +267,6 @@ const RequestContainer = ({
   }
 
   const handleChange = (name: string, value: any) => {
-    console.log(name, value)
     //setFormState({...formState, [name]: value});
     //console.log('formState1', formState)
     setFormState((prevState) => ({...prevState, [name]: value}));
@@ -466,7 +465,6 @@ const RequestContainer = ({
   };
 
   useEffect(() => {
-    console.log('test loop 1')
 
     const checkConnection = async () => {
       const netInfoState = await NetInfo.fetch();
@@ -510,7 +508,6 @@ const RequestContainer = ({
   }, [isConnected])
 
   useEffect(() => {
-    console.log('test loop 2')
 
     if(requestItems) {
       fetchAssetTag(requestItems?.plant_id);
@@ -548,7 +545,7 @@ const RequestContainer = ({
         onFaultDescriptionChange={value=>handleChange("description", value)}
 
         plants={plants}
-        onPlantLocationChange={value=>handlePlantLocationChange(value)}
+        onPlantLocationChange={handlePlantLocationChange}
 
         assetTags={assetTags}
         onAssetTagChange={value=>handleChange("taggedAssetID", parseInt(value))}
@@ -574,6 +571,8 @@ const RequestContainer = ({
         onRejectionCommentChange={handleRejectionCommentChange}
 
         onNameChange={value=>handleChange("name", value)}
+
+        formState={formState}
       />
       </>
 

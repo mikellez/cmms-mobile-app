@@ -2,6 +2,9 @@ import { FormControl, HStack, Radio, Select, CheckIcon, TextArea, Pressable, But
 import { FlatList } from "react-native";
 import ImagePreview from "../ImagePreview";
 import ImageComponent from "../Image";
+import { useState } from "react";
+
+import { isEmpty } from "../../helper/utility";
 
 const FormGroup = ({
   action,
@@ -31,12 +34,35 @@ const FormGroup = ({
   onSubmit,
   onStatusAction,
   onRejectionCommentChange,
-  onNameChange
+  onNameChange,
+  formState
 }) => {
+  const [formData, setFormData] = useState({
+    guest_name: "",
+    requestTypeID: "",
+    faultTypeID: "",
+    faultDescription: "",
+    plantLocationID: "",
+    assetTagID: "",
+    priorityID: "",
+    assignUserID: "",
+    completionImage: [],
+    completionComment: "",
+    rejectionComment: "",
+    images: []
+  });
+
+  const [errors, setErrors] = useState({});
+
+  console.log(faultTypes)
+  console.log(requestItems)
+
   const data = [
     {
       id: 0,
-      isRequried: true,
+      required: true,
+      requiredMessage: "Guest Name is required",
+      name: "guest_name",
       type: "textarea",
       label: "Guest Name",
       placeholder: "Guest Name",
@@ -46,75 +72,87 @@ const FormGroup = ({
     },
     {
       id: 1, 
-      isRequried: true,
+      required: true,
+      requiredMessage: "Request Type is required",
       type:"radio", 
       label: "Request Type", 
       accessibilityLabel: "Pick a type", 
-      name:"request_type", 
-      defaultValue: "1", 
+      name:"requestTypeID", 
+      //defaultValue: "1", 
       onChange: onRequestTypeChange, 
       value: (requestItems?.req_id ?? ''), 
       items: requestTypes, 
       itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: action !== "create" ?? false},
-      selectedValueCond: (action !== 'create' && { value: requestItems?.req_id ?? ''})
+      selectedValueCond: (action !== 'create' && { value: requestItems?.req_id ?? ''}),
+      show: true
     },
     {
       id: 2, 
-      isRequried: true,
+      required: true,
+      requiredMessage: "Fault Type is required",
       type: "select", 
       label: "Fault Type", 
       accessibilityLabel: "Fault Type", 
+      name: "faultTypeID",
       placeholder: "Choose Fault Type", 
       onValueChange: onFaultTypeChange, 
       isDisabled: action !== "create" ?? false, 
-      selectedValue: requestItems?.fault_id || '', 
       items: faultTypes,
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: (action !== 'create' && { value: requestItems?.fault_id ?? ''})
+      selectedValueCond: (action !== 'create' && { selectedValue: requestItems?.fault_id || ''}),
+      show: true
     },
     {
       id: 3,
-      isRequried: true,
+      required: false,
+      requiredMessage: "",
       type: "textarea",
       label: "Fault Description",
       placeholder: "Fault Description",
       accessibilityLabel: "Fault Description",
-      name: "fault_description",
+      name: "faultDescription",
       defaultValue: requestItems?.description || '',
       onChangeText: onFaultDescriptionChange,
       isDisabled: action !== "create" ?? false,
       isReadOnly: action !== "create" ?? false,
-      valueCond: (action !== 'create' && { value: requestItems?.description || 'NIL'})
+      valueCond: (action !== 'create' && { value: requestItems?.description || 'NIL'}),
+      show: true
     },
     {
       id: 4, 
-      isRequried: true,
+      required: true,
       type: "select", 
       label: "Plant Location",
       accessibilityLabel: "Plant Location",
+      name: "plantLocationID",
       placeholder: "Choose Plant Location", 
       onValueChange: onPlantLocationChange, 
       isDisabled: (action !== "create" || (action === 'create' && plant)) ?? false,
-      items: faultTypes,
-      itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (requestItems?.plant_id || '')})
+      items: plants,
+      itemsConfig: { key: "plant_id", value: "plant_id", label: "plant_name"},
+      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (requestItems?.plant_id || '')}),
+      show: true
     },
     {
       id: 5,
-      isRequried: true,
+      required: true,
+      requiredMessage: "Asset Tag is required",
       type: "select",
       label: "Asset Tag",
       accessibilityLabel: "Asset Tag",
+      name: "taggedAssetID",
       placeholder: "Choose Asset Tag",
       onValueChange: onAssetTagChange,
       isDisabled: (action !== "create" || (action === 'create' && asset)) ?? false,
       items: assetTags,
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
-      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (requestItems?.psa_id || '')})
+      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (requestItems?.psa_id || '')}),
+      show: true
     },
     {
       id: 6,
-      isRequried: true,
+      required: true,
+      requiredMessage: "Image is required",
       type: "image",
       label: "Image",
       accessibilityLabel: "Image",
@@ -124,51 +162,56 @@ const FormGroup = ({
       isDisabled: action !== "create" ?? false,
       value: requestItems?.image || '',
       imageSource: imageSource,
-      bufferData: requestItems?.uploaded_file.data
+      bufferData: requestItems?.uploaded_file?.data,
+      show: true
     },
     {
       id: 8,
-      isRequried: true,
+      required: true,
+      requiredMessage: "Assign To is required",
       type: "select",
       label: "Assign To",
       accessibilityLabel: "Assign To",
       placeholder: "Choose Assign To",
+      name: "assignUserID",
       onValueChange: onAssignUserChange,
-      isDisabled: action !== "create" ?? false,
       items: assignUsers,
       itemsConfig: { key: "id", value: "id", label: "detail" },
-      selectedValue: assignUserSelected?.value ? assignUserSelected?.value : requestItems?.assigned_user_id,
+      selectedValueCond: { value: assignUserSelected?.value ? assignUserSelected?.value : requestItems?.assigned_user_id },
       show: action === 'assign'
     },
     {
       id: 9,
-      isRequried: true,
+      required: true,
       type: "select",
       label: "Priority",
       accessibilityLabel: "Priority",
+      name: "priorityID",
       placeholder: "Choose Priority",
       onValueChange: onPriorityChange,
-      isDisabled: action !== "create" ?? false,
       items: priorities,
-      itemsConfig: { key: "priority_id", value: "priority_id", label: "priority" },
-      selectedValueCond: (action !== 'create' && { value: requestItems?.priority_id ?? ''}),
+      itemsConfig: { key: "p_id", value: "p_id", label: "priority" },
+      selectedValueCond: {value: prioritySelected?.p_id ? prioritySelected?.p_id : requestItems?.priority_id},
       show: action === 'assign'
     },
     {
       id: 10,
-      isRequired: true,
+      required: true,
+      requiredMessage: "Completion image is required",
       type: "image",
       label: "Completion Image",
+      name: "completionImage",
       onPress: onCompletionImagePicker,
       imageSource: completionImageSource,
-      bufferData: [],//requestItems?.completion_file?.data,
+      bufferData: requestItems?.completion_file?.data,
       show: ['complete','manage'].includes(action)
     },
     {
       id: 11,
-      isRequired: true,
+      required: false,
       type: "textarea",
       label: "Completion Comment",
+      name: "completionComment",
       placeholder: "Completion Comment",
       defaultValue: requestItems?.completion_comment || '',
       onChangeText: onCompletionCommentChange,
@@ -179,16 +222,16 @@ const FormGroup = ({
     },
     {
       id: 12,
-      isRequired: true,
+      required: false,
       type: "textarea",
       label: "Comments",
+      name: "rejectionComment",
       placeholder: "Comments",
       onChangeText: onRejectionCommentChange,
       show: action === 'manage'
     },
     {
       id: 13,
-      isRequired: true,
       type: "buttongroup",
       items: [{
         label: 'Approve',
@@ -203,7 +246,6 @@ const FormGroup = ({
     },
     {
       id: 14,
-      isRequired: true,
       type: "button",
       label: "Submit",
       bgColor: "#C8102E",
@@ -212,6 +254,52 @@ const FormGroup = ({
     }
 
   ]
+
+  console.log(data)
+
+  const validate = () => {
+
+    for(const i in data) {
+      const { type, name, required, requiredMessage, show, imageSource } = data[i];
+
+      if(type==='image') {
+
+        if (show && required && isEmpty(imageSource)) {
+          setErrors({ 
+            [name]: requiredMessage
+          });
+          return false;
+        }
+
+      } else {
+
+        if (show && required && (isEmpty(formData[name]) || formData[name] === '0' )) {
+          setErrors({ 
+            [name]: requiredMessage
+          });
+          return false;
+        }
+
+      }
+
+      console.log(name, errors, data[i])
+
+    }
+
+    return true;
+  };
+
+  const handleSubmit = (onSubmit) => {
+    validate() ? onSubmit() : console.log('Validation Failed');
+  };
+
+  const handleChange = (name, value, action) => {
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+    action;
+    console.log('formData', formData)
+    console.log(name, value, action)
+  }
+
   return (
     <>
     <FlatList
@@ -231,36 +319,39 @@ const FormGroup = ({
           placeholder, 
           onValueChange, 
           isDisabled,
-          selectedValue,
+          isReadOnly,
           onChangeText,
           selectedValueCond,
           bufferData,
           onPress,
           show = true,
           valueCond,
-          bgColor
+          bgColor,
+          required,
+          requiredMessage
         } = item.item;
       
         switch(type) {
           case "radio":
             return ( 
-              <FormControl isRequired>
+              <FormControl isRequired={required} isInvalid={name in errors}>
                 <FormControl.Label>{label}</FormControl.Label>
                 <Radio.Group
                   name={name}
                   defaultValue={defaultValue}
                   accessibilityLabel={accessibilityLabel}
-                  onChange={onChange}
+                  onChange={(value) => handleChange(name, value, onChange(value))}
                   {...(action !== 'create' && { value: value})}
                   >
 
                   <HStack flex={1} justifyContent="space-between" w="100%" flexWrap={'wrap'}>
-                    {items.map((item) => (
+                    {items?.map((item) => (
                       <Radio key={item[itemsConfig.key]} value={item[itemsConfig.value]} colorScheme="red" size="sm" my={1} isDisabled={itemsConfig.isDisabled}>{item[itemsConfig.label]}</Radio>
                     ))}
 
                   </HStack>
                 </Radio.Group>
+                {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
               </FormControl>
             );
             break;
@@ -269,23 +360,24 @@ const FormGroup = ({
             return ( 
               <>
               { show && 
-                <FormControl isRequired>
+                <FormControl isRequired={required} isInvalid={name in errors}>
                   <FormControl.Label>{ label }</FormControl.Label>
                   <Select
                     accessibilityLabel={accessibilityLabel}
                     placeholder={placeholder}
                     _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }}
                     mt="1"
-                    onValueChange={onValueChange}
+                    onValueChange={(value) => handleChange(name, value, onValueChange(value))}
                     isDisabled={isDisabled}
                     {...selectedValueCond}
                     >
 
-                    {items.map((item) => {
+                    {items?.map((item) => {
                       return (<Select.Item key={item[itemsConfig.key]} label={item[itemsConfig.label]} value={item[itemsConfig.value]} />)
                     })}
 
                   </Select>
+                  {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
                 </FormControl>
               }
               </>
@@ -296,19 +388,20 @@ const FormGroup = ({
           return (
             <>
             { show &&
-            <FormControl isRequired>
+            <FormControl isRequired={required} isInvalid={name in errors}>
               <FormControl.Label>{label}</FormControl.Label>
               <TextArea 
                 placeholder={placeholder}
                 autoCompleteType={true} 
-                onChangeText={onChangeText} 
-                isDisabled={action !== "create" ?? false} 
-                isReadOnly={action !== "create" ?? false}
+                onChangeText={(value) => handleChange(name, value, onChangeText(value))} 
+                isDisabled={isDisabled}
+                isReadOnly={isReadOnly}
                 _disabled={{
                   bg: "muted.100",
                 }}
                 {...valueCond}
                 />
+                {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
             </FormControl>
             }
             </>
@@ -318,7 +411,7 @@ const FormGroup = ({
         case "image":
           return (
             <>
-            { show && <FormControl isRequired>
+            { show && <FormControl isRequired={required} isInvalid={name in errors}>
               <FormControl.Label>{label}</FormControl.Label>
               { bufferData 
                 ? <ImageComponent bufferData={bufferData}/> 
@@ -327,6 +420,7 @@ const FormGroup = ({
                   <ImagePreview source={{ uri: imageSource }} alt="test" />
                 </Pressable>
               }
+              {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
             </FormControl>
             }
             </>
@@ -350,7 +444,7 @@ const FormGroup = ({
         case "button":
           return (
             <>
-            { show && <Button bgColor={bgColor} mt={5} mb={10} onPress={onPress}>{ label }</Button>}
+            { show && <Button bgColor={bgColor} mt={5} mb={10} onPress={()=>handleSubmit(onPress)}>{ label }</Button>}
             </>
           );
           break;
