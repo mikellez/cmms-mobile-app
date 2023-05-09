@@ -23,14 +23,18 @@ import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RouteProp } from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
 
 
 import instance from '../../axios.config';
-import Form from '../../components/Request/Form';
+import FormGroup from '../../components/Request/FormGroup';
 import axios from 'axios';
 import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
+import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
+import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
 
 type FormValues = {
+  name?: string;
   requestTypeID: number;
   faultTypeID: number;
   description: string;
@@ -81,25 +85,27 @@ const RequestContainer = ({
   navigation, 
   action 
 } : { 
-  route?: RouteProp<{ params: { id: '' } }, 'params'>;
+  route?: RouteProp<{ params: { id: '', plant: '', asset: '' } }, 'params'>;
   navigation?: any;
   action?: string;
 }) => {
+  const [isConnected, setIsConnected] = useState(false);
   const [prioritySelected, setPrioritySelected] = useState({});
   const [assignUserSelected, setAssignUserSelected] = useState({});
   const [requestItems, setRequestItems] = useState<CMMSRequest>();
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedCompletionImage, setSelectedCompletionImage] = useState(null);
+  const [actionComment, setActionComment] = useState("");
 
-  const [completionComment, setCompletionComment] = useState("");
   const [completionImage, setCompletionImage] = useState(null);
 
   const [formState, setFormState] = useState<FormValues>({
+    name: "",
     requestTypeID: 0,
     faultTypeID: 0,
     description: "",
-    plantLocationID: 0,
-    taggedAssetID: 0,
+    plantLocationID: route?.params?.plant || 0,
+    taggedAssetID: route?.params?.asset || 0,
     image: null
   });
 
@@ -115,6 +121,9 @@ const RequestContainer = ({
   const [priorities, setPriorities] = useState([]);
   const [assignUsers, setAssignUsers] = useState([]);
 
+  const [plant, setPlant] = useState(route?.params?.plant);
+  const [asset, setAsset] = useState(route?.params?.asset);
+
 
   const getData = async (key) => {
     try {
@@ -129,6 +138,7 @@ const RequestContainer = ({
 
   const createRequest = async () => {
     const formData = new FormData();
+    formData.append("name", formState.name);
     formData.append("description", formState.description);
     formData.append("faultTypeID", formState.faultTypeID.toString());
     formData.append("plantLocationID", formState.plantLocationID.toString());
@@ -139,20 +149,44 @@ const RequestContainer = ({
     console.log('formData', formData);
     //setFormData(formData);
 
-    return await instance
-      .post("/api/request/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((response) => {
-        alert("Request created successfully");
-        navigation.navigate("Report");
-        return response.data;
-      })
-      .catch((e) => {
-        console.log("error creating request");
-        console.log(e);
-        return null;
-      });
+    if(isConnected) {
+      return await instance
+        .post("/api/request/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((response) => {
+          alert("Request created successfully");
+          navigation.navigate("Report");
+          return response.data;
+        })
+        .catch((e) => {
+          console.log("error creating request");
+          console.log(e);
+          return null;
+        });
+
+    } else {
+      let data = await getData('offlineRequests');
+      console.log('prev offlineRequests', data)
+      if(!data) {
+        data = [];
+      }
+
+      const newRequest = {
+        id: data.length + 1,
+        name: formState.name,
+        description: formState.description,
+        faultTypeID: formState.faultTypeID,
+        plantLocationID: plant,
+        requestTypeID: formState.requestTypeID,
+        taggedAssetID: asset,
+        image: formState.image
+      }
+      console.log('newRequest', newRequest)
+      data.push(newRequest);
+      await _storeData('offlineRequests', data);
+      navigation.navigate("OfflineRequest");
+    }
 
   }
 
@@ -179,7 +213,7 @@ const RequestContainer = ({
     const { id } = route.params;
 
     const formData = new FormData();
-    formData.append("complete_comment", formState.description);
+    formData.append("complete_comments", completionFormState.complete_comments);
     if (completionFormState.completion_file) formData.append("completion_file", completionFormState.completion_file);
 
     console.log('formData', formData);
@@ -212,20 +246,42 @@ const RequestContainer = ({
 
   }
 
-  const handleChange = (name: string, value: number) => {
-    setFormState({...formState, [name]: value});
+  const handleStatusAction = async (status) => {
+    const { id } = route.params;
+    return await instance
+      .patch(`/api/request/${id}/${status}`, { comments: actionComment })
+      .then((response) => {
+        alert("Request updated successfully");
+        navigation.navigate("Report");
+        return response.data;
+      })
+      .catch((e) => {
+        console.log("error updating request");
+        console.log(e);
+        return null;
+      });
+  }
+
+  const handleRejectionCommentChange = (value: string) => {
+    setActionComment(value);
+  }
+
+  const handleChange = (name: string, value: any) => {
+    console.log(name, value)
+    //setFormState({...formState, [name]: value});
+    //console.log('formState1', formState)
+    setFormState((prevState) => ({...prevState, [name]: value}));
+    //console.log('formState2', formState)
   }
 
   const handlePriorityChange = (value: string) => {
     const selectedItem = priorities.find((item) => item.p_id === value);
-    console.log(value)
-    console.log(selectedItem)
     setPrioritySelected({ p_id: selectedItem.p_id, priority: selectedItem.priority });
   }
 
   const handleAssignUserChange = (value: string) => {
     const selectedItem = assignUsers.find((item) => item.id === value);
-    setAssignUserSelected({ value: selectedItem.id, label: selectedItem.name + ' | ' + selectedItem.email });
+    setAssignUserSelected({ value: selectedItem.id, label: selectedItem.detail });
   }
 
   const NativeImagePicker = async () => {
@@ -242,7 +298,8 @@ const RequestContainer = ({
       quality: 0.5,
     });
 
-    if(result.canceled) return;
+    if(result.canceled) return false;
+
     const uri = result.assets[0].uri
     const type = result.assets[0].type;
     const name = result.assets[0].fileName || 'image.jpg';
@@ -259,93 +316,139 @@ const RequestContainer = ({
   const handleImagePicker = async () => {
     const file = await NativeImagePicker();
 
-    setSelectedImage(file.oriUri);
-    setFormState({...formState, image: file});
+    if(file) {
+      setSelectedImage(file.oriUri);
+      setFormState({...formState, image: file});
+    }
   };
 
   const handleCompletionImagePicker = async () => {
     const file = await NativeImagePicker();
 
-    setSelectedCompletionImage(file.oriUri);
-    setCompletionFormState({...completionFormState, completion_file: file});
+    if(file) {
+      setSelectedCompletionImage(file.oriUri);
+      setCompletionFormState({...completionFormState, completion_file: file});
+    }
   }
 
   const handleCompletionCommentChange = (value: string) => {
-    setCompletionComment(value);
     setCompletionFormState({...completionFormState, complete_comments: value});
   }
 
 
-  const handlePlantLocationChange = (value: string) => {
-    setFormState({...formState, plantLocationID: parseInt(value)});
+  const handlePlantLocationChange = (value: number) => {
+    setFormState({...formState, plantLocationID: value});
     fetchAssetTag(value);
+    fetchAssignUser(value);
   }
 
   const fetchFaultTypes = async () => {
-    await instance.get(`/api/fault/types`)
-    .then((res)=> {
-      setFaultTypes(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+    if(isConnected) {
+
+      await instance.get(`/api/fault/types`)
+        .then(async (res)=> {
+          _storeData('faultTypes', res.data);
+          setFaultTypes(res.data);
+        })
+        .catch((err) => {
+          console.log(err)
+          console.log('Unable fetch types')
+        });
+
+    } else {
+      const value = await _retrieveData('faultTypes');
+      if(value) setFaultTypes(JSON.parse(value));
+
+    }
   };
 
   const fetchRequestTypes = async () => {
-    await instance.get(`/api/request/types`)
-    .then((res)=> {
-      setRequestTypes(res.data);
-    })
-    .catch((err) => {
+    if(isConnected) {
+      await instance.get(`/api/request/types`)
+      .then((res)=> {
+        _storeData('requestTypes', res.data);
+        setRequestTypes(res.data);
+      })
+      .catch((err) => {
         console.log(err)
-    });
+        console.log('Unable fetch types')
+      });
+
+    } else {
+      const value = await _retrieveData('requestTypes');
+      if(value) setRequestTypes(JSON.parse(value));
+    }
   }
 
   const fetchPlants = async () => {
-    await instance.get(`/api/getPlants`)
-    .then((res)=> {
-      setPlants(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+    if(isConnected) {
+      await instance.get(`/api/plants`)
+      .then((res)=> {
+        _storeData('plants', res.data);
+        setPlants(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable fetch plants')
+      });
+    } else {
+      const value = await _retrieveData('plants');
+      if(value) setPlants(JSON.parse(value));
+    }
   }
 
-  const fetchAssetTag = async (id: string) => {
-    await instance.get(`/api/asset/${id}`)
-    .then((res)=> {
-      setAssetTags(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+  const fetchAssetTag = async (id: number) => {
+    if(isConnected) {
+      await instance.get(`/api/asset/${id}`)
+      .then((res)=> {
+        setAssetTags(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable fetch assets tags')
+      });
+
+    } else {
+      const value = await _retrieveData('assetTags');
+      if(value) {
+        const asset_tags = JSON.parse(value).filter(item => item.plant_id === id);
+        setAssetTags(asset_tags);
+      }
+    }
   }
 
   const fetchPriority = async () => {
-    await instance.get(`/api/request/priority`)
-    .then((res)=> {
-      setPriorities(res.data);
-    })
-    .catch((err)=> {
-      console.log(err)
-    })
-  }
-
-  const fetchAssignUser = async () => {
-    try {
-      const user = getData('@user');
-      console.log(user)
-
-      await instance.get(`/api/getAssignedUsers/4`)
+    if(isConnected) {
+      await instance.get(`/api/request/priority`)
       .then((res)=> {
-        setAssignUsers(res.data);
+        _storeData('priorities', res.data);
+        setPriorities(res.data);
       })
       .catch((err)=> {
         console.log(err)
+        console.log('Unable fetch priority')
+      })
+    } else {
+      const value = await _retrieveData('priorities');
+      setPriorities(JSON.parse(value));
+    }
+  }
+
+  const fetchAssignUser = async (plant_id) => {
+    try {
+
+      await instance.get(`/api/getAssignedUsers/${plant_id}`)
+      .then((res)=> {
+        setAssignUsers(res.data.map(item => ({ ...item, detail: item.name + ' | ' + item.email })));
+      })
+      .catch((err)=> {
+        console.log(err)
+        console.log('Unable fetch assign users')
       })
     } catch(err) {
       console.log(err)
       // error reading value
+      console.log('Unable fetch assign users')
     }
 
   }
@@ -358,91 +461,123 @@ const RequestContainer = ({
     })
     .catch((err) => {
         console.log(err)
+        console.log('Unable fetch requests')
     });
   };
 
-
   useEffect(() => {
-    if(requestItems) {
-      fetchAssetTag(requestItems?.plant_id.toString());
-    }
-  }, [requestItems?.plant_id]);
+    console.log('test loop 1')
+
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setIsConnected(netInfoState.isConnected);
+    };
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    const fetchData = async () => {
+      try {
+        await checkConnection();
+        // Do something else that depends on the network status
+        fetchFaultTypes();
+        fetchRequestTypes();
+        fetchPlants();
 
 
-  useEffect(() => {
+      } catch (error) {
+        console.log('Error fetching data: ', error);
+      }
+    };
+
     if(action==='create') {
-      fetchFaultTypes();
-      fetchRequestTypes();
-      fetchPlants();
+
+      fetchData();
 
     } else {
-
-      Promise.all([fetchFaultTypes(), fetchRequestTypes(), fetchPlants(), fetchPriority(), fetchAssignUser()])
+      Promise.all([fetchFaultTypes(), fetchRequestTypes(), fetchPlants(), fetchPriority()])
       .then(() => {
         fetchRequest();
       })
+
     }
 
-  }, [])
+    return () => {
+      unsubscribe();
+    };
+
+  }, [isConnected])
+
+  useEffect(() => {
+    console.log('test loop 2')
+
+    if(requestItems) {
+      fetchAssetTag(requestItems?.plant_id);
+      fetchAssignUser(requestItems?.plant_id);
+    }
+
+    // this is to default check whether there is route.params.plant pass in from previous screen
+    if(plant) {
+      fetchAssetTag(plant);
+    }
+
+  }, [isConnected, plant, asset, requestItems?.plant_id]);
+
 
   return (
 
-    <ModuleScreen navigation={navigation}>
 
-      <HStack flex={1}>
-        <VStack flex={1}>
-          <HStack px="5" py="5" w="100%" justifyContent="space-between">
-            <HStack>
-              <Heading size="md" color="#C8102E">Create Request</Heading>
-            </HStack>
-          </HStack>
+    <>
+      { !isConnected && <Text>Offline</Text> }
 
-          <ScrollView w="100%" h="200" p="5">
+      <FormGroup
+        action={action}
 
-            <Form 
-              action={action}
+        plant={plant}
+        asset={asset}
 
-              requestItems={requestItems}
+        requestItems={requestItems}
 
-              requestTypes={requestTypes}
-              onRequestTypeChange={value=>handleChange("requestTypeID", parseInt(value))}
+        requestTypes={requestTypes}
+        onRequestTypeChange={value=>handleChange("requestTypeID", parseInt(value))}
 
-              faultTypes={faultTypes}
-              onFaultTypeChange={value=>handleChange("faultTypeID", parseInt(value))}
+        faultTypes={faultTypes}
+        onFaultTypeChange={value=>handleChange("faultTypeID", parseInt(value))}
 
-              onFaultDescriptionChange={value=>handleChange("description", value)}
+        onFaultDescriptionChange={value=>handleChange("description", value)}
 
-              plants={plants}
-              onPlantLocationChange={value=>handlePlantLocationChange(value)}
+        plants={plants}
+        onPlantLocationChange={value=>handlePlantLocationChange(value)}
 
-              assetTags={assetTags}
-              onAssetTagChange={value=>handleChange("taggedAssetID", parseInt(value))}
+        assetTags={assetTags}
+        onAssetTagChange={value=>handleChange("taggedAssetID", parseInt(value))}
 
-              imageSource={selectedImage}
-              onImagePicker={handleImagePicker}
+        imageSource={selectedImage}
+        onImagePicker={handleImagePicker}
 
-              prioritySelected={prioritySelected}
-              priorities={priorities}
-              onPriorityChange={handlePriorityChange}
+        prioritySelected={prioritySelected}
+        priorities={priorities}
+        onPriorityChange={handlePriorityChange}
 
-              assignUserSelected={assignUserSelected}
-              assignUsers={assignUsers}
-              onAssignUserChange={handleAssignUserChange}
+        assignUserSelected={assignUserSelected}
+        assignUsers={assignUsers}
+        onAssignUserChange={handleAssignUserChange}
 
-              onCompletionImagePicker={handleCompletionImagePicker}
-              onCompletionCommentChange={handleCompletionCommentChange}
+        completionImageSource={selectedCompletionImage}
+        onCompletionImagePicker={handleCompletionImagePicker}
+        onCompletionCommentChange={handleCompletionCommentChange}
 
-              onSubmit={handleSubmit}
-            />
+        onSubmit={handleSubmit}
+        onStatusAction={handleStatusAction}
 
-          </ScrollView>
+        onRejectionCommentChange={handleRejectionCommentChange}
 
-        </VStack>
-      </HStack>
+        onNameChange={value=>handleChange("name", value)}
+      />
+      </>
 
 
-
-    </ModuleScreen>
   )
 }
 

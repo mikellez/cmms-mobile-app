@@ -2,11 +2,20 @@ import { HStack, Heading, Text, Box, Center, IconButton, Icon, Pressable, VStack
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
 import { View } from 'react-native';
-import {Collapse, CollapseHeader, CollapseBody} from "accordion-collapse-react-native";
+import Collapsible from 'react-native-collapsible';
 
-const ListBox = ({ item, navigation }) => {
+import { ItemData } from '../../pages/Report';
+
+type ItemProps = {
+  item: ItemData;
+  navigation: any;
+};
+
+const ListBox = ({ 
+  item, 
+  navigation 
+}: ItemProps) => {
   return (
     <>
     <Box key={item.request_id} px="1" mx="2" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderColor='#C8102E'>

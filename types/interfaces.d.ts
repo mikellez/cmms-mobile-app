@@ -220,6 +220,7 @@ interface CMMSSchedule {
   startDate: Date;
   endDate: Date;
   recurringPeriod: number;
+  assignedUsers: string[];
   assignedIds: number[];
   remarks: string;
   plantId: number;

@@ -1,10 +1,10 @@
-import { HStack, Heading, VStack } from 'native-base';
-import { ModuleScreen } from '../../components/ModuleLayout';
+import { HStack, Heading, NativeBaseProvider, VStack } from 'native-base';
 import RequestContainer from '../../components/Request/RequestContainer';
+import { ModuleScreen } from '../../components/ModuleLayout';
 
 const CreateRequest = ({ route, navigation }) => {
   return (
-    <ModuleScreen navigation={navigation}>
+    <ModuleScreen layout="empty" navigation={navigation}>
 
       <HStack flex={1}>
         <VStack flex={1}>
@@ -13,12 +13,13 @@ const CreateRequest = ({ route, navigation }) => {
               <Heading size="md" color="#C8102E">Create Request</Heading>
             </HStack>
           </HStack>
-          
           <RequestContainer route={route} navigation={navigation} action="create"/>
         </VStack>
       </HStack>
 
     </ModuleScreen>
+
+
   )
 }
 
