@@ -1,35 +1,32 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useState, useEffect } from "react";
 import { Box, HStack, IconButton, Input, Actionsheet, useDisclose, VStack } from "native-base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ChecklistRow from "./classes/ChecklistRow";
-import { SingleChoiceType } from "./Checks";
+import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType } from "./Checks";
 import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
 import CheckType from "./classes/CheckType";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { View } from "react-native";
 
-const Choices = [
-    "SingleChoice",
-    "MultiChoice",
-    "FreeText",
-    "Signature",
-];
+const Choices = ["SingleChoice", "MultiChoice", "FreeText", "Signature"];
 
-const ChecklistCreatorRow = ({row, setRows} : {
-    row: ChecklistRow,
-    setRows: React.Dispatch<React.SetStateAction<ChecklistRow[]>>
+const ChecklistCreatorRow = ({
+    row,
+    setRows,
+}: {
+    row: ChecklistRow;
+    setRows: React.Dispatch<React.SetStateAction<ChecklistRow[]>>;
 }) => {
-
     const { isOpen, onOpen, onClose } = useDisclose();
     const [checks, setChecks] = useState<CheckType[]>([]);
     const { level, setLevel } = useContext(ChecklistFormContext);
 
     const deleteRow = (rowId: string) => {
-        setRows(prev => prev.filter(item => item.getId() != rowId));
+        setRows((prev) => prev.filter((item) => item.getId() != rowId));
     };
 
     const handleTextChange = (text: string, rowId: string) => {
-        setRows(prevRows => {
+        setRows((prevRows) => {
             const newRows = [...prevRows];
             for (let i = 0; i < prevRows.length; i++) {
                 if (prevRows[i].getId() === rowId) {
@@ -42,42 +39,46 @@ const ChecklistCreatorRow = ({row, setRows} : {
 
     const actionSheetItems = Choices.map((choice, index) => {
         return (
-            <Actionsheet.Item 
-                key={index}
-                onPress={() => addNewCheck(index)}
-            >{choice}</Actionsheet.Item>
-        )
+            <Actionsheet.Item key={index} onPress={() => addNewCheck(index)}>
+                {choice}
+            </Actionsheet.Item>
+        );
     });
 
     const createNewCheck = useCallback((index: number) => {
-        switch(index) {
+        switch (index) {
             case 0:
                 return new SingleChoiceType("", "", ["Yes", "No"]);
-        };
+            case 1:
+                return new MultiChoiceType("", "", ["Option 1", "Option 2"])
+            case 2:
+                return new FreeTextType("", "");
+            case 3:
+                return new SignatureType("", "");
+        }
     }, []);
 
     const addNewCheck = (index: number) => {
         const newCheck = createNewCheck(index);
-        setChecks(prev => [...prev, newCheck]);
+        setChecks((prev) => [...prev, newCheck]);
 
         onClose();
     };
 
     const deleteCheck = useCallback((checkId: string) => {
-        setChecks(prevChecks => prevChecks.filter(check => check.getId() !== checkId));
+        setChecks((prevChecks) => prevChecks.filter((check) => check.getId() !== checkId));
     }, []);
 
-    // const checkElements = checks.map(check => {
-    //     return (
-    //         <View key={check.getId()}>
-    //             {check.renderCreatorForm(deleteCheck, setChecks)}
-    //         </View>
-    //     );
-    // });
-
+    const checkElements = checks.map(check => {
+        return (
+            <View key={check.getId()}>
+                {check.renderCreatorForm(deleteCheck, setChecks)}
+            </View>
+        );
+    });
 
     if (level === 3) {
-        setRows(prevRows => {
+        setRows((prevRows) => {
             const newRows = [...prevRows];
             for (let i = 0; i < prevRows.length; i++) {
                 if (prevRows[i].getId() === row.getId()) {
@@ -88,21 +89,28 @@ const ChecklistCreatorRow = ({row, setRows} : {
         });
 
         setLevel(2);
-    };
+    }
 
     const appendChecks = (row: ChecklistRow) => {
         row.removeAllChecks();
 
-        checks.forEach(check => {
+        checks.forEach((check) => {
             row.addCheck(check);
         });
     };
-    
+
+    useEffect(() => {
+        if (row.checks) {
+            setChecks(row.checks);
+            // console.log(row.checks)
+        } else setChecks([])
+    }, [row])
+
     return (
         <ModuleCardContainer>
             <VStack>
                 <HStack space={2}>
-                    <Input 
+                    <Input
                         w="80%"
                         my={2}
                         placeholder="Row Description"
@@ -113,7 +121,7 @@ const ChecklistCreatorRow = ({row, setRows} : {
                         marginLeft="auto"
                         _icon={{
                             as: MaterialCommunityIcons,
-                            name: "dots-vertical"
+                            name: "dots-vertical",
                         }}
                         colorScheme="white"
                         onPress={onOpen}
@@ -122,14 +130,14 @@ const ChecklistCreatorRow = ({row, setRows} : {
                         marginLeft="auto"
                         _icon={{
                             as: MaterialCommunityIcons,
-                            name: "delete-outline"
+                            name: "delete-outline",
                         }}
                         colorScheme="white"
                         onPress={() => deleteRow(row.getId())}
                     />
                 </HStack>
 
-                {/* {checkElements} */}
+                {checkElements}
                 
             </VStack>
             <Actionsheet isOpen={isOpen} onClose={onClose}>

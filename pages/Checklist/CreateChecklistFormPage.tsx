@@ -20,6 +20,15 @@ const fetchSpecificChecklistTemplate = async (id: number): Promise<CMMSChecklist
     };
 };
 
+const submitChecklist = async (checklist: CMMSChecklist) => {
+    try {
+        instance.post("/api/checklist/record/", { checklist })
+    }
+    catch (err) {
+        console.log(err);
+    };
+};
+
 const ChecklistFormContext = createContext(null);
 
 const CreateChecklistFormPage = ({ navigation, route }) => {
@@ -28,17 +37,23 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     const [successModal, setSuccessModal] = useState<boolean>(false);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     const [level, setLevel] = useState<number>();
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const { checklistId } = route.params;
 
     const handleSubmit = () => {
         setLevel(1)
+        setSubmitting(true);
 
-        // if (!validateChecklistFormData(checklist)) {
-        //     setIncompleteModal(true);
-        // } else {
-        //     setSuccessModal(true);
-        //     navigation.navigate("Maintenance");
-        // }
+        if (!validateChecklistFormData(checklist)) {
+            setIncompleteModal(true);
+            setSubmitting(false);
+
+        } else {
+            submitChecklist(checklist).then(res => {
+                setSuccessModal(true);
+                navigation.navigate("Maintenance");
+            })     
+        }
     };
 
     const toDataJSON = (sections: ChecklistSection[]) => {
@@ -46,7 +61,11 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     if (level === 0) {
-        console.log(toDataJSON(sections))
+        setChecklist(prevChecklist => {
+            const newChecklist = {...prevChecklist};
+            newChecklist.datajson = toDataJSON(sections);
+            return newChecklist;
+        })
         setLevel(undefined);
     };
 
@@ -99,6 +118,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                     variant="solid"
                     backgroundColor="#C8102E"
                     onPress={handleSubmit}
+                    disabled={isSubmitting}
                 />
             </ScrollView>
 

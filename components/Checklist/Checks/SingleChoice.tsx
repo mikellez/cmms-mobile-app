@@ -63,6 +63,7 @@ const SingleChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
                         w="80%"
                         my={2}
                         placeholder="Question"
+                        defaultValue={check.question}
                         onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
                     />
                     <IconButton

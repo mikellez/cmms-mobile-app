@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Select } from "native-base";
+import { View } from "react-native";
 import instance from "../../axios.config";
 import { CMMSAsset } from "../../types/interfaces";
+import MultiSelect from "react-native-multiple-select";
 
 interface PlantSelectProps {
     plantId?: number
     value?: string,
-    onChange: (itemValue: string) => void
+    onChange: Function
 };
 
 const fetchAssets = async (plantId: number) : Promise<CMMSAsset[]> => {
@@ -44,11 +46,50 @@ const AssetSelect = (props: PlantSelectProps) => {
         <Select
             placeholder="Select Asset" 
             selectedValue={props.value ? props.value : null}
-            onValueChange={props.onChange}
+            onValueChange={(value) => props.onChange(value)}
         >
             {options}
         </Select>
     );
 };
 
-export { AssetSelect };
+
+const AssetMultiSelect = (props: PlantSelectProps) => {
+    const [assets, setAssets] = useState<CMMSAsset[]>([]);
+    const [selectedItems, setSelectedItems] = useState<{id: number, name: string}[]>([]);
+
+    useEffect(() => {
+        if (props.plantId) {
+            fetchAssets(props.plantId).then(result => {
+                if (result) setAssets(result);
+            });
+        } else setAssets([]);
+    }, [props.plantId]);
+
+    const options = assets.map(asset => {
+        return {
+            id: asset.psa_id,
+            name: asset.asset_name
+        };
+    });
+
+    const handleChange = (items: {id: number, name: string}[]) => {
+        setSelectedItems(items);
+        props.onChange(items.map(item => item.id));
+    }
+
+    return (
+        <MultiSelect
+            uniqueKey="id"
+            items={options}
+            selectedItems={selectedItems}
+            onSelectedItemsChange={handleChange}
+            styleItemsContainer={{maxHeight: 200}}
+            selectText=""
+            styleDropdownMenu={{ flex: 1, borderColor: "rgb(133, 133, 133))", borderWidth: 1, borderRadius: 5}}
+            styleSelectorContainer={{ flex: 1, borderColor: "rgb(133, 133, 133))", borderWidth: 1, borderRadius: 5}}
+        />
+    );
+};
+
+export { AssetSelect, AssetMultiSelect };

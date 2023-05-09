@@ -65,6 +65,7 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
                         my={2}
                         placeholder="Question"
                         onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
+                        defaultValue={check.question}
                     />
                     <IconButton
                         marginLeft="auto"
@@ -79,5 +80,7 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
                 {choiceElements}
             </VStack>
         </ModuleCardContainer>
-    )
-}
+    );
+};
+
+export { MultiChoiceType }

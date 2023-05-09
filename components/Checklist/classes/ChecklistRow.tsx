@@ -1,5 +1,6 @@
 import uuid from 'react-native-uuid';
 import CheckType from './CheckType';
+import { SingleChoiceType, MultiChoiceType, FreeTextType, SignatureType } from '../Checks';
 
 class ChecklistRow {
     private _id: string;
@@ -32,7 +33,23 @@ class ChecklistRow {
     };
 
     static fromJSON(json: any) {
-        return new ChecklistRow(json.description);
+        return new ChecklistRow(json.description, json.checks.map(check => ChecklistRow.checkFromJSON(check)));
+    }
+
+    private static checkFromJSON(json: any) {
+        console.log(json)
+        switch(json.type) {
+            case "SingleChoice":
+                return new SingleChoiceType(json.question, json.value, json.choices);
+            case "MultiChoice":
+                return new MultiChoiceType(json.question, json.value, json.choices);
+            case "FileUpload":
+            case "FreeText":
+                return new FreeTextType(json.question, json.value);
+            case "Signature":
+                return new SignatureType(json.question, json.value);
+            
+        }
     }
 };
 

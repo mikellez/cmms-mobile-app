@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { VStack, Input, TextArea, FormControl} from "native-base";
-import { PlantSelect, AssetSelect, PersonSelect } from "../General";
+import { PlantSelect, AssetSelect, PersonSelect, AssetMultiSelect } from "../General";
 import { CMMSChecklist } from "../../types/interfaces";
 
 
@@ -20,7 +20,7 @@ const ChecklistForm = (props: ChecklistFormProps) => {
             } as CMMSChecklist
         });
     };
-
+    
     return (
         <VStack 
                 marginY={3}
@@ -52,12 +52,16 @@ const ChecklistForm = (props: ChecklistFormProps) => {
                 onChange={value => updateChecklist(+value, "plant_id")}
                 accessControl
                 value={props.checklist.plant_id ? props.checklist.plant_id.toString() : null}
-                
             />
 
             <FormControl.Label>Asset</FormControl.Label>
-            <AssetSelect 
+            {/* <AssetSelect 
                 onChange={value => updateChecklist(value, "linkedassetids")}
+                plantId={props.checklist.plant_id}
+            /> */}
+
+            <AssetMultiSelect
+                onChange={items => updateChecklist(items.join(","), "linkedasstids")}
                 plantId={props.checklist.plant_id}
             />
 

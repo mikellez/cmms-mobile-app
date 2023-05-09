@@ -56,7 +56,6 @@ const ChecklistCreatorSection = ({section} : {
         section.removeAllRows();
 
         rows.forEach(row => {
-            // console.log(row)
             section.addRow(row);
         });
     };
