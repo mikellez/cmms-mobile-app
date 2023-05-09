@@ -11,6 +11,8 @@ import { View } from "react-native";
 const Choices = [
     "SingleChoice",
     "MultiChoice",
+    "FreeText",
+    "Signature",
 ];
 
 const ChecklistCreatorRow = ({row, setRows} : {

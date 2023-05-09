@@ -12,6 +12,15 @@ class SingleChoiceType extends CheckType {
         this.choices = choices ? choices : [];
 	};
 
+    toJSON() {
+        return {
+            question: this.question,
+            value: this.value,
+            choices: this.choices,
+            type: "SingleChoice",
+        }
+    };
+
     renderCreatorForm(deleteCheck: Function, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>) {
         return (
             <SingleChoiceCreatorForm 
