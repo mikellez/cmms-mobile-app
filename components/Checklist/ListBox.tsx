@@ -9,8 +9,6 @@ import { Swipeable } from "react-native-gesture-handler";
 
 const ListBox = ({ checklist, navigation }:
      { checklist: CMMSChecklist,navigation?: any }) => {
-        console.log("hi")
-        console.log(navigation)
 
     const rightAction = () => {
         return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import { ModuleScreen, ModuleHeader } from "../../components/ModuleLayout";
 import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
@@ -7,10 +7,22 @@ import { ScrollView, StyleSheet } from "react-native";
 import { VStack, Text, Center} from "native-base";
 import { Table, Rows } from "react-native-table-component";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
+import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
+import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
 
-
+const ChecklistEditableFormContext = createContext(null);
 
 const CompleteChecklistPage = ({navigation, route}) => {
+    const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
+    const [sections, setSections] = useState<ChecklistSection[]>([]);
+
+    useEffect(() => {
+        if (route.params) setChecklist(route.params);
+    }, [route.params]);
+
+    useEffect(() => {
+        if (checklist && checklist.datajson) setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)))
+    }, [checklist])
 
     return (
         <ModuleScreen navigation={navigation}>
@@ -19,8 +31,11 @@ const CompleteChecklistPage = ({navigation, route}) => {
             </ModuleHeader>
             <ScrollView>
                 <Center>
-                    <ChecklistDetails checklist={route.params}></ChecklistDetails>
+                    <ChecklistDetails checklist={checklist}></ChecklistDetails>
                 </Center>
+                <ChecklistEditableFormContext.Provider value={{ sections, setSections }}>
+                    <ChecklistEditableForm />
+                </ChecklistEditableFormContext.Provider>
             </ScrollView>
             
         </ModuleScreen>
@@ -28,5 +43,5 @@ const CompleteChecklistPage = ({navigation, route}) => {
 };
 
 
-
+export { ChecklistEditableFormContext }
 export default CompleteChecklistPage;

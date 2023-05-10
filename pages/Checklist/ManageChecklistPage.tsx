@@ -11,7 +11,6 @@ import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
 
 
 const ManageChecklistPage = ({navigation, route}) => {
-
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Mange Checklist">
@@ -22,7 +21,7 @@ const ManageChecklistPage = ({navigation, route}) => {
                     <ChecklistDetails checklist={route.params}></ChecklistDetails>
                 </Center>
             </ScrollView>
-            
+
         </ModuleScreen>
     );
 };
