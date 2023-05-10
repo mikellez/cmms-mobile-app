@@ -41,7 +41,7 @@ const Maintenance = ({ navigation }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
     const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
-
+    
     useEffect(() => {
         fetchChecklist(viewType)
             .then(result => {
@@ -52,7 +52,7 @@ const Maintenance = ({ navigation }) => {
 
     const checklistElements = checklists.length > 0 ? checklists.map(cl => {
         return (
-            <ListBox key={cl.checklist_id} checklist={cl} />
+            <ListBox key={cl.checklist_id} checklist={cl} navigation={navigation} />
 
         );
     }) : <Text>No Checklist Found</Text>;

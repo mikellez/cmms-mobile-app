@@ -7,7 +7,10 @@ import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
 
-const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
+const ListBox = ({ checklist, navigation }:
+     { checklist: CMMSChecklist,navigation?: any }) => {
+        console.log("hi")
+        console.log(navigation)
 
     const rightAction = () => {
         return (
@@ -21,7 +24,7 @@ const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
 
     return (
         <Pressable
-            onPress={() => {console.log("press")}}
+            onPress={() => {navigation.navigate("ApprovedChecklist",checklist)}}
         >
             <Swipeable
                 renderRightActions={rightAction}
