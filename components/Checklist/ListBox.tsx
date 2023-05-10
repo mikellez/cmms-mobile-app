@@ -6,8 +6,11 @@ import { CMMSChecklist } from "../../types/interfaces";
 import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
 
-const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
+const ListBox = ({ checklist, navigation }: { checklist: CMMSChecklist, navigation: any }) => {
+
+    // const navigation = useNavigation();
 
     const rightAction = () => {
         return (
@@ -26,10 +29,12 @@ const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
             <Swipeable
                 renderRightActions={rightAction}
             >
-                <ModuleCardContainer>
-                    <HStack>
-                        <VStack>
-                            <Text 
+                <ModuleCardContainer onPress={() => checklist.status === "WORK DONE" 
+                                                        ? navigation.navigate("TestChecklistComponent")
+                                                        : null}>
+                    <HStack style={{borderColor: "red", borderWidth: 3}}>
+                        <VStack style={{borderColor: "blue", borderWidth: 3}}>
+                            <Text
                                 fontSize={14}
                                 fontWeight={600}
                             >

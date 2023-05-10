@@ -82,6 +82,16 @@ const Maintenance = ({ navigation }) => {
                         size="xs"
                         onPress={() => navigation.navigate("ChecklistTemplatesPage")}
                     ></Button>
+                    <Button
+                        w="30" 
+                        padding={2} 
+                        bg="#C8102E" 
+                        leftIcon={
+                            <Icon as={AntDesign} name="addfile" size="sm"/>
+                        } 
+                        size="xs"
+                        onPress={() => navigation.navigate("TestChecklistComponent")}
+                    ></Button>
                 </HStack>
             </ModuleHeader>
 

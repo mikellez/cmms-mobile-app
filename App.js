@@ -15,6 +15,7 @@ import CompleteRequest from './pages/Request/Complete';
 import ManageRequest from './pages/Request/Manage';
 import OfflineRequest from './pages/Request/Offline';
 import QRScan from './pages/QRScan/index';
+import TestChecklistComponent from './pages/Checklist/TestChecklistComponent';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { navigationRef } from './RootNavigation';
@@ -43,6 +44,7 @@ export default function App() {
         <Stack.Screen name="QRScan" component={QRScan} />
         <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
         <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
+        <Stack.Screen name="TestChecklistComponent" component={TestChecklistComponent} />
       </Stack.Navigator>
     </NavigationContainer>
   );
