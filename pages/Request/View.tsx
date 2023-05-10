@@ -11,33 +11,8 @@ import RNFS from 'react-native-fs';
 
 import ImageComponent from "../../components/Image";
 import App from "../App";
-
-interface CMMSRequest {
-  request_id: string;
-  request_name?: string;
-  created_date: string;
-  fullname: string;
-  fault_name: string;
-  fault_id?: number;
-  asset_name: string;
-  psa_id?: number;
-  req_id?: number;
-  plant_name: string;
-  plant_id?: number;
-  priority: string;
-  priority_id: number;
-  status: string;
-  status_id?: number;
-  assigned_user_email: string;
-  assigned_user_id: number;
-  assigned_user_name: string;
-  fault_description?: string;
-  uploaded_file?: any;
-  requesthistory?: string;
-  complete_comments?: string;
-  completion_file?: any;
-  rejection_comments: string;
-}
+import { CMMSRequest } from "../../types/interfaces";
+import { shortDateWithDay } from "../../helper/DateFormat";
 
 
 const ReportScreen = ({ route, navigation }) => {
@@ -57,11 +32,13 @@ const ReportScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     fetchRequest();
-  });
+  }, []);
 
   function moment(arg0: string) {
     throw new Error("Function not implemented.");
   }
+
+  console.log(requestItems)
 
   return (
     <App navigation={navigation}>
@@ -86,9 +63,9 @@ const ReportScreen = ({ route, navigation }) => {
 
           <ScrollView w="100%" h="200" px={3}>
 
-            <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date }</Text>
-            <Text><Heading size="xs">Reported By:</Heading>{ requestItems?.assigned_user_name }</Text>
-            <Text><Heading size="xs">Assigned To:</Heading>{ requestItems?.assigned_user_name }</Text>
+            <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date ? shortDateWithDay(new Date(requestItems?.created_date)) : 'NIL' }</Text>
+            <Text><Heading size="xs">Reported By: </Heading>{ requestItems?.assigned_user_name || 'NIL' }</Text>
+            <Text><Heading size="xs">Assigned To: </Heading>{ requestItems?.created_by || 'NIL'}</Text>
 
             <Heading size="sm" pt="3" pb="1" color="#C8102E">
               Fault Description

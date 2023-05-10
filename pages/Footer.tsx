@@ -34,7 +34,7 @@ const Footer = ({ navigation }) => {
                     />
                 </Center>
                 <Center>
-                    <Text>Work Orders</Text>
+                    <Text>Requests</Text>
                 </Center>
             </Pressable>
             <Pressable
