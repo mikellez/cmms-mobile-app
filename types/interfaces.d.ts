@@ -260,7 +260,7 @@ interface CMMSChecklist {
   description: string;
   status_id: number;
   createdbyuser: string;
-  created_by_user_id: string | null;
+  created_by_user_id: number | null;
   created_by_user_email: string | null;
   assigneduser: string;
   assigned_user_email: string | null;

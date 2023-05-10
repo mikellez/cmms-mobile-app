@@ -23,10 +23,12 @@ const ChecklistCreator = () => {
         );
     });
 
+    
     if (level === 1) {
         setLevel(0);
     }
- 
+   
+    
     return (
         <VStack>
             <FormControl.Label>Checklist Content</FormControl.Label>

@@ -102,7 +102,6 @@ const ChecklistCreatorRow = ({
     useEffect(() => {
         if (row.checks) {
             setChecks(row.checks);
-            // console.log(row.checks)
         } else setChecks([])
     }, [row])
 
