@@ -3,8 +3,6 @@ import { Button, Text, View, StyleSheet } from "react-native";
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { ModuleScreen } from "../../components/ModuleLayout";
 import instance from "../../axios.config";
-import NetInfo from '@react-native-community/netinfo';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QRScanIndex = ({ route, navigation }) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -26,11 +24,15 @@ const QRScanIndex = ({ route, navigation }) => {
     const plant = parseInt(data.split("/")[3]);
     const asset = parseInt(data.split("/")[4]);
 
-    await instance.post(`/api/login`, {username: 'admin', password: '123Az!!!'})
+    /*await instance.post(`/api/login`, {username: 'admin', password: '123Az!!!'})
     .catch((err) => {
       console.log(err)
-    });
-    navigation.navigate("GuestCreateRequest", {plant, asset});
+    });*/
+    if(plant && asset) {
+      navigation.navigate("GuestCreateRequest", {plant, asset});
+    } else {
+      alert("Invalid QR Code");
+    }
   };
 
   if (hasPermission === null) {

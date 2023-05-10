@@ -128,6 +128,7 @@ interface CMMSRequest {
   request_id: string;
   request_name?: string;
   created_date: Date;
+  created_by: string;
   fullname: string;
   fault_name: string;
   fault_id?: number;

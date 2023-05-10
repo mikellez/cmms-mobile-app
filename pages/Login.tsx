@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import NetInfo from '@react-native-community/netinfo';
 
+import { _storeData, _retrieveData } from '../helper/AsyncStorage';
 import instance from '../axios.config';
 import { API_URL } from '@env';
 
@@ -26,32 +27,6 @@ const Login = ({ navigation }) => {
   const [plants, setPlants] = useState([]);
   const [assets, setAssets] = useState([]);
 
-  const _storeData = async (key, value) => {
-    if(typeof value === 'object') value = JSON.stringify(value);
-
-    try {
-      await AsyncStorage.setItem(
-        '@'+key,
-        value,
-      );
-    } catch (err) {
-      // Error saving data
-      console.log(err)
-    } 
-  }
-
-  const _retrieveData = async (key) => {
-    try {
-      const value = await AsyncStorage.getItem('@'+key);
-      if (value !== null) {
-        return value;
-      }
-    } catch (err) {
-      // Error retrieving data
-      console.log(err)
-    }
-  }
-
   const fetchFaultTypes = async () => {
     if(isConnected) {
 
@@ -62,6 +37,7 @@ const Login = ({ navigation }) => {
         })
         .catch((err) => {
             console.log(err)
+          console.log('Unable to fetch fault types')
         });
 
     } else {
@@ -80,6 +56,7 @@ const Login = ({ navigation }) => {
       })
       .catch((err) => {
         console.log(err)
+          console.log('Unable to fetch request types')
       });
 
     } else {
@@ -96,8 +73,8 @@ const Login = ({ navigation }) => {
         setPlants(res.data);
       })
       .catch((err) => {
-        alert(1)
           console.log(err)
+          console.log('Unable to fetch plants')
       });
     } else {
       const value = await _retrieveData('plants');
@@ -114,6 +91,7 @@ const Login = ({ navigation }) => {
       })
       .catch((err) => {
           console.log(err)
+          console.log('Unable to fetch assets')
       });
 
     } else {
@@ -140,6 +118,8 @@ const Login = ({ navigation }) => {
         fetchRequestTypes();
         fetchPlants();
         fetchAssets();
+
+        const result = await _retrieveData('assetTags');
 
       } catch (error) {
         console.log('Error fetching data: ', error);
@@ -172,9 +152,8 @@ const Login = ({ navigation }) => {
         navigation.navigate('Home');
       })
     })
-
     .catch((error) => {
-			console.log("error", error);
+			console.log("Error login", error);
 			let reason:string = ""
 			if(error.response.status === 429)
 				reason = "Too many Login attempts. Try again later."
@@ -188,40 +167,14 @@ const Login = ({ navigation }) => {
 
   };
 
-  const handleLoginTest = async () => {
-    await instance.post(`/api/login`, {username, password})
-    .then((res)=> {
-        alert(res.data);
-        console.log(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-    });
-  };
-
-  const handleUser = async () => {
-    await instance.get(`/api/user`)
-    .then((res)=> {
-        alert(JSON.stringify(res.data));
-        console.log(res.data);
-    })
-    .catch((err) => {
-        console.log(err)
-        alert(err.response.data);
-    });
-  };
-
   const handleLogout = async () => {
     await instance.post(`/api/logout`)
     .then((res)=> {
-        alert(res.data);
-        console.log(res.data);
+      alert('logout');
     })
-    .catch((err) => {
-        console.log(err)
-    });
+
   };
-  
+
   return (
     <NativeBaseProvider>
       <Center w="100%">

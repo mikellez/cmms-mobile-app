@@ -34,7 +34,7 @@ const Footer = ({ navigation }) => {
                     />
                 </Center>
                 <Center>
-                    <Text>Work Orders</Text>
+                    <Text>Requests</Text>
                 </Center>
             </Pressable>
             <Pressable
@@ -56,7 +56,7 @@ const Footer = ({ navigation }) => {
                     <Text>Maintenance</Text>
                 </Center>
             </Pressable>
-            <Pressable py="3" flex={1}>
+            <Pressable py="3" flex={1} onPress={() => navigation.navigate("ViewAsset")}>
                 <Center>
                     <Icon
                         mb="1"
