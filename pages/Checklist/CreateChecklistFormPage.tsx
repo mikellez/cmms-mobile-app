@@ -9,6 +9,7 @@ import ChecklistForm from "../../components/Checklist/ChecklistForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
 import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
 import instance from "../../axios.config";
+import { useCurrentUser } from "../../helper/hooks/SWR";
 
 const fetchSpecificChecklistTemplate = async (id: number): Promise<CMMSChecklist | void> => {
     try {
@@ -39,51 +40,70 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     const [level, setLevel] = useState<number>();
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const { checklistId } = route.params;
+    const user = useCurrentUser();
 
     const handleSubmit = () => {
-        setLevel(1)
+        setLevel(3);
         setSubmitting(true);
-
-        if (!validateChecklistFormData(checklist)) {
-            setIncompleteModal(true);
-            setSubmitting(false);
-
-        } else {
-            submitChecklist(checklist).then(res => {
-                setSuccessModal(true);
-                navigation.navigate("Maintenance");
-            })     
-        }
     };
 
     const toDataJSON = (sections: ChecklistSection[]) => {
         return sections.map(section => section.toJSON());
     };
 
-    if (level === 0) {
+    const validateChecklistFormData = (checklist: CMMSChecklist) => {
+        return true;
+    };
+
+    const updateChecklistDataJSON = async () => {
         setChecklist(prevChecklist => {
             const newChecklist = {...prevChecklist};
             newChecklist.datajson = toDataJSON(sections);
             return newChecklist;
-        })
-        setLevel(undefined);
+        });
     };
 
-    const validateChecklistFormData = (checklist) => {
-        return false;
+    if (level === 0) {
+        updateChecklistDataJSON().then(res => {
+            if (!validateChecklistFormData(checklist)) {
+                setIncompleteModal(true); 
+            } else {
+                submitChecklist(checklist).then(res => {
+                    setSuccessModal(true);
+                })   
+            }
+        });
+
+        setSubmitting(false);
+        setLevel(undefined); 
+
+        setTimeout(() => {
+            if (successModal) navigation.navigate("Maintenance");
+        }, 1000);
     };
 
     useEffect(() => {
         if (checklistId) {
             fetchSpecificChecklistTemplate(checklistId).then(data => {
                 if (data) {
-                    setChecklist(data);
+                    setChecklist({
+                        ...data,
+                        createdbyuser: user.data.name,
+                        created_by_user_id: user.data.id,
+                    });
 
                     setSections(data.datajson.map(section => ChecklistSection.fromJSON(section)));
                 }   
             })
+        } else {
+            setChecklist({
+                createdbyuser: user.data.name,
+                created_by_user_id: user.data.id,
+            } as CMMSChecklist);
         }
     }, [checklistId]);
+
+    console.log(checklist)
 
     return (
         <ModuleScreen navigation={navigation}>
@@ -127,6 +147,14 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 setOpen={setIncompleteModal}
                 title="Missing Details"
                 text="Ensure that all fields have been filled"
+                icon={ModalIcons.Warning}
+            />
+
+            <ModuleSimpleModal
+                isOpen={successModal}
+                setOpen={setSuccessModal}
+                title="Success"
+                text="New checklist successfully created"
                 icon={ModalIcons.Warning}
             />
 
