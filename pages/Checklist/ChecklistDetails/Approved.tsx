@@ -6,6 +6,7 @@ import ChecklistTemplate from "../../../components/Checklist/ChecklistTemplate";
 import { ScrollView, StyleSheet } from "react-native";
 import { VStack, Text, Center} from "native-base";
 import { Table, Rows } from "react-native-table-component";
+import ChecklistDetails from "../../../components/Checklist/ChecklistDetails";
 
 
 
@@ -23,35 +24,11 @@ const Approved = ({navigation, route}) => {
 
 ];
 
-
     return (
-        // <ModuleScreen navigation={navigation}>
-        //     <ModuleHeader header="Approved">
-
-        //     </ModuleHeader>
-        //     <ScrollView>
-        //         <VStack space={2}>
-        //            <Text>Approved</Text>
-        //         </VStack>
-        //     </ScrollView>
-        // </ModuleScreen>
         <ModuleScreen navigation={navigation}>
       <ScrollView>
         <Center>
-          <Text underline fontSize={18} marginBottom={5}>
-            {route.params.chl_name}
-          </Text>
-            <Table>
-              <Rows
-                data={tableData}
-                widthArr={widthArr}
-                style={{
-                  margin: 6,
-                  borderTopColor: "#cad5dd", 
-                  borderTopWidth: 0
-                }}
-              ></Rows>
-            </Table>
+            <ChecklistDetails checklist={route.params}></ChecklistDetails>
         </Center>
       </ScrollView>
     </ModuleScreen>
