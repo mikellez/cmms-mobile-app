@@ -10,7 +10,10 @@ import { useNavigation } from "@react-navigation/native";
 
 const ListBox = ({ checklist, navigation }: { checklist: CMMSChecklist, navigation: any }) => {
 
-    // const navigation = useNavigation();
+const ListBox = ({ checklist, navigation }:
+     { checklist: CMMSChecklist,navigation?: any }) => {
+        console.log("hi")
+        console.log(navigation)
 
     const rightAction = () => {
         return (
@@ -24,7 +27,7 @@ const ListBox = ({ checklist, navigation }: { checklist: CMMSChecklist, navigati
 
     return (
         <Pressable
-            onPress={() => {console.log("press")}}
+            onPress={() => {navigation.navigate("ApprovedChecklist",checklist)}}
         >
             <Swipeable
                 renderRightActions={rightAction}

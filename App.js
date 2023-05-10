@@ -20,6 +20,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { navigationRef } from './RootNavigation';
 import { linking } from './linking';
+import ApprovedChecklist from './pages/Checklist/ChecklistDetails/Approved';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,7 @@ export default function App() {
         <Stack.Screen name="QRScan" component={QRScan} />
         <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
         <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
+        <Stack.Screen name="ApprovedChecklist" component={ApprovedChecklist} />
         <Stack.Screen name="TestChecklistComponent" component={TestChecklistComponent} />
       </Stack.Navigator>
     </NavigationContainer>

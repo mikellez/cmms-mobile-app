@@ -37,7 +37,6 @@ class ChecklistRow {
     }
 
     private static checkFromJSON(json: any) {
-        console.log(json)
         switch(json.type) {
             case "SingleChoice":
                 return new SingleChoiceType(json.question, json.value, json.choices);
