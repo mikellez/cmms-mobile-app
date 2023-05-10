@@ -22,9 +22,14 @@ const ListBox = ({ checklist, navigation }:
         )
     }
 
+    const page = checklist.status_id === 4 ? 
+        "ManageChecklistPage" :
+        checklist.status_id === 2 ?
+        "CompleteChecklistPage" : ""
+
     return (
         <Pressable
-            onPress={() => {navigation.navigate("ApprovedChecklist",checklist)}}
+            onPress={() => {navigation.navigate(page, checklist)}}
         >
             <Swipeable
                 renderRightActions={rightAction}

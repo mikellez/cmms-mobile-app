@@ -103,8 +103,6 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         }
     }, [checklistId]);
 
-    console.log(checklist)
-
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Create Checklist">
