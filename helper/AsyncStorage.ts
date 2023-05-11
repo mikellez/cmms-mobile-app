@@ -26,7 +26,18 @@ const _retrieveData = async (key) => {
   }
 }
 
+const _clear = () => {
+  try {
+    return AsyncStorage.clear();
+  } catch (err) {
+    console.log(err)
+    console.log('Async storage clear err')
+
+  }
+}
+
 export {
   _storeData,
-  _retrieveData
+  _retrieveData,
+  _clear
 }

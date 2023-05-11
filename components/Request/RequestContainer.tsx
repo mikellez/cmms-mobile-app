@@ -172,7 +172,7 @@ const RequestContainer = ({
         })
         .then((response) => {
           alert("Request created successfully");
-          if(route?.params?.plant) {
+          if(!user?.id) {
             alert("Please login to view your requests.");
             navigation.navigate("Login");
           } else {
