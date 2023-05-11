@@ -4,11 +4,13 @@ import uuid from 'react-native-uuid';
 abstract class CheckType {
     question: string;
 	value: string;
+    type: string;
 	private _id: string;
 
-    constructor(question?: string, value?: string) {
+    constructor(question?: string, value?: string, type?: string) {
 		this.question = question ? question : "";
 		this.value = value ? value : "";
+        this.type = type ? type : "";
 		this._id = uuid.v4() as string;
 	};
 

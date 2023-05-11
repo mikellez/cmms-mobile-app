@@ -13,7 +13,7 @@ class SingleChoiceType extends CheckType {
     choices: string[];
 
     constructor(question?: string, value?: string, choices?: string[]) {
-		super(question, value);
+		super(question, value, "SingleChoice");
         this.choices = choices ? choices : [];
 	};
     
@@ -24,7 +24,7 @@ class SingleChoiceType extends CheckType {
             question: this.question,
             value: this.value,
             choices: this.choices,
-            type: "SingleChoice",
+            type: this.type,
         }
     };
 

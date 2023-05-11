@@ -10,14 +10,14 @@ import { ChecklistEditableFormContext } from "../../../context/checklistContext"
 
 class FreeTextType extends CheckType {
     constructor(question?: string, value?: string) {
-        super(question, value);
+        super(question, value, "FreeText");
     }
 
     toJSON() {
         return {
             question: this.question,
             value: this.value,
-            type: "FreeText",
+            type: this.type,
         };
     }
 
@@ -67,7 +67,13 @@ const FreeTextCreatorForm = ({
                         onPress={() => deleteCheck(check.getId())}
                     />
                 </HStack>
-                <Input w="80%" my={2} isDisabled={true} _disabled={{ backgroundColor: "grey" }} />
+                <TextArea 
+                    h={20} placeholder="" 
+                    numberOfLines={4} 
+                    autoCompleteType={true} 
+                    isDisabled
+                    _disabled={{ backgroundColor: "grey" }}
+                />
             </VStack>
         </ModuleCardContainer>
     );

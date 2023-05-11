@@ -12,7 +12,7 @@ class MultiChoiceType extends CheckType {
     choices: string[];
 
     constructor(question?: string, value?: string, choices?: string[]) {
-		super(question, value);
+		super(question, value, "MultiChoice");
         this.choices = choices ? choices : [];
 	};
 
@@ -21,7 +21,7 @@ class MultiChoiceType extends CheckType {
             question: this.question,
             value: this.value,
             choices: this.choices,
-            type: "MultiChoice", 
+            type: this.type, 
         } 
     }
 

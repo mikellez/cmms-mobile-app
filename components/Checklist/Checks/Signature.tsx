@@ -7,14 +7,14 @@ import { color } from "native-base/lib/typescript/theme/styled-system";
 
 class SignatureType extends CheckType {
     constructor(question?: string, value?: string) {
-        super(question, value);
+        super(question, value, "Signature");
     }
 
     toJSON() {
         return {
             question: this.question,
             value: this.value,
-            type: "Signature",
+            type: this.type,
         };
     }
 
