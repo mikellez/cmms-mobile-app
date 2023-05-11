@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { ModuleScreen } from "../../components/ModuleLayout";
-import { Button, Center, ScrollView, Text, VStack } from "native-base";
+import { Button, Center, Link, ScrollView, Text, VStack } from "native-base";
 import instance from "../../axios.config";
 import AssetLevels from "../../components/Assets/AssetLevels";
+import AssetLevelName from "../../components/Assets/AssetLevelName";
 
 const Assets = ({ navigation }) => {
+  const inititalHierarchyState = {
+    level: 1,
+    plant: null,
+    system: null,
+    system_asset: null,
+    system_asset_name: null,
+    asset_type: null,
+    sub_component1: null,
+    plant_asset_instrument: null,
+  };
   const [loading, setLoading] = useState(false);
   const [plants, setPlants] = useState(null);
   const [systems, setSystems] = useState(null);
@@ -12,30 +23,12 @@ const Assets = ({ navigation }) => {
   const [systemAssetNames, setSystemAssetNames] = useState(null);
   const [subComponents, setSubComponents] = useState(null);
   const [assetTypes, setAssetTypes] = useState(null);
-  const [hierarchy, setHierarchy] = useState({
-    level: 1,
-    plant: null,
-    system: null,
-    system_asset: null,
-    system_asset_name: null,
-    sub_component1: null,
-    asset_type: null,
-    plant_asset_instrument: null,
-  });
+  const [hierarchy, setHierarchy] = useState(inititalHierarchyState);
 
   // Reset all state on unmount
   useEffect(() => {
     const reset = navigation.addListener("focus", () => {
-      setHierarchy({
-        level: 1,
-        plant: null,
-        system: null,
-        system_asset: null,
-        system_asset_name: null,
-        asset_type: null,
-        sub_component1: null,
-        plant_asset_instrument: null,
-      });
+      setHierarchy(inititalHierarchyState);
     });
     return reset;
   }, [navigation]);
@@ -151,12 +144,89 @@ const Assets = ({ navigation }) => {
         <Center>
           <Text>
             {hierarchy.level === 1 && "Select a plant"}
-            {hierarchy.plant && hierarchy.plant.plant}
-            {hierarchy.system && " > " + hierarchy.system.system}
-            {hierarchy.system_asset && " > " + hierarchy.system_asset}
-            {hierarchy.system_asset_name && " > " + hierarchy.system_asset_name}
-            {hierarchy.sub_component1 && " > " + hierarchy.sub_component1}
-            {hierarchy.asset_type && " > " + hierarchy.asset_type}
+            <Text
+              underline
+              onPress={() =>
+                setHierarchy((prevState) => {
+                  return {
+                    ...inititalHierarchyState,
+                    level: 2,
+                    plant: prevState.plant,
+                  };
+                })
+              }
+            >
+              {hierarchy.plant && hierarchy.plant.plant}
+            </Text>
+
+            {hierarchy.system && (
+              <AssetLevelName
+                name={hierarchy.system.system}
+                onPress={() =>
+                  setHierarchy((prevState) => {
+                    return {
+                      ...inititalHierarchyState,
+                      level: 3,
+                      plant: prevState.plant,
+                      system: prevState.system,
+                    };
+                  })
+                }
+              />
+            )}
+            {hierarchy.system_asset && (
+              <AssetLevelName
+                name={hierarchy.system_asset}
+                onPress={() =>
+                  setHierarchy((prevState) => {
+                    return {
+                      ...inititalHierarchyState,
+                      level: 4,
+                      plant: prevState.plant,
+                      system: prevState.system,
+                      system_asset: prevState.system_asset,
+                    };
+                  })
+                }
+              />
+            )}
+
+            {hierarchy.system_asset_name && (
+              <AssetLevelName
+                name={hierarchy.system_asset_name}
+                onPress={() =>
+                  setHierarchy((prevState) => {
+                    return {
+                      ...prevState,
+                      level: 5,
+                      asset_type: null,
+                      sub_component1: null,
+                      plant_asset_instrument: null,
+                    };
+                  })
+                }
+              />
+            )}
+
+            {hierarchy.sub_component1 && (
+              <AssetLevelName
+                name={hierarchy.sub_component1}
+                onPress={() =>
+                  setHierarchy((prevState) => {
+                    return {
+                      ...prevState,
+                      level: 6,
+                      asset_type: null,
+                      plant_asset_instrument: null,
+                    };
+                  })
+                }
+              />
+            )}
+
+            {hierarchy.asset_type && (
+              <AssetLevelName name={hierarchy.asset_type} />
+            )}
           </Text>
         </Center>
         <Center marginY={3}>

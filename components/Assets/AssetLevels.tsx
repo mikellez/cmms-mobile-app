@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { Button } from "native-base";
 import uuid from "react-native-uuid";
 
