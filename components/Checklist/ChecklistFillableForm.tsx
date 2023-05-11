@@ -49,6 +49,7 @@ const ChecklistEditableFormRow = ({sectionId, row}: {sectionId: string, row: Che
     );
 };
 
+// Editing sectionState using setSections based on changed value in check
 const updateSpecificCheck = (
     sectionId: string,
     rowId: string,
