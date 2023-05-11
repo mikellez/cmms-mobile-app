@@ -47,13 +47,13 @@ const Footer = ({ navigation }) => {
                 <Center>
                     <Icon
                         mb="1"
-                        as={<MaterialCommunityIcons name="clipboard-clock-outline" />}
+                        as={<MaterialCommunityIcons name="playlist-check" />}
                         color="#C8102E"
                         size="lg"
                     />
                 </Center>
                 <Center>
-                    <Text>Maintenance</Text>
+                    <Text>Checklist</Text>
                 </Center>
             </Pressable>
             <Pressable py="3" flex={1} onPress={() => navigation.navigate("ViewAsset")}>
@@ -80,7 +80,7 @@ const Footer = ({ navigation }) => {
                 <Center>
                     <Icon
                         mb="1"
-                        as={<MaterialCommunityIcons name="clipboard-clock-outline" />}
+                        as={<MaterialCommunityIcons name="calendar" />}
                         color="#C8102E"
                         size="lg"
                     />
