@@ -21,16 +21,16 @@ const ListBox = ({ checklist, navigation }:
             </View>
         )
     }
-
-    const page = checklist.status_id === ChecklistID.Pending || ChecklistID.Assigned ? 
+    const clID = checklist.status_id;
+    const page = clID === ChecklistID.Pending || clID === ChecklistID.Assigned ? 
         "CompleteChecklistPage" : 
-        checklist.status_id === ChecklistID.WorkDone || ChecklistID.Approved ?
+        clID === ChecklistID.WorkDone || clID === ChecklistID.Approved ?
         "ManageChecklistPage" : null;
 
     return (
         <Pressable
             onPress={() => {
-                console.log(checklist.status_id);
+                // console.log(checklist.status_id);
                 navigation.navigate(page, checklist)}}
         >
             <Swipeable

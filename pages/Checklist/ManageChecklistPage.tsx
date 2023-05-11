@@ -9,21 +9,12 @@ import { Table, Rows } from "react-native-table-component";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
 import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
-
-const ChecklistEditableFormContext = createContext(null);
-
+import ChecklistEditableContext from "../../context/checklistContext";
 
 const ManageChecklistPage = ({navigation, route}) => {
     const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     
-    // useEffect(() => {
-    //     if (route.params) setChecklist(route.params);
-    // }, [route.params]);
-
-    // useEffect(() => {
-    //     if (checklist && checklist.datajson) setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)))
-    // }, [checklist])
     useEffect(() => {
         console.log(route.params)
         if (route.params) {
@@ -47,16 +38,13 @@ const ManageChecklistPage = ({navigation, route}) => {
                 <Center>
                     <ChecklistDetails checklist={route.params}></ChecklistDetails>
                 </Center>
-                <ChecklistEditableFormContext.Provider value={{ sections }}>
-                    <ChecklistEditableForm />
-                </ChecklistEditableFormContext.Provider>
+                {ChecklistEditableContext(sections, setSections)}
             </ScrollView>
-            {/* < */}
-
+            
         </ModuleScreen>
     );
 };
 
 
-
+// export ChecklistEditableFormContext ; 
 export default ManageChecklistPage;
