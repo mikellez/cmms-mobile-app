@@ -1,8 +1,11 @@
+import { useContext } from "react";
 import CheckType from "../../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
 import {FlatList, Text} from "react-native";
 import { ModuleCardContainer } from "../../../ModuleLayout";
+import { updateSpecificCheck } from "../../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../../pages/Checklist/CompleteChecklistPage";
 
 class SingleChoiceType extends CheckType {
 
@@ -34,8 +37,8 @@ class SingleChoiceType extends CheckType {
         )
     };
 
-    renderEditableForm(isDisabled?: boolean) {
-        return <SingleChoiceEditableForm check={this} isDisabled={isDisabled}/>;
+    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
+        return <SingleChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>;
     }
 };
 
@@ -81,8 +84,19 @@ const SingleChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const SingleChoiceEditableForm = ({check, isDisabled}) => {
+const SingleChoiceEditableForm = ({check, sectionId, rowId, isDisabled}: {
+    check: SingleChoiceType,
+    sectionId: string,
+    rowId: string,
+    isDisabled?: boolean
+}) => {
 
+    const { setSections } = useContext(ChecklistEditableFormContext);
+
+    const handleChange = (value: string) => {
+        updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections);
+    };
+    
     return <ModuleCardContainer>
             <VStack>
                 <HStack>
@@ -90,7 +104,11 @@ const SingleChoiceEditableForm = ({check, isDisabled}) => {
                         {check.question}
                     </Text>
                 </HStack>
-                <Radio.Group name="SingleChoice">
+                <Radio.Group 
+                    name="SingleChoice"
+                    onChange={handleChange}
+                    value={check.value}
+                >
                     <FlatList
                     data={check.choices}
                     keyExtractor={ch => ch}

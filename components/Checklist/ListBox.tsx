@@ -21,12 +21,12 @@ const ListBox = ({ checklist, navigation }:
             </View>
         )
     }
-
-    const page = checklist.status_id === ChecklistID.Pending || ChecklistID.Assigned ? 
-        "CompleteChecklistPage" :
-        checklist.status_id === ChecklistID.WorkDone || ChecklistID.Approved ?
+ 
+    const page = (checklist.status_id === ChecklistID.Pending || checklist.status_id === ChecklistID.Assigned) ? 
+        "CompleteChecklistPage" : 
+        (checklist.status_id === ChecklistID.WorkDone || checklist.status_id === ChecklistID.Approved) ?
         "ManageChecklistPage" : null;
-
+        
     return (
         <Pressable
             onPress={() => {navigation.navigate(page, checklist)}}

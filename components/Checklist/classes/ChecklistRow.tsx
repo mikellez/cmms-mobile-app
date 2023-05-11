@@ -36,6 +36,12 @@ class ChecklistRow {
         return new ChecklistRow(json.description, json.checks.map(check => ChecklistRow.checkFromJSON(check)));
     }
 
+    updateRow(checkId: string, value: string) {
+        this.checks.forEach(check => {
+			if (check.getId() === checkId) check.updateCheck(value)
+		})
+    }
+
     private static checkFromJSON(json: any) {
         switch(json.type) {
             case "SingleChoice":
