@@ -27,7 +27,7 @@ class SignatureType extends CheckType {
         );
     }
 
-    renderEditableForm() {
+    renderEditableForm(isDisabled?: boolean) {
         return <></>
     }
 }

@@ -34,8 +34,8 @@ class SingleChoiceType extends CheckType {
         )
     };
 
-    renderEditableForm() {
-        return <SingleChoiceEditableForm check={this}/>;
+    renderEditableForm(isDisabled?: boolean) {
+        return <SingleChoiceEditableForm check={this} isDisabled={isDisabled}/>;
     }
 };
 
@@ -81,7 +81,7 @@ const SingleChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const SingleChoiceEditableForm = ({check}) => {
+const SingleChoiceEditableForm = ({check, isDisabled}) => {
 
     return <ModuleCardContainer>
             <VStack>
@@ -89,20 +89,13 @@ const SingleChoiceEditableForm = ({check}) => {
                     <Text>
                         {check.question}
                     </Text>
-                    {/* <Input 
-                        w="80%"
-                        my={2}
-                        placeholder="Question"
-                        defaultValue={check.question}
-                        onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
-                    /> */}
                 </HStack>
                 <Radio.Group name="SingleChoice">
                     <FlatList
                     data={check.choices}
                     keyExtractor={ch => ch}
                     renderItem={({item}) => {
-                        return <Radio value={item} size="sm">
+                        return <Radio value={item} size="sm" isDisabled={isDisabled}>
                             {item}
                         </Radio>
                     }}/>
