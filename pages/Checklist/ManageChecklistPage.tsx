@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import { ModuleScreen, ModuleHeader } from "../../components/ModuleLayout";
 import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
@@ -7,10 +7,37 @@ import { ScrollView, StyleSheet } from "react-native";
 import { VStack, Text, Center} from "native-base";
 import { Table, Rows } from "react-native-table-component";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
+import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
+import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
 
+const ChecklistEditableFormContext = createContext(null);
 
 
 const ManageChecklistPage = ({navigation, route}) => {
+    const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
+    const [sections, setSections] = useState<ChecklistSection[]>([]);
+    
+    // useEffect(() => {
+    //     if (route.params) setChecklist(route.params);
+    // }, [route.params]);
+
+    // useEffect(() => {
+    //     if (checklist && checklist.datajson) setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)))
+    // }, [checklist])
+    useEffect(() => {
+        console.log(route.params)
+        if (route.params) {
+            setChecklist(route.params);
+        }
+    }, [route.params])
+
+    useEffect(() => {
+        console.log("hellodqwerqerqwerqwer world");
+        if (checklist && checklist.datajson) {
+            setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)));
+        }
+    }, [checklist])
+
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Manage Checklist">
@@ -20,7 +47,11 @@ const ManageChecklistPage = ({navigation, route}) => {
                 <Center>
                     <ChecklistDetails checklist={route.params}></ChecklistDetails>
                 </Center>
+                <ChecklistEditableFormContext.Provider value={{ sections }}>
+                    <ChecklistEditableForm />
+                </ChecklistEditableFormContext.Provider>
             </ScrollView>
+            {/* < */}
 
         </ModuleScreen>
     );
