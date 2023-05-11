@@ -27,8 +27,8 @@ class FreeTextType extends CheckType {
         );
     }
 
-    renderEditableForm() {
-        <FreeTextEditableForm check={this}/>
+    renderEditableForm(isDisabled: boolean) {
+        <FreeTextEditableForm check={this} isDisabled={isDisabled}/>
     }
 }
 
@@ -70,7 +70,7 @@ const FreeTextCreatorForm = ({
     );
 };
 
-const FreeTextEditableForm = ({check}) => {
+const FreeTextEditableForm = ({check, isDisabled}) => {
     return (
         <ModuleCardContainer>
             <VStack >
@@ -79,7 +79,7 @@ const FreeTextEditableForm = ({check}) => {
                         {check.question}
                     </Text>
                 </HStack>
-                <Input w="80%" my={2} isDisabled={true} _disabled={{ backgroundColor: "grey" }} />
+                <Input w="80%" my={2} isDisabled={isDisabled} _disabled={{ backgroundColor: "grey" }} />
             </VStack>
         </ModuleCardContainer>
     );

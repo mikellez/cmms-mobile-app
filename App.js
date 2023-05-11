@@ -46,7 +46,7 @@ export default function App() {
         <Stack.Screen name="QRScan" component={QRScan} />
         <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
         <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
-        <Stack.Screen name="ApprovedChecklist" component={ApprovedChecklist} />
+        {/* <Stack.Screen name="ApprovedChecklist" component={ApprovedChecklist} /> */}
         <Stack.Screen name="TestChecklistComponent" component={TestChecklistComponent} />
         <Stack.Screen name="ManageChecklistPage" component={ManageChecklistPage} />
         <Stack.Screen name="CompleteChecklistPage" component={CompleteChecklistPage} />

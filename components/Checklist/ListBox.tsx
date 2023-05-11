@@ -6,6 +6,7 @@ import { CMMSChecklist } from "../../types/interfaces";
 import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
+import { ChecklistID } from "../../types/enums";
 import { useNavigation } from "@react-navigation/native";
 
 const ListBox = ({ checklist, navigation }:
@@ -21,10 +22,10 @@ const ListBox = ({ checklist, navigation }:
         )
     }
 
-    const page = checklist.status_id === 4 ? 
+    const page = checklist.status_id === ChecklistID.Pending || ChecklistID.Assigned ? 
         "ManageChecklistPage" :
-        checklist.status_id === 2 ?
-        "CompleteChecklistPage" : ""
+        checklist.status_id === ChecklistID.WorkDone || ChecklistID.Approved ?
+        "CompleteChecklistPage" : null;
 
     return (
         <Pressable

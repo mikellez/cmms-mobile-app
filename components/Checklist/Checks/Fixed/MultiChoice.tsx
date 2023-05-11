@@ -33,8 +33,8 @@ class MultiChoiceType extends CheckType {
         );
     };
 
-    renderEditableForm() {
-        return <MultiChoiceEditableForm check={this}/>
+    renderEditableForm(isDisabled: boolean) {
+        return <MultiChoiceEditableForm check={this} isDisabled={isDisabled}/>
     }
 };
 
@@ -79,7 +79,7 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const MultiChoiceEditableForm = ({check}) => {
+const MultiChoiceEditableForm = ({check, isDisabled}) => {
 
     return (
         <ModuleCardContainer>
@@ -100,7 +100,7 @@ const MultiChoiceEditableForm = ({check}) => {
                     data={check.choices}
                     keyExtractor={ch => ch}
                     renderItem={({item}) => {
-                        return <Checkbox value={item} size="sm">
+                        return <Checkbox value={item} size="sm" isDisabled={isDisabled}>
                             {item}
                         </Checkbox>
                     }}/>
