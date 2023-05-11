@@ -4,8 +4,7 @@ import ChecklistRow from "./classes/ChecklistRow";
 import { FlatList, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CMMSChecklist } from "../../types/interfaces";
-import { ChecklistEditableFormContext } from "../../pages/Checklist/CompleteChecklistPage";
-
+import { ChecklistEditableFormContext } from "../../context/checklistContext";
 
 const ChecklistEditableForm = () => {
     const { sections, setSections } = useContext(ChecklistEditableFormContext);

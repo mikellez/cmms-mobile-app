@@ -5,7 +5,8 @@ import { ModuleCardContainer } from "../../../ModuleLayout";
 import { Text, FlatList } from "react-native"; 
 import { Dispatch, SetStateAction, ReactNode, useContext } from "react";
 import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../pages/Checklist/CompleteChecklistPage";
+import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
+
 
 class MultiChoiceType extends CheckType {
     choices: string[];

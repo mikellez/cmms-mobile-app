@@ -5,7 +5,8 @@ import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
 import {FlatList, Text} from "react-native";
 import { ModuleCardContainer } from "../../../ModuleLayout";
 import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../pages/Checklist/CompleteChecklistPage";
+import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
+
 
 class SingleChoiceType extends CheckType {
 

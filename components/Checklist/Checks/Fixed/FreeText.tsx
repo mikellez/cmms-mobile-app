@@ -6,7 +6,7 @@ import { ModuleCardContainer } from "../../../ModuleLayout";
 import { Text } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../pages/Checklist/CompleteChecklistPage";
+import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
 
 class FreeTextType extends CheckType {
     constructor(question?: string, value?: string) {
