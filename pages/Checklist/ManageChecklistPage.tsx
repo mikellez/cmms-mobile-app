@@ -38,7 +38,7 @@ const ManageChecklistPage = ({navigation, route}) => {
                 <Center>
                     <ChecklistDetails checklist={route.params}></ChecklistDetails>
                 </Center>
-                {ChecklistEditableContext(sections, setSections)}
+                <ChecklistEditableContext sections={sections} setSections={setSections} isDisabled />
             </ScrollView>
             
         </ModuleScreen>

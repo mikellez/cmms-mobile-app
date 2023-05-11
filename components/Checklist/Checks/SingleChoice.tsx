@@ -1,11 +1,11 @@
 import { useContext } from "react";
-import CheckType from "../../classes/CheckType";
+import CheckType from "../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
 import {FlatList, Text} from "react-native";
-import { ModuleCardContainer } from "../../../ModuleLayout";
-import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
+import { ModuleCardContainer } from "../../ModuleLayout";
+import { updateSpecificCheck } from "../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../context/checklistContext";
 
 
 class SingleChoiceType extends CheckType {
@@ -13,7 +13,7 @@ class SingleChoiceType extends CheckType {
     choices: string[];
 
     constructor(question?: string, value?: string, choices?: string[]) {
-		super(question, value);
+		super(question, value, "SingleChoice");
         this.choices = choices ? choices : [];
 	};
     
@@ -24,7 +24,7 @@ class SingleChoiceType extends CheckType {
             question: this.question,
             value: this.value,
             choices: this.choices,
-            type: "SingleChoice",
+            type: this.type,
         }
     };
 
@@ -38,8 +38,8 @@ class SingleChoiceType extends CheckType {
         )
     };
 
-    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
-        return <SingleChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>;
+    renderEditableForm(sectionId: string, rowId: string) {
+        return <SingleChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId}/>;
     }
 };
 
@@ -85,15 +85,13 @@ const SingleChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const SingleChoiceEditableForm = ({check, sectionId, rowId, isDisabled}: {
+const SingleChoiceEditableForm = ({check, sectionId, rowId}: {
     check: SingleChoiceType,
     sectionId: string,
     rowId: string,
-    isDisabled?: boolean
 }) => {
 
-    const { setSections } = useContext(ChecklistEditableFormContext);
-
+    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
     const handleChange = (value: string) => {
         updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections);
     };

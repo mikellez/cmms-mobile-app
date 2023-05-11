@@ -1,12 +1,11 @@
-import CheckType from "../../classes/CheckType";
+import CheckType from "../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
-import { ModuleCardContainer } from "../../../ModuleLayout";
-import { TextInput, Text, Image, View, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { Box, Input, IconButton, HStack, VStack, Radio, Modal } from "native-base";
+import { ModuleCardContainer } from "../../ModuleLayout";
+import { TextInput, TouchableOpacity, Text, View, StyleSheet } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 import { useRef , useState} from "react";
 import SignatureScreen, {SignatureViewRef} from "react-native-signature-canvas";
-import { ModuleFullPageModal } from "../../../ModuleLayout";
 import { Entypo } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 
@@ -14,14 +13,14 @@ import * as FileSystem from "expo-file-system";
 
 class SignatureType extends CheckType {
     constructor(question?: string, value?: string) {
-        super(question, value);
+        super(question, value, "Signature");
     }
 
     toJSON() {
         return {
             question: this.question,
             value: this.value,
-            type: "Signature",
+            type: this.type,
         };
     }
 
@@ -34,7 +33,7 @@ class SignatureType extends CheckType {
         );
     }
 
-    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
+    renderEditableForm(sectionId: string, rowId: string) {
         return <></>
     }
 }
