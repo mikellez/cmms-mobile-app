@@ -26,7 +26,7 @@ const ListBox = ({ checklist, navigation }:
         "CompleteChecklistPage" : 
         clID === ChecklistID.WorkDone || clID === ChecklistID.Approved ?
         "ManageChecklistPage" : null;
-
+        
     return (
         <Pressable
             onPress={() => {

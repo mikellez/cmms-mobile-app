@@ -33,6 +33,12 @@ class ChecklistSection {
         this.rows = [];
     };
 
+    updateSection(rowId: string, checkId: string, value: string) {
+        this.rows.forEach(row => {
+			if (row.getId() === rowId) row.updateRow(checkId, value)
+		})
+    };
+
     static fromJSON(json: any) {
         return new ChecklistSection(json.description, json.rows.map(row => ChecklistRow.fromJSON(row)))
     };

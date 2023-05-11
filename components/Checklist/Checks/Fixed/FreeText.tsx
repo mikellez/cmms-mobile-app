@@ -1,9 +1,12 @@
 import CheckType from "../../classes/CheckType";
+import { useContext } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio, TextArea } from "native-base";
 import { ModuleCardContainer } from "../../../ModuleLayout";
 import { Text } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
+import { updateSpecificCheck } from "../../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
 
 class FreeTextType extends CheckType {
     constructor(question?: string, value?: string) {
@@ -27,8 +30,8 @@ class FreeTextType extends CheckType {
         );
     }
 
-    renderEditableForm(isDisabled?: boolean) {
-        return <FreeTextEditableForm check={this} isDisabled={isDisabled}/>
+    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
+        return <FreeTextEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>
     }
 }
 
@@ -43,7 +46,7 @@ const FreeTextCreatorForm = ({
 }) => {
     return (
         <ModuleCardContainer>
-            <VStack >
+            <VStack>
                 <HStack>
                     <Input
                         w="80%"
@@ -70,16 +73,34 @@ const FreeTextCreatorForm = ({
     );
 };
 
-const FreeTextEditableForm = ({check, isDisabled}) => {
+const FreeTextEditableForm = ({check, sectionId, rowId, isDisabled}: {
+    check: FreeTextType,
+    sectionId: string,
+    rowId: string,
+    isDisabled: boolean,
+}) => {
+
+    const { setSections } = useContext(ChecklistEditableFormContext);
+    const handleTextChange = (text: string) => {
+        updateSpecificCheck(sectionId, rowId, check.getId(), text, setSections);
+    };
+
     return (
         <ModuleCardContainer>
-            <VStack >
+            <VStack>
                 <HStack>
                     <Text>
                         {check.question}
                     </Text>
                 </HStack>
-                <TextArea h={20} placeholder="" numberOfLines={4} autoCompleteType={true} isDisabled={isDisabled} />
+                <TextArea 
+                    h={20} placeholder="" 
+                    numberOfLines={4} 
+                    autoCompleteType={true} 
+                    isDisabled={isDisabled} 
+                    onChangeText={handleTextChange}
+                    value={check.value}
+                />
             </VStack>
         </ModuleCardContainer>
     );

@@ -3,7 +3,9 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { Box, Input, IconButton, HStack, VStack, Checkbox } from "native-base";
 import { ModuleCardContainer } from "../../../ModuleLayout";
 import { Text, FlatList } from "react-native"; 
-import { Dispatch, SetStateAction, ReactNode } from "react";
+import { Dispatch, SetStateAction, ReactNode, useContext } from "react";
+import { updateSpecificCheck } from "../../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
 
 
 class MultiChoiceType extends CheckType {
@@ -33,8 +35,8 @@ class MultiChoiceType extends CheckType {
         );
     };
 
-    renderEditableForm(isDisabled?: boolean) {
-        return <MultiChoiceEditableForm check={this} isDisabled={isDisabled}/>
+    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
+        return <MultiChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>
     }
 };
 
@@ -79,7 +81,29 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const MultiChoiceEditableForm = ({check, isDisabled}) => {
+const MultiChoiceEditableForm = ({check, sectionId, rowId, isDisabled}: {
+    check: MultiChoiceType,
+    sectionId: string,
+    rowId: string,
+    isDisabled?: boolean
+}) => {
+    
+    const { setSections } = useContext(ChecklistEditableFormContext);
+    const handleChange = (value: string, isSelected: boolean) => {
+        if (isSelected) {
+            if (check.value.trim().length > 0) {
+                updateSpecificCheck(sectionId, rowId, check.getId(), check.value + "," + value, setSections); 
+            } else {
+                updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections);
+            }
+            
+        } else {
+            const newValues = [...values].filter(v => v != value);
+            updateSpecificCheck(sectionId, rowId, check.getId(), newValues.join(","), setSections);
+        }
+    }
+
+    const values = check.value.split(",");
 
     return (
         <ModuleCardContainer>
@@ -93,10 +117,19 @@ const MultiChoiceEditableForm = ({check, isDisabled}) => {
                     data={check.choices}
                     keyExtractor={ch => ch}
                     renderItem={({item}) => {
-                        return <Checkbox value={item} size="sm" isDisabled={isDisabled}>
-                            {item}
-                        </Checkbox>
-                    }}/>
+                        return (
+                            <Checkbox 
+                                value={item} 
+                                size="sm" 
+                                isDisabled={isDisabled}
+                                onChange={(isSelected) => handleChange(item, isSelected)}
+                                isChecked={values.includes(item)}
+                            >
+                                {item}
+                            </Checkbox>
+                        )
+                    }}
+                />
             </VStack>
         </ModuleCardContainer>
     )

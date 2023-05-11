@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, SetStateAction } from "react";
 import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistRow from "./classes/ChecklistRow";
 import { FlatList, Text, StyleSheet } from "react-native";
@@ -42,15 +42,30 @@ const ChecklistEditableFormRow = ({sectionId, row}: {sectionId: string, row: Che
             <Text style={styles.rowTitle}>{row.description}</Text>
             <FlatList
                 data={row.checks}
-                renderItem={({ item }) => <React.Fragment>{item.renderEditableForm()}</React.Fragment>}
+                renderItem={({ item }) => <React.Fragment>{item.renderEditableForm(sectionId, row.getId())}</React.Fragment>}
                 keyExtractor={check => check.getId()}
             />
         </SafeAreaView>
     );
 };
 
-const updateSpecificCheck = () => {
-    
+const updateSpecificCheck = (
+    sectionId: string,
+    rowId: string,
+    checkId: string,
+    value: string,
+    setSections: React.Dispatch<SetStateAction<ChecklistSection[]>>,
+) => {
+    setSections(prevSections => {
+        const newSections = [...prevSections];
+
+        for (let i = 0; i < prevSections.length; i++) {
+            if (newSections[i].getId() === sectionId) {
+                newSections[i].updateSection(rowId, checkId, value);
+            }
+        }
+        return newSections;
+    })
 };
 
 const styles = StyleSheet.create({
