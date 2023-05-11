@@ -25,9 +25,10 @@ const ChecklistTemplatesPage = ({navigation}) => {
         });
     }, []);
 
-    const templateElements = templates.map(template => {
+    const templateElements = templates.map((template, index) => {
         return (
             <ChecklistTemplate
+                key={index}
                 checklist={template}
                 navigation={navigation}
             />

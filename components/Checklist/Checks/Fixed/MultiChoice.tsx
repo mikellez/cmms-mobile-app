@@ -1,7 +1,8 @@
-import CheckType from "../classes/CheckType";
+import CheckType from "../../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Checkbox } from "native-base";
-import { ModuleCardContainer } from "../../ModuleLayout";
+import { ModuleCardContainer } from "../../../ModuleLayout";
+import { Text, FlatList } from "react-native"; 
 import { Dispatch, SetStateAction, ReactNode } from "react";
 
 
@@ -31,30 +32,18 @@ class MultiChoiceType extends CheckType {
             />
         );
     };
+
+    renderEditableForm() {
+        return <MultiChoiceEditableForm check={this}/>
+    }
 };
 
-const MultiChoiceCreatorFormChoice = ({choice}: {choice: string}) => {
-    return (
-        <Checkbox value={choice} isDisabled>
-            {choice}
-        </Checkbox>
-    );
-};
 
 const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     deleteCheck: Function,
     check: MultiChoiceType,
     setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>
 }) => {
-
-    const choiceElements = check.choices.map((choice, index) => {
-        return (
-            <MultiChoiceCreatorFormChoice
-                key={index}
-                choice={choice}
-            />
-        );
-    });
 
     return (
         <ModuleCardContainer>
@@ -77,10 +66,47 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
                         onPress={() => deleteCheck(check.getId())}
                     />
                 </HStack>
-                {choiceElements}
+                <FlatList
+                    data={check.choices}
+                    keyExtractor={ch => ch}
+                    renderItem={({item}) => {
+                        return <Checkbox value={item} size="sm" isDisabled>
+                            {item}
+                        </Checkbox>
+                    }}/>
             </VStack>
         </ModuleCardContainer>
     );
 };
+
+const MultiChoiceEditableForm = ({check}) => {
+
+    return (
+        <ModuleCardContainer>
+            <VStack>
+                <HStack>
+                    <Text>
+                        {check.question()}
+                    </Text>
+                    {/* <Input 
+                        w="80%"
+                        my={2}
+                        placeholder="Question"
+                        onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
+                        defaultValue={check.question}
+                    /> */}
+                </HStack>
+                <FlatList
+                    data={check.choices}
+                    keyExtractor={ch => ch}
+                    renderItem={({item}) => {
+                        return <Checkbox value={item} size="sm">
+                            {item}
+                        </Checkbox>
+                    }}/>
+            </VStack>
+        </ModuleCardContainer>
+    )
+}
 
 export { MultiChoiceType }

@@ -1,8 +1,8 @@
-import CheckType from "../classes/CheckType";
+import CheckType from "../../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
-import { ModuleCardContainer } from "../../ModuleLayout";
-import { TextInput } from "react-native";
+import { ModuleCardContainer } from "../../../ModuleLayout";
+import { Text } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 
 class FreeTextType extends CheckType {
@@ -23,12 +23,16 @@ class FreeTextType extends CheckType {
         setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>
     ) {
         return (
-            <SingleChoiceCreatorForm check={this} deleteCheck={deleteCheck} setChecks={setChecks} />
+            <FreeTextCreatorForm check={this} deleteCheck={deleteCheck} setChecks={setChecks} />
         );
+    }
+
+    renderEditableForm() {
+        <FreeTextEditableForm check={this}/>
     }
 }
 
-const SingleChoiceCreatorForm = ({
+const FreeTextCreatorForm = ({
     deleteCheck,
     check,
     setChecks,
@@ -39,7 +43,7 @@ const SingleChoiceCreatorForm = ({
 }) => {
     return (
         <ModuleCardContainer>
-            <VStack>
+            <VStack >
                 <HStack>
                     <Input
                         w="80%"
@@ -65,5 +69,20 @@ const SingleChoiceCreatorForm = ({
         </ModuleCardContainer>
     );
 };
+
+const FreeTextEditableForm = ({check}) => {
+    return (
+        <ModuleCardContainer>
+            <VStack >
+                <HStack>
+                    <Text>
+                        {check.question}
+                    </Text>
+                </HStack>
+                <Input w="80%" my={2} isDisabled={true} _disabled={{ backgroundColor: "grey" }} />
+            </VStack>
+        </ModuleCardContainer>
+    );
+}
 
 export { FreeTextType };

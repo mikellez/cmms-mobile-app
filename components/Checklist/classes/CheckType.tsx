@@ -16,6 +16,10 @@ abstract class CheckType {
         return this._id;
     };
 
+    updateCheck(value: string) {
+        this.value = value;
+    }
+
     abstract toJSON(): Object;
 
     abstract renderCreatorForm(deleteCheck: Function, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>): React.ReactNode;

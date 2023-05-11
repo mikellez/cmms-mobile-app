@@ -8,8 +8,6 @@ import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 
-const ListBox = ({ checklist, navigation }: { checklist: CMMSChecklist, navigation: any }) => {
-
 const ListBox = ({ checklist, navigation }:
      { checklist: CMMSChecklist,navigation?: any }) => {
         console.log("hi")
@@ -35,8 +33,8 @@ const ListBox = ({ checklist, navigation }:
                 <ModuleCardContainer onPress={() => checklist.status === "WORK DONE" 
                                                         ? navigation.navigate("TestChecklistComponent")
                                                         : null}>
-                    <HStack style={{borderColor: "red", borderWidth: 3}}>
-                        <VStack style={{borderColor: "blue", borderWidth: 3}}>
+                    <HStack>
+                        <VStack>
                             <Text
                                 fontSize={14}
                                 fontWeight={600}

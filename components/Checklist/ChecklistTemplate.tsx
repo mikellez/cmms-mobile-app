@@ -6,8 +6,10 @@ import { Pressable, StyleSheet } from "react-native";
 
 const ChecklistTemplate = ({navigation, checklist}: {navigation: any, checklist: CMMSChecklist}) => {
     return (
-        <Pressable
-            onPress={() => navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id })}
+        <Pressable onPress={() => {
+                navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id })
+            }
+        }
         >
             <ModuleCardContainer>
                 <VStack>

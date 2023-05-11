@@ -1,12 +1,11 @@
 import React from "react";
 import { Box, Pressable } from "native-base";
 interface ModuleCardContainerProps extends React.PropsWithChildren {
-    onPress?: () => void;
+
 };
 
 const ModuleCardContainer = (props: ModuleCardContainerProps) => {
     return (
-        <Pressable onPress={props.onPress}>
             <Box 
                 px="2.5"
                 py="2.5"
@@ -17,8 +16,7 @@ const ModuleCardContainer = (props: ModuleCardContainerProps) => {
                 // shadow="3"
                 >{props.children}
             </Box>
-        </Pressable>
-        
+
     )
 };
 

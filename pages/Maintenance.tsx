@@ -41,7 +41,7 @@ const Maintenance = ({ navigation }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
     const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
-    
+
     useEffect(() => {
         fetchChecklist(viewType)
             .then(result => {
@@ -52,7 +52,7 @@ const Maintenance = ({ navigation }) => {
 
     const checklistElements = checklists.length > 0 ? checklists.map(cl => {
         return (
-            <ListBox key={cl.checklist_id} checklist={cl} navigation={navigation} />
+            <ListBox key={cl.checklist_id} checklist={cl} />
 
         );
     }) : <Text>No Checklist Found</Text>;
@@ -81,16 +81,6 @@ const Maintenance = ({ navigation }) => {
                         } 
                         size="xs"
                         onPress={() => navigation.navigate("ChecklistTemplatesPage")}
-                    ></Button>
-                    <Button
-                        w="30" 
-                        padding={2} 
-                        bg="#C8102E" 
-                        leftIcon={
-                            <Icon as={AntDesign} name="addfile" size="sm"/>
-                        } 
-                        size="xs"
-                        onPress={() => navigation.navigate("TestChecklistComponent")}
                     ></Button>
                 </HStack>
             </ModuleHeader>
