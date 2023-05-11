@@ -32,6 +32,7 @@ import axios from 'axios';
 import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
+import { CMMSUser } from '../../types/interfaces';
 
 type FormValues = {
   name?: string;
@@ -101,7 +102,7 @@ const RequestContainer = ({
 
   const [formState, setFormState] = useState<FormValues>({
     name: "",
-    requestTypeID: 0,
+    requestTypeID: route?.params?.plant ? 3 : 1,
     faultTypeID: 0,
     description: "",
     plantLocationID: route?.params?.plant || 0,
@@ -120,6 +121,16 @@ const RequestContainer = ({
   const [assetTags, setAssetTags] = useState([]);
   const [priorities, setPriorities] = useState([]);
   const [assignUsers, setAssignUsers] = useState([]);
+  const [user, setUser] = useState<CMMSUser>({
+    id: 0,
+    role_id: 0,
+    role_name: "",
+    name: "",
+    email: "",
+    fname: "",
+    lname: "",
+    username: ""
+  });
 
   const [plant, setPlant] = useState(route?.params?.plant);
   const [asset, setAsset] = useState(route?.params?.asset);
@@ -138,7 +149,12 @@ const RequestContainer = ({
 
   const createRequest = async () => {
     const formData = new FormData();
-    formData.append("name", formState.name);
+    if(user?.id) {
+      formData.append("user_id", user.id);
+      formData.append("role_id", user.role_id);
+    } else {
+      formData.append("name", formState.name);
+    }
     formData.append("description", formState.description);
     formData.append("faultTypeID", formState.faultTypeID.toString());
     formData.append("plantLocationID", formState.plantLocationID.toString());
@@ -156,7 +172,12 @@ const RequestContainer = ({
         })
         .then((response) => {
           alert("Request created successfully");
-          navigation.navigate("Report");
+          if(route?.params?.plant) {
+            alert("Please login to view your requests.");
+            navigation.navigate("Login");
+          } else {
+            navigation.navigate("Report");
+          }
           return response.data;
         })
         .catch((e) => {
@@ -464,7 +485,13 @@ const RequestContainer = ({
     });
   };
 
+  const fetchUser = async () => {
+    const user = await _retrieveData('user');
+    setUser(JSON.parse(user));
+  }
+
   useEffect(() => {
+    fetchUser();
 
     const checkConnection = async () => {
       const netInfoState = await NetInfo.fetch();
@@ -533,6 +560,7 @@ const RequestContainer = ({
 
         plant={plant}
         asset={asset}
+        user={user}
 
         requestItems={requestItems}
 

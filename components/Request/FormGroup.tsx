@@ -8,6 +8,7 @@ import { isEmpty } from "../../helper/utility";
 
 const FormGroup = ({
   action,
+  user,
   plant,
   asset,
   requestItems,
@@ -37,6 +38,8 @@ const FormGroup = ({
   onNameChange,
   formState
 }) => {
+  console.log(user)
+
   const [formData, setFormData] = useState({
     guest_name: "",
     requestTypeID: 1,
@@ -66,7 +69,7 @@ const FormGroup = ({
       placeholder: "Reporter Name",
       accessibilityLabel: "Reporter Name",
       onChangeText: onNameChange,
-      show: action === "create" && (plant || false)
+      show: action === "create" && !user && (plant || false)
     },
     {
       id: 1, 
