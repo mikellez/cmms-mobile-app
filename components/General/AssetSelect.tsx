@@ -75,7 +75,7 @@ const AssetMultiSelect = (props: PlantSelectProps) => {
 
     const handleChange = (items: {id: number, name: string}[]) => {
         setSelectedItems(items);
-        props.onChange(items.map(item => item.id));
+        props.onChange(items.map(item => item));
     }
 
     return (

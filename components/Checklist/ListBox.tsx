@@ -10,8 +10,6 @@ import { useNavigation } from "@react-navigation/native";
 
 const ListBox = ({ checklist, navigation }:
      { checklist: CMMSChecklist,navigation?: any }) => {
-        console.log("hi")
-        console.log(navigation)
 
     const rightAction = () => {
         return (
@@ -23,16 +21,19 @@ const ListBox = ({ checklist, navigation }:
         )
     }
 
+    const page = checklist.status_id === 4 ? 
+        "ManageChecklistPage" :
+        checklist.status_id === 2 ?
+        "CompleteChecklistPage" : ""
+
     return (
         <Pressable
-            onPress={() => {navigation.navigate("ApprovedChecklist",checklist)}}
+            onPress={() => {navigation.navigate(page, checklist)}}
         >
             <Swipeable
                 renderRightActions={rightAction}
             >
-                <ModuleCardContainer onPress={() => checklist.status === "WORK DONE" 
-                                                        ? navigation.navigate("TestChecklistComponent")
-                                                        : null}>
+                <ModuleCardContainer>
                     <HStack>
                         <VStack>
                             <Text

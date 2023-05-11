@@ -20,7 +20,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { navigationRef } from './RootNavigation';
 import { linking } from './linking';
-import ApprovedChecklist from './pages/Checklist/ChecklistDetails/Approved';
+import ManageChecklistPage from './pages/Checklist/ManageChecklistPage';
+import CompleteChecklistPage from './pages/Checklist/CompleteChecklistPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,8 @@ export default function App() {
         <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
         <Stack.Screen name="ApprovedChecklist" component={ApprovedChecklist} />
         <Stack.Screen name="TestChecklistComponent" component={TestChecklistComponent} />
+        <Stack.Screen name="ManageChecklistPage" component={ManageChecklistPage} />
+        <Stack.Screen name="CompleteChecklistPage" component={CompleteChecklistPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
