@@ -86,15 +86,8 @@ const MultiChoiceEditableForm = ({check}) => {
             <VStack>
                 <HStack>
                     <Text>
-                        {check.question()}
+                        {check.question}
                     </Text>
-                    {/* <Input 
-                        w="80%"
-                        my={2}
-                        placeholder="Question"
-                        onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
-                        defaultValue={check.question}
-                    /> */}
                 </HStack>
                 <FlatList
                     data={check.choices}

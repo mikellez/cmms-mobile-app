@@ -9,7 +9,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 
 const ListBox = ({ checklist, navigation }:
-     { checklist: CMMSChecklist,navigation?: any }) => {
+     { checklist: CMMSChecklist, navigation?: any }) => {
 
     const rightAction = () => {
         return (
@@ -20,7 +20,7 @@ const ListBox = ({ checklist, navigation }:
             </View>
         )
     }
-
+ 
     const page = checklist.status_id === 4 ? 
         "ManageChecklistPage" :
         checklist.status_id === 2 ?

@@ -28,7 +28,7 @@ class SignatureType extends CheckType {
     }
 
     renderEditableForm() {
-
+        return <></>
     }
 }
 
