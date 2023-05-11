@@ -1,12 +1,12 @@
-import CheckType from "../../classes/CheckType";
+import CheckType from "../classes/CheckType";
 import { useContext } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio, TextArea } from "native-base";
-import { ModuleCardContainer } from "../../../ModuleLayout";
+import { ModuleCardContainer } from "../../ModuleLayout";
 import { Text } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
-import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
+import { updateSpecificCheck } from "../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../context/checklistContext";
 
 class FreeTextType extends CheckType {
     constructor(question?: string, value?: string) {
@@ -30,8 +30,8 @@ class FreeTextType extends CheckType {
         );
     }
 
-    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
-        return <FreeTextEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>
+    renderEditableForm(sectionId: string, rowId: string) {
+        return <FreeTextEditableForm check={this} sectionId={sectionId} rowId={rowId}/>
     }
 }
 
@@ -73,14 +73,13 @@ const FreeTextCreatorForm = ({
     );
 };
 
-const FreeTextEditableForm = ({check, sectionId, rowId, isDisabled}: {
+const FreeTextEditableForm = ({check, sectionId, rowId}: {
     check: FreeTextType,
     sectionId: string,
     rowId: string,
-    isDisabled: boolean,
 }) => {
 
-    const { setSections } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
     const handleTextChange = (text: string) => {
         updateSpecificCheck(sectionId, rowId, check.getId(), text, setSections);
     };

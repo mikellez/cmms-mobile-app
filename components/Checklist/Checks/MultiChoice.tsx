@@ -1,11 +1,11 @@
-import CheckType from "../../classes/CheckType";
+import CheckType from "../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Checkbox } from "native-base";
-import { ModuleCardContainer } from "../../../ModuleLayout";
+import { ModuleCardContainer } from "../../ModuleLayout";
 import { Text, FlatList } from "react-native"; 
 import { Dispatch, SetStateAction, ReactNode, useContext } from "react";
-import { updateSpecificCheck } from "../../ChecklistFillableForm";
-import { ChecklistEditableFormContext } from "../../../../context/checklistContext";
+import { updateSpecificCheck } from "../ChecklistFillableForm";
+import { ChecklistEditableFormContext } from "../../../context/checklistContext";
 
 
 class MultiChoiceType extends CheckType {
@@ -35,8 +35,8 @@ class MultiChoiceType extends CheckType {
         );
     };
 
-    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
-        return <MultiChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId} isDisabled={isDisabled}/>
+    renderEditableForm(sectionId: string, rowId: string) {
+        return <MultiChoiceEditableForm check={this} sectionId={sectionId} rowId={rowId}/>
     }
 };
 
@@ -81,14 +81,13 @@ const MultiChoiceCreatorForm = ({ deleteCheck, check, setChecks }: {
     );
 };
 
-const MultiChoiceEditableForm = ({check, sectionId, rowId, isDisabled}: {
+const MultiChoiceEditableForm = ({check, sectionId, rowId}: {
     check: MultiChoiceType,
     sectionId: string,
     rowId: string,
-    isDisabled?: boolean
 }) => {
     
-    const { setSections } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
     const handleChange = (value: string, isSelected: boolean) => {
         if (isSelected) {
             if (check.value.trim().length > 0) {

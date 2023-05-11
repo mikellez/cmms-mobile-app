@@ -4,8 +4,13 @@ import ChecklistSection from "../components/Checklist/classes/ChecklistSection";
 
 const ChecklistEditableFormContext = createContext(null);
 
-const ChecklistEditableContext = (sections : ChecklistSection[], setSections: React.Dispatch<React.SetStateAction<ChecklistSection[]>>) => {
-    return <ChecklistEditableFormContext.Provider value={{ sections, setSections }}>
+const ChecklistEditableContext = ({sections, setSections, isDisabled}: 
+    {
+        sections: ChecklistSection[], 
+        setSections: React.Dispatch<React.SetStateAction<ChecklistSection[]>>, 
+        isDisabled?: boolean}
+) => {
+    return <ChecklistEditableFormContext.Provider value={{ sections, setSections, isDisabled }}>
         <ChecklistEditableForm />
     </ChecklistEditableFormContext.Provider>
 }

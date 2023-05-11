@@ -1,7 +1,7 @@
-import CheckType from "../../classes/CheckType";
+import CheckType from "../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
-import { ModuleCardContainer } from "../../../ModuleLayout";
+import { ModuleCardContainer } from "../../ModuleLayout";
 import { TextInput } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 
@@ -27,7 +27,7 @@ class SignatureType extends CheckType {
         );
     }
 
-    renderEditableForm(sectionId: string, rowId: string, isDisabled?: boolean) {
+    renderEditableForm(sectionId: string, rowId: string) {
         return <></>
     }
 }
