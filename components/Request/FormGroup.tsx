@@ -39,11 +39,11 @@ const FormGroup = ({
 }) => {
   const [formData, setFormData] = useState({
     guest_name: "",
-    requestTypeID: "",
+    requestTypeID: 1,
     faultTypeID: "",
     faultDescription: "",
-    plantLocationID: "",
-    assetTagID: "",
+    plantLocationID: plant || 0,
+    taggedAssetID: asset || 0,
     priorityID: "",
     assignUserID: "",
     completionImage: [],
@@ -52,21 +52,19 @@ const FormGroup = ({
     images: []
   });
 
-  const [errors, setErrors] = useState({});
-
-  console.log(faultTypes)
-  console.log(requestItems)
+  const [errors, setErrors] = useState<object>({});
+  const [hasError, setHasError] = useState<boolean>(false);
 
   const data = [
     {
       id: 0,
       required: true,
-      requiredMessage: "Guest Name is required",
+      requiredMessage: "Reporter Name is required",
       name: "guest_name",
       type: "textarea",
-      label: "Guest Name",
-      placeholder: "Guest Name",
-      accessibilityLabel: "Guest Name",
+      label: "Reporter Name",
+      placeholder: "Reporter Name",
+      accessibilityLabel: "Reporter Name",
       onChangeText: onNameChange,
       show: action === "create" && (plant || false)
     },
@@ -78,11 +76,11 @@ const FormGroup = ({
       label: "Request Type", 
       accessibilityLabel: "Pick a type", 
       name:"requestTypeID", 
-      //defaultValue: "1", 
+      defaultValue: plant ? 3 : 1, 
       onChange: onRequestTypeChange, 
       value: (requestItems?.req_id ?? ''), 
       items: requestTypes, 
-      itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: action !== "create" ?? false},
+      itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: (action !== "create" || (action === 'create' && plant)) ?? false},
       selectedValueCond: (action !== 'create' && { value: requestItems?.req_id ?? ''}),
       show: true
     },
@@ -121,6 +119,7 @@ const FormGroup = ({
     {
       id: 4, 
       required: true,
+      requiredMessage: "Plant Location is required",
       type: "select", 
       label: "Plant Location",
       accessibilityLabel: "Plant Location",
@@ -255,9 +254,10 @@ const FormGroup = ({
 
   ]
 
-  console.log(data)
-
   const validate = () => {
+    let hasError = 0;
+    setErrors({});
+    setHasError(false);
 
     for(const i in data) {
       const { type, name, required, requiredMessage, show, imageSource } = data[i];
@@ -265,25 +265,32 @@ const FormGroup = ({
       if(type==='image') {
 
         if (show && required && isEmpty(imageSource)) {
-          setErrors({ 
+          setErrors(prevErrors=> ({ 
+            ...prevErrors,
             [name]: requiredMessage
-          });
-          return false;
+          }));
+          //return false;
+          hasError++;
         }
 
       } else {
 
         if (show && required && (isEmpty(formData[name]) || formData[name] === '0' )) {
-          setErrors({ 
+          setErrors(prevErrors=>({ 
+            ...prevErrors,
             [name]: requiredMessage
-          });
-          return false;
+          }));
+          //return false;
+          hasError++;
         }
 
       }
 
-      console.log(name, errors, data[i])
+    }
 
+    if(hasError>0) {
+      setHasError(true);
+      return false;
     }
 
     return true;
@@ -296,8 +303,6 @@ const FormGroup = ({
   const handleChange = (name, value, action) => {
     setFormData(prevState => ({ ...prevState, [name]: value }));
     action;
-    console.log('formData', formData)
-    console.log(name, value, action)
   }
 
   return (
@@ -444,7 +449,12 @@ const FormGroup = ({
         case "button":
           return (
             <>
-            { show && <Button bgColor={bgColor} mt={5} mb={10} onPress={()=>handleSubmit(onPress)}>{ label }</Button>}
+            { show && 
+              <>
+              { hasError && <Text color={"rgb(220, 38, 38)"} fontSize={12} mt={3}>Please fill in all required fields</Text> }
+              <Button bgColor={bgColor} mt={5} mb={10} onPress={()=>handleSubmit(onPress)}>{ label }</Button>
+              </>
+            }
             </>
           );
           break;
