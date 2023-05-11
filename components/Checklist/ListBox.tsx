@@ -10,7 +10,7 @@ import { ChecklistID } from "../../types/enums";
 import { useNavigation } from "@react-navigation/native";
 
 const ListBox = ({ checklist, navigation }:
-     { checklist: CMMSChecklist,navigation?: any }) => {
+     { checklist: CMMSChecklist, navigation?: any }) => {
 
     const rightAction = () => {
         return (

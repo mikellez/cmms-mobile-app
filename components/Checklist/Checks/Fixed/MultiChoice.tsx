@@ -33,7 +33,7 @@ class MultiChoiceType extends CheckType {
         );
     };
 
-    renderEditableForm(isDisabled: boolean) {
+    renderEditableForm(isDisabled?: boolean) {
         return <MultiChoiceEditableForm check={this} isDisabled={isDisabled}/>
     }
 };
@@ -86,15 +86,8 @@ const MultiChoiceEditableForm = ({check, isDisabled}) => {
             <VStack>
                 <HStack>
                     <Text>
-                        {check.question()}
+                        {check.question}
                     </Text>
-                    {/* <Input 
-                        w="80%"
-                        my={2}
-                        placeholder="Question"
-                        onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
-                        defaultValue={check.question}
-                    /> */}
                 </HStack>
                 <FlatList
                     data={check.choices}

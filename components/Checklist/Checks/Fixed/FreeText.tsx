@@ -1,6 +1,6 @@
 import CheckType from "../../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Box, Input, IconButton, HStack, VStack, Radio } from "native-base";
+import { Box, Input, IconButton, HStack, VStack, Radio, TextArea } from "native-base";
 import { ModuleCardContainer } from "../../../ModuleLayout";
 import { Text } from "react-native";
 import { color } from "native-base/lib/typescript/theme/styled-system";
@@ -27,8 +27,8 @@ class FreeTextType extends CheckType {
         );
     }
 
-    renderEditableForm(isDisabled: boolean) {
-        <FreeTextEditableForm check={this} isDisabled={isDisabled}/>
+    renderEditableForm(isDisabled?: boolean) {
+        return <FreeTextEditableForm check={this} isDisabled={isDisabled}/>
     }
 }
 
@@ -79,7 +79,7 @@ const FreeTextEditableForm = ({check, isDisabled}) => {
                         {check.question}
                     </Text>
                 </HStack>
-                <Input w="80%" my={2} isDisabled={isDisabled} _disabled={{ backgroundColor: "grey" }} />
+                <TextArea h={20} placeholder="" numberOfLines={4} autoCompleteType={true} isDisabled={isDisabled} />
             </VStack>
         </ModuleCardContainer>
     );

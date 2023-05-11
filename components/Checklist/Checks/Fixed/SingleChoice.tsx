@@ -34,7 +34,7 @@ class SingleChoiceType extends CheckType {
         )
     };
 
-    renderEditableForm(isDisabled: boolean) {
+    renderEditableForm(isDisabled?: boolean) {
         return <SingleChoiceEditableForm check={this} isDisabled={isDisabled}/>;
     }
 };
@@ -89,13 +89,6 @@ const SingleChoiceEditableForm = ({check, isDisabled}) => {
                     <Text>
                         {check.question}
                     </Text>
-                    {/* <Input 
-                        w="80%"
-                        my={2}
-                        placeholder="Question"
-                        defaultValue={check.question}
-                        onChangeText={(text: string) => CheckType.handleTextChange(text, check.getId(), setChecks)}
-                    /> */}
                 </HStack>
                 <Radio.Group name="SingleChoice">
                     <FlatList

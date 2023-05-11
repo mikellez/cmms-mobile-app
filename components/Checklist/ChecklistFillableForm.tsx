@@ -39,8 +39,17 @@ const ChecklistEditableFormRow = ({sectionId, row}: {sectionId: string, row: Che
     return (
         <SafeAreaView>
             <Text style={styles.rowTitle}>{row.description}</Text>
+            <FlatList
+                data={row.checks}
+                renderItem={({ item }) => <React.Fragment>{item.renderEditableForm()}</React.Fragment>}
+                keyExtractor={check => check.getId()}
+            />
         </SafeAreaView>
     );
+};
+
+const updateSpecificCheck = () => {
+    
 };
 
 const styles = StyleSheet.create({
@@ -54,4 +63,5 @@ const styles = StyleSheet.create({
     },
 })
 
+export { updateSpecificCheck }
 export default ChecklistEditableForm;

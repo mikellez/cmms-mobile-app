@@ -24,6 +24,8 @@ abstract class CheckType {
 
     abstract renderCreatorForm(deleteCheck: Function, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>): React.ReactNode;
 
+    abstract renderEditableForm(isDisabled?: boolean): React.ReactNode;
+
     static handleTextChange(text: string, id: string, setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>) {
         setChecks(prevChecks => {
             const newChecks = [...prevChecks];
