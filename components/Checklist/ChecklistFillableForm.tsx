@@ -5,12 +5,14 @@ import { FlatList, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CMMSChecklist } from "../../types/interfaces";
 import { ChecklistEditableFormContext } from "../../context/checklistContext";
+import { ModuleDivider } from "../ModuleLayout";
 
 const ChecklistEditableForm = () => {
     const { sections, setSections } = useContext(ChecklistEditableFormContext);
 
     return (
         <SafeAreaView>
+            <ModuleDivider/>
             <FlatList 
                 data={sections}
                 keyExtractor={section => section.getId()}
