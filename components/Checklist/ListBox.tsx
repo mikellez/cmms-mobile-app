@@ -7,35 +7,38 @@ import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
 import { ChecklistID } from "../../types/enums";
-import { useNavigation } from "@react-navigation/native";
+import { useCurrentUser } from "../../helper/hooks/SWR";
+import { Role } from "../../types/enums";
 
 const ListBox = ({ checklist, navigation }:
-     { checklist: CMMSChecklist, navigation?: any }) => {
+     { checklist: CMMSChecklist, navigation?: any }
+) => {
+    
+    const user = useCurrentUser();
 
-    const rightAction = () => {
-        return (
-            <View
-                style={styles.leftSwipeView}
-            >
-                <Text>Hello</Text>
-            </View>
-        )
+    const handlePress = () => {
+        const clID = checklist.status_id;
+        if (clID === ChecklistID.Assigned) 
+        {
+            navigation.navigate("CompleteChecklistPage", checklist);
+        } 
+        else if (
+            clID === ChecklistID.WorkDone && (
+                user.data.role_id === Role.Manager ||
+                user.data.role_id === Role.Admin
+            )) 
+        {
+            navigation.navigate("ManageChecklistPage", checklist);
+        } else {
+            navigation.navigate("ViewChecklistPage", checklist);
+        }
     }
-    const clID = checklist.status_id;
-    const page = clID === ChecklistID.Pending || clID === ChecklistID.Assigned ? 
-        "CompleteChecklistPage" : 
-        clID === ChecklistID.WorkDone || clID === ChecklistID.Approved ?
-        "ManageChecklistPage" : null;
         
     return (
         <Pressable
-            onPress={() => {
-                // console.log(checklist.status_id);
-                navigation.navigate(page, checklist)}}
+            onPress={handlePress}
         >
-            <Swipeable
-                renderRightActions={rightAction}
-            >
+
                 <ModuleCardContainer>
                     <HStack>
                         <VStack>
@@ -78,7 +81,6 @@ const ListBox = ({ checklist, navigation }:
                         </Text>
                     </HStack>
                 </ModuleCardContainer>
-            </Swipeable>
         </Pressable>
     );
 };

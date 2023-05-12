@@ -22,6 +22,7 @@ import { navigationRef } from './RootNavigation';
 import { linking } from './linking';
 import ManageChecklistPage from './pages/Checklist/ManageChecklistPage';
 import CompleteChecklistPage from './pages/Checklist/CompleteChecklistPage';
+import ViewChecklistPage from './pages/Checklist/ViewChecklistPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +50,7 @@ export default function App() {
         <Stack.Screen name="TestChecklistComponent" component={TestChecklistComponent} />
         <Stack.Screen name="ManageChecklistPage" component={ManageChecklistPage} />
         <Stack.Screen name="CompleteChecklistPage" component={CompleteChecklistPage} />
+        <Stack.Screen name="ViewChecklistPage" component={ViewChecklistPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
