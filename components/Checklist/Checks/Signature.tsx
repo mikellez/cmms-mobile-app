@@ -1,13 +1,14 @@
 import CheckType from "../classes/CheckType";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { Box, Input, IconButton, HStack, VStack, Radio, Modal } from "native-base";
+import { IconButton, HStack, VStack, TextArea, Button, ScrollView } from "native-base";
 import { ModuleCardContainer } from "../../ModuleLayout";
-import { TextInput, TouchableOpacity, Text, View, StyleSheet } from "react-native";
-import { color } from "native-base/lib/typescript/theme/styled-system";
-import { useRef , useState} from "react";
+import { TouchableOpacity, Text, View, StyleSheet, Modal, Image} from "react-native";
+import { useRef , useState, useContext} from "react";
 import SignatureScreen, {SignatureViewRef} from "react-native-signature-canvas";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
+import { ChecklistEditableFormContext } from "../../../context/checklistContext";
+import { updateSpecificCheck } from "../ChecklistFillableForm";
 
 
 
@@ -34,7 +35,7 @@ class SignatureType extends CheckType {
     }
 
     renderEditableForm(sectionId: string, rowId: string) {
-        return <></>
+        return <SignatureEditableForm check={this} sectionId={sectionId} rowId={rowId}/>
     }
 }
 
@@ -43,9 +44,9 @@ const Sign = ({text, onOK}) => {
     const ref = useRef<SignatureViewRef>();
     const showSignature = () => setShow(true);
     const closeSignature = () => setShow(false);
+    
   
     const handleSignature = signature => {
-      console.log(signature);
       onOK(signature);
       setShow(false);
     };
@@ -59,7 +60,7 @@ const Sign = ({text, onOK}) => {
     }
   
     const handleEnd = () => {
-        // ref.current.readSignature();
+        console.log('end success!');
     }
   
     const handleBegin = () => {
@@ -68,10 +69,23 @@ const Sign = ({text, onOK}) => {
   
     return (
       <View style={styles.container}>
-        <TouchableOpacity style={{borderColor: "red", borderWidth: 3}} onPress={showSignature}>
-            <Text>Signature</Text></TouchableOpacity>
-        {show && <Modal>
-            <TouchableOpacity onPress={closeSignature} style={{alignItems: "flex-end"}}><Entypo size={34} name="cross"></Entypo></TouchableOpacity>
+        <TouchableOpacity style={{}} onPress={showSignature}>
+            <HStack alignItems={"center"}>
+                <Text>Sign here</Text>
+                <Button onPress={showSignature} style={{marginHorizontal: 20}} bg="#C8102E">
+                    <FontAwesome5 name="signature" size={24} color="white" />
+                </Button>
+            </HStack>
+        </TouchableOpacity>
+
+        <Modal visible={show}
+            onRequestClose={() => setShow(false)}
+            transparent={true}
+            style={{height: "50%", borderWidth: 10}}>
+            <TouchableOpacity onPress={closeSignature} 
+            style={{alignItems: "flex-end", backgroundColor: "#C8102E"}}>
+                <Entypo size={34} name="cross"></Entypo>
+            </TouchableOpacity>
             <SignatureScreen
                 ref={ref}
                 onEnd={handleEnd}
@@ -82,9 +96,14 @@ const Sign = ({text, onOK}) => {
                 autoClear={true} 
                 descriptionText={text}
                 backgroundColor="rgb(255,255,255)"
-                // penColor={"rgba(255,117,2,1)"}
+                style={{height: 100}}
+                webStyle={`.m-signature-pad--footer
+                    .button {
+                        background-color: #C8102E;
+                        color: #FFF;
+                    }`}
             />
-        </Modal>}
+        </Modal>
       </View>
     );
   }
@@ -95,7 +114,12 @@ const Sign = ({text, onOK}) => {
       backgroundColor: '#fff',
       alignItems: 'flex-start',
       justifyContent: 'center',
+      width: "100%",
+      height: "50%"
     },
+    // signature: {
+    //     marginHorizontal:
+    // }
   });
 
 const SignatureCreatorForm = ({
@@ -107,38 +131,12 @@ const SignatureCreatorForm = ({
     check: SignatureType;
     setChecks: React.Dispatch<React.SetStateAction<CheckType[]>>;
 }) => {
-    const handleOK = (signature) => {
-        const path = FileSystem.cacheDirectory + "sign.png";
-        FileSystem.writeAsStringAsync(
-          path,
-          signature.replace("data:image/png;base64,", ""),
-          { encoding: FileSystem.EncodingType.Base64 }
-        )
-          .then(() => FileSystem.getInfoAsync(path))
-          .then(console.log)
-          .catch(console.error);
-      };
-
-    const style = `.m-signature-pad--footer
-    .button {
-      background-color: red;
-      color: #FFF;
-    }`;
 
     return (
         <ModuleCardContainer>
             <VStack>
                 <HStack>
-                    {/* <Input
-                        w="80%"
-                        my={2}
-                        placeholder="Question"
-                        defaultValue={check.question}
-                        onChangeText={(text: string) =>
-                            CheckType.handleTextChange(text, check.getId(), setChecks)
-                        }
-                    /> */}
-                    {<Sign text="Sign above" onOK={handleOK}></Sign>}
+                    <Text>Sign here</Text>
                     <IconButton
                         marginLeft="auto"
                         _icon={{
@@ -149,9 +147,56 @@ const SignatureCreatorForm = ({
                         onPress={() => deleteCheck(check.getId())}
                     />
                 </HStack>
+                <TextArea 
+                    h={20} placeholder="" 
+                    numberOfLines={4} 
+                    autoCompleteType={true} 
+                    isDisabled
+                    _disabled={{ borderColor: "black",
+                                borderWidth: "1px" ,
+                                borderStyle: "dashed"}}
+                />
             </VStack>
         </ModuleCardContainer>
     );
 };
+
+const SignatureEditableForm = ({check, sectionId, rowId}: {
+    check: SignatureType,
+    sectionId: string,
+    rowId: string,
+}) => {
+    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const [finalSignature, setSignature] = useState("");
+
+    const onOK = (signature) => {
+        // setSignature(signature);
+        updateSpecificCheck(sectionId, rowId, check.getId(), signature, setSections);
+    }
+
+    return (
+        <ModuleCardContainer>
+            { isDisabled ? <View>
+                <Image style={{width: 50, height: 50}} source={{uri: check.value}}/>
+            </View>
+            : <>
+            <Sign text="Sign above" onOK={onOK}></Sign>
+            <View style={{  width: "100%", 
+                            height: 150, 
+                            borderColor: "grey",
+                            borderWidth: 3,
+                            borderStyle: "dashed",
+                            marginTop: 10,
+                            marginBottom: 15}}>
+                <Image style= {{ 
+                            width: "100%", 
+                            height: "100%", 
+                        }}
+                    source={{uri: check.value}}/>
+            </View>
+            </>}
+        </ModuleCardContainer>
+    );
+}
 
 export { SignatureType };
