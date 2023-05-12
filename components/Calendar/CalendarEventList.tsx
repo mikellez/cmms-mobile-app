@@ -17,10 +17,11 @@ const CalendarEventList = (props: CalendarEventListProps) => {
     const [ChecklistElements, setChecklistElements] = useState([]);
 
     useEffect(() => {
+        let key = 0;
         if (props.COPItems) {
             setCOPElements(
                 props.COPItems.map((item) => {
-                    return <ScheduleCOPEvent key={item.copId} COPSchedule={item} />;
+                    return <ScheduleCOPEvent key={key++} COPSchedule={item} />;
                 })
             );
         } else {
@@ -30,7 +31,7 @@ const CalendarEventList = (props: CalendarEventListProps) => {
             setChecklistElements(
                 props.ChecklistItems.map((item) => {
                     return (
-                        <ScheduleChecklistEvent key={item.scheduleId} checklistSchedule={item} />
+                        <ScheduleChecklistEvent key={key++} checklistSchedule={item} />
                     );
                 })
             );

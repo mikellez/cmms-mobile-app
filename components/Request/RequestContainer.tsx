@@ -174,8 +174,13 @@ const RequestContainer = ({
         .post("/api/request/", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         })
-        .then((response) => {
-          alert("Request created successfully");
+        .then(async (response) => {
+          if(type === 'corrective') {
+            await completeRequest();            
+          } else {
+            alert("Request created successfully");
+          }
+
           if(type==='guest' && !user?.id) {
             alert("Please login to view your requests.");
             navigation.navigate("Login");
@@ -606,7 +611,7 @@ const RequestContainer = ({
 
         onNameChange={value=>handleChange("name", value)}
 
-        formState={formState}
+        setFormState={setFormState}
       />
       </>
 

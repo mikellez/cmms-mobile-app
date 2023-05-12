@@ -10,6 +10,7 @@ interface PlantSelectProps {
     onChange: (itemValue: string) => void;
     selectAllPlants?: boolean;
     maxHeight?: number;
+    minWidth?: string | number;
     style?: StyleProp<ViewStyle>;
 }
 
@@ -48,7 +49,7 @@ const PlantSelect = (props: PlantSelectProps) => {
             placeholder="Select Plant"
             selectedValue={props.value ? props.value : null}
             onValueChange={props.onChange}
-            minW={110}
+            minW={props.minWidth || 110}
             maxH={props.maxHeight}
             style={props.style}
         >

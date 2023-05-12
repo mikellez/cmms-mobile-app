@@ -1,7 +1,8 @@
-import { HStack, Icon, Button } from "native-base";
+import { HStack, Icon, Button, Center, Text, VStack } from "native-base";
 import React, { useEffect, useState } from "react";
 import { View, ScrollView } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Octicons from "react-native-vector-icons/Octicons";
 import { DateData, Calendar } from "react-native-calendars";
 import instance from "../axios.config";
 import { ModuleHeader, ModuleScreen, ModuleDivider } from "../components/ModuleLayout";
@@ -69,6 +70,9 @@ const CalendarTab = ({ navigation }) => {
     const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
     const [dateSelected, setDateSelected] = useState<DateData>();
 
+    const checklistCalConfig = {key: 'checklist', color: 'green'};
+    const copCalConfig = {key: 'cop', color: 'purple'};
+
     const addItems = async (plantId) => {
         setItems([{}, {}]);
 
@@ -76,7 +80,10 @@ const CalendarTab = ({ navigation }) => {
             if (results) {
                 results.forEach((result) => {
                     result.calendar_dates.forEach((date) => {
-                        markedDates[date] = { marked: true };
+                        const dots = markedDates[date]?.dots || [];
+                        const cond = dots.length === 0 || (dots > 0 && dots.filter(i => i.key !== 'checklist'));
+
+                        markedDates[date] = { dots: [...dots, (cond ? checklistCalConfig : {})] };
                         var newItems = items;
                         if (!newItems[0][date]) {
                             newItems[0][date] = [];
@@ -106,7 +113,10 @@ const CalendarTab = ({ navigation }) => {
                     const date = result.changedDate
                         ? new Date(result.changedDate).toISOString().split("T")[0]
                         : new Date(result.scheduledDate).toISOString().split("T")[0];
-                    markedDates[date] = { marked: true };
+                    const dots = markedDates[date]?.dots || [];
+                    const cond = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop'));
+
+                    markedDates[date] = { dots: [...dots, (cond ? copCalConfig : {})] };
                     var newItems = items;
                     if (!newItems[1][date]) {
                         newItems[1][date] = [];
@@ -143,9 +153,10 @@ const CalendarTab = ({ navigation }) => {
         setChecklistItems(items[0][day.dateString]);
         setCOPItems(items[1][day.dateString]);
         setDateSelected(day);
+        console.log(markedDatesProp[day.dateString])
         setSelectDatesProp({
             ...markedDatesProp,
-            [day.dateString]: { marked: true, selected: true },
+            [day.dateString]: { ...markedDatesProp[day.dateString], selected: true, selectedColor: '#C8102E' }
         });
     };
 
@@ -167,7 +178,7 @@ const CalendarTab = ({ navigation }) => {
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Calendar">
-                <HStack style={{ gap: 2, height: 25, minWidth: 150 }}>
+                <HStack style={{ gap: 2, height: 25, minWidth: 200 }} mb={3}>
                     {isCalendarView && (
                         <Button
                             w="30"
@@ -205,16 +216,53 @@ const CalendarTab = ({ navigation }) => {
                         accessControl
                         selectAllPlants
                         maxHeight={25}
+                        minWidth={150}
                         style={{ height: 40 }}
                     />
                 </HStack>
             </ModuleHeader>
 
             <ModuleDivider />
+            
+            { isCalendarView && <View style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+                <VStack>
+                    <HStack>
+                        <Icon
+                            as={Octicons}
+                            name="dot-fill"
+                            size="xs"
+                            color="green.800"
+                        />
+                        <Text fontSize={10}>Checklist</Text>
+
+                    </HStack>
+                    <HStack>
+                        <Icon
+                            as={Octicons}
+                            name="dot-fill"
+                            size="xs"
+                            color="purple.800"
+                        />
+                        <Text fontSize={10}>Change of Parts</Text>
+                    </HStack>
+
+                </VStack>
+            </View>
+            }
 
             {isReady && isCalendarView && (
                 <View>
-                    <Calendar markedDates={selectDatesProp} onDayPress={dayPress} />
+                    <Calendar 
+                        markingType={'multi-dot'} 
+                        markedDates={selectDatesProp} 
+                        onDayPress={dayPress} 
+                        onDayLongPress={dayPress} 
+                        style={{ marginTop: 5, marginBottom: 20}}
+                        theme={{
+                            todayTextColor: '#C8102E',
+                            arrowColor: '#C8102E',
+                        }}
+                        />
                     <ModuleDivider />
                 </View>
             )}
