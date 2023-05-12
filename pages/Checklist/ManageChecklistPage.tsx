@@ -14,6 +14,7 @@ import ChecklistEditableContext from "../../context/checklistContext";
 const ManageChecklistPage = ({navigation, route}) => {
     const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
+    // const [remarks, setRemarks] = useState<string>("");
     
     useEffect(() => {
         console.log(route.params)
