@@ -200,9 +200,7 @@ const ReportScreen = ({ navigation }) => {
 
       <ModuleHeader header="Report">
         <HStack >
-          <Button w="100" padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs">
-            Filter
-          </Button>
+          <Button padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs"/>
         </HStack>
       </ModuleHeader>
 
