@@ -14,4 +14,16 @@ enum RequestID {
     Cancelled = 6
 }
 
-export {ChecklistID, RequestID};
+enum Action {
+    Approve = 1,
+    Reject = 2,
+}
+
+enum Role {
+    Admin = 1,
+    Manager = 2,
+    Engineer = 3,
+    Specialist = 4,
+};
+
+export {ChecklistID, RequestID, Action, Role};
