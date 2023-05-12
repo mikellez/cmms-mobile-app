@@ -2,13 +2,17 @@ import { FormControl, HStack, Radio, Select, CheckIcon, TextArea, Pressable, But
 import { FlatList } from "react-native";
 import ImagePreview from "../ImagePreview";
 import ImageComponent from "../Image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { isEmpty } from "../../helper/utility";
+import instance from "../../axios.config";
+import { CMMSRequest } from "../../types/interfaces";
 
 const FormGroup = ({
   action,
+  id,
   user,
+  type = '',
   plant,
   asset,
   requestItems,
@@ -36,14 +40,14 @@ const FormGroup = ({
   onStatusAction,
   onRejectionCommentChange,
   onNameChange,
-  formState
+  setFormState
 }) => {
-  console.log(user)
+  console.log(requestItems)
 
   const [formData, setFormData] = useState({
     guest_name: "",
     requestTypeID: 1,
-    faultTypeID: "",
+    faultTypeID: 0,
     faultDescription: "",
     plantLocationID: plant || 0,
     taggedAssetID: asset || 0,
@@ -57,6 +61,39 @@ const FormGroup = ({
 
   const [errors, setErrors] = useState<object>({});
   const [hasError, setHasError] = useState<boolean>(false);
+  const [reqItems, setReqItems] = useState<CMMSRequest>();
+
+  const fetchRequest = async () => {
+    if(id) {
+
+      await instance.get(`/api/request/${id}`)
+      .then((res)=> {
+        setReqItems(res.data);
+        setFormState({
+          requestTypeID: res.data.req_id || 0,
+          faultTypeID: res.data.fault_id || 0,
+          description: res.data.description || "",
+          plantLocationID: res.data.plant_id || 0,
+          taggedAssetID: res.data.psa_id || 0,
+          image: null
+
+        });
+      })
+      .catch((err) => {
+          console.log(err)
+      });
+
+    } else {
+      setReqItems(requestItems);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchRequest();
+  }, []);
+
+  console.log(reqItems)
 
   const data = [
     {
@@ -69,7 +106,7 @@ const FormGroup = ({
       placeholder: "Reporter Name",
       accessibilityLabel: "Reporter Name",
       onChangeText: onNameChange,
-      show: action === "create" && !user && (plant || false)
+      show: action === "create" && type==='guest' && !user
     },
     {
       id: 1, 
@@ -79,12 +116,12 @@ const FormGroup = ({
       label: "Request Type", 
       accessibilityLabel: "Pick a type", 
       name:"requestTypeID", 
-      defaultValue: plant ? 3 : 1, 
+      defaultValue: ['guest', 'corrective'].includes(type) ? 3 : 1, 
       onChange: onRequestTypeChange, 
-      value: (requestItems?.req_id ?? ''), 
+      value: (reqItems?.req_id ?? ''), 
       items: requestTypes, 
-      itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: (action !== "create" || (action === 'create' && plant)) ?? false},
-      selectedValueCond: (action !== 'create' && { value: requestItems?.req_id ?? ''}),
+      itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false},
+      selectedValueCond: (action !== 'create' && { value: reqItems?.req_id ?? ''}),
       show: true
     },
     {
@@ -100,7 +137,7 @@ const FormGroup = ({
       isDisabled: action !== "create" ?? false, 
       items: faultTypes,
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: (action !== 'create' && { selectedValue: requestItems?.fault_id || ''}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: reqItems?.fault_id ?? '' }),
       show: true
     },
     {
@@ -112,11 +149,11 @@ const FormGroup = ({
       placeholder: "Fault Description",
       accessibilityLabel: "Fault Description",
       name: "faultDescription",
-      defaultValue: requestItems?.description || '',
+      defaultValue: (action !== 'create' || (action === 'create' && type === 'corrective')) && (action === 'create' && type ==='corrective' ? `[Corrective Request] ${reqItems?.fault_description ?? ''}` : (reqItems?.fault_description ?? '')),
       onChangeText: onFaultDescriptionChange,
       isDisabled: action !== "create" ?? false,
       isReadOnly: action !== "create" ?? false,
-      valueCond: (action !== 'create' && { value: requestItems?.description || 'NIL'}),
+      valueCond: (action !== 'create' && { value: reqItems?.fault_description }),
       show: true
     },
     {
@@ -129,10 +166,10 @@ const FormGroup = ({
       name: "plantLocationID",
       placeholder: "Choose Plant Location", 
       onValueChange: onPlantLocationChange, 
-      isDisabled: (action !== "create" || (action === 'create' && plant)) ?? false,
+      isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false,
       items: plants,
       itemsConfig: { key: "plant_id", value: "plant_id", label: "plant_name"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (requestItems?.plant_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (reqItems?.plant_id || '')}),
       show: true
     },
     {
@@ -145,26 +182,26 @@ const FormGroup = ({
       name: "taggedAssetID",
       placeholder: "Choose Asset Tag",
       onValueChange: onAssetTagChange,
-      isDisabled: (action !== "create" || (action === 'create' && asset)) ?? false,
+      isDisabled: (action !== "create" || (action === 'create' && type==='guest')) ?? false,
       items: assetTags,
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
-      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (requestItems?.psa_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (reqItems?.psa_id || '')}),
       show: true
     },
     {
       id: 6,
-      required: true,
+      required: false,
       requiredMessage: "Image is required",
       type: "image",
       label: "Image",
       accessibilityLabel: "Image",
       name: "image",
-      defaultValue: requestItems?.image || '',
+      defaultValue: reqItems?.image || '',
       onPress: onImagePicker,
       isDisabled: action !== "create" ?? false,
-      value: requestItems?.image || '',
-      imageSource: imageSource,
-      bufferData: requestItems?.uploaded_file?.data,
+      value: reqItems?.image || '',
+      imageSource: (action !== 'create') && imageSource,
+      bufferData: reqItems?.uploaded_file?.data,
       show: true
     },
     {
@@ -179,7 +216,7 @@ const FormGroup = ({
       onValueChange: onAssignUserChange,
       items: assignUsers,
       itemsConfig: { key: "id", value: "id", label: "detail" },
-      selectedValueCond: { value: assignUserSelected?.value ? assignUserSelected?.value : requestItems?.assigned_user_id },
+      selectedValueCond: { value: assignUserSelected?.value ? assignUserSelected?.value : reqItems?.assigned_user_id },
       show: action === 'assign'
     },
     {
@@ -193,7 +230,7 @@ const FormGroup = ({
       onValueChange: onPriorityChange,
       items: priorities,
       itemsConfig: { key: "p_id", value: "p_id", label: "priority" },
-      selectedValueCond: {value: prioritySelected?.p_id ? prioritySelected?.p_id : requestItems?.priority_id},
+      selectedValueCond: {value: prioritySelected?.p_id ? prioritySelected?.p_id : reqItems?.priority_id},
       show: action === 'assign'
     },
     {
@@ -205,7 +242,7 @@ const FormGroup = ({
       name: "completionImage",
       onPress: onCompletionImagePicker,
       imageSource: completionImageSource,
-      bufferData: requestItems?.completion_file?.data,
+      bufferData: reqItems?.completion_file?.data,
       show: ['complete','manage'].includes(action)
     },
     {
@@ -215,11 +252,11 @@ const FormGroup = ({
       label: "Completion Comment",
       name: "completionComment",
       placeholder: "Completion Comment",
-      defaultValue: requestItems?.completion_comment || '',
+      defaultValue: reqItems?.completion_comment || '',
       onChangeText: onCompletionCommentChange,
       isDisabled: action === "manage",
       isReadOnly: action === "manage",
-      valueCond: (action !== 'complete' && { value: requestItems?.completion_comments || 'NIL'}),
+      valueCond: (action !== 'complete' && { value: reqItems?.completion_comments || 'NIL'}),
       show: ['complete','manage'].includes(action)
     },
     {
@@ -407,6 +444,7 @@ const FormGroup = ({
                 _disabled={{
                   bg: "muted.100",
                 }}
+                defaultValue={defaultValue}
                 {...valueCond}
                 />
                 {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}

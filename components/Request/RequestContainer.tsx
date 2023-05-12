@@ -84,11 +84,13 @@ export interface CMMSRequestPriority {
 const RequestContainer = ({ 
   route, 
   navigation, 
-  action 
+  action,
+  type
 } : { 
-  route?: RouteProp<{ params: { id: '', plant: '', asset: '' } }, 'params'>;
+  route?: RouteProp<{ params: { id: '', plant: '', asset: '', fault: '' } }, 'params'>;
   navigation?: any;
   action?: string;
+  type?: string;
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [prioritySelected, setPrioritySelected] = useState({});
@@ -102,8 +104,8 @@ const RequestContainer = ({
 
   const [formState, setFormState] = useState<FormValues>({
     name: "",
-    requestTypeID: route?.params?.plant ? 3 : 1,
-    faultTypeID: 0,
+    requestTypeID: ['guest', 'corrective'].includes(type) ? 3 : 1,
+    faultTypeID: route?.params?.fault || 0,
     description: "",
     plantLocationID: route?.params?.plant || 0,
     taggedAssetID: route?.params?.asset || 0,
@@ -134,6 +136,7 @@ const RequestContainer = ({
 
   const [plant, setPlant] = useState(route?.params?.plant);
   const [asset, setAsset] = useState(route?.params?.asset);
+  const [id, setId] = useState(route?.params?.id);
 
 
   const getData = async (key) => {
@@ -149,10 +152,10 @@ const RequestContainer = ({
 
   const createRequest = async () => {
     const formData = new FormData();
-    if(user?.id) {
+    if(type === 'guest' && user?.id) {
       formData.append("user_id", user.id);
       formData.append("role_id", user.role_id);
-    } else {
+    } else if(type === 'guest') {
       formData.append("name", formState.name);
     }
     formData.append("description", formState.description);
@@ -161,6 +164,7 @@ const RequestContainer = ({
     formData.append("requestTypeID", formState.requestTypeID.toString());
     formData.append("taggedAssetID", formState.taggedAssetID.toString());
     if (formState.image) formData.append("image", formState.image);
+    if (type==='corrective') formData.append("linkedRequestId", route?.params?.id);
 
     console.log('formData', formData);
     //setFormData(formData);
@@ -172,7 +176,7 @@ const RequestContainer = ({
         })
         .then((response) => {
           alert("Request created successfully");
-          if(!user?.id) {
+          if(type==='guest' && !user?.id) {
             alert("Please login to view your requests.");
             navigation.navigate("Login");
           } else {
@@ -558,9 +562,11 @@ const RequestContainer = ({
       <FormGroup
         action={action}
 
+        id={id}
         plant={plant}
         asset={asset}
         user={user}
+        type={type}
 
         requestItems={requestItems}
 

@@ -170,10 +170,12 @@ const ReportScreen = ({ navigation }) => {
               <Text><Heading size="xs">Requested By:</Heading> {item?.request_name ?? 'NIL'}</Text>
               <HStack justifyContent="center" w="100%" flex={1}>
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="eyeo" color="#C8102E" />} onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}/>
+                  <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>
                   {
                     ['PENDING', 'ASSIGNED'].includes(item.status)
                     && <IconButton icon={<Icon size="lg" as={AntDesign} name="adduser" color="#C8102E" />} onPress={()=>navigation.navigate("AssignRequest", { id: item.request_id })}/>
                   }
+                  
                   {
                     ['COMPLETED', 'REJECTED'].includes(item.status)
                     && [1, 2].includes(role_id)
