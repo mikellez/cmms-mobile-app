@@ -5,10 +5,14 @@ import instance from "../../axios.config";
 import { CMMSAsset } from "../../types/interfaces";
 import MultiSelect from "react-native-multiple-select";
 
-interface PlantSelectProps {
+interface AssetSelectProps {
     plantId?: number
     value?: string,
     onChange: Function
+};
+
+interface AssetMultiSelectProps extends AssetSelectProps {
+    defaultValues?: number[],
 };
 
 const fetchAssets = async (plantId: number) : Promise<CMMSAsset[]> => {
@@ -21,7 +25,7 @@ const fetchAssets = async (plantId: number) : Promise<CMMSAsset[]> => {
     }
 };
 
-const AssetSelect = (props: PlantSelectProps) => {
+const AssetSelect = (props: AssetSelectProps) => {
     const [assets, setAssets] = useState<CMMSAsset[]>([]);
 
     useEffect(() => {
@@ -54,9 +58,9 @@ const AssetSelect = (props: PlantSelectProps) => {
 };
 
 
-const AssetMultiSelect = (props: PlantSelectProps) => {
+const AssetMultiSelect = (props: AssetMultiSelectProps) => {
     const [assets, setAssets] = useState<CMMSAsset[]>([]);
-    const [selectedItems, setSelectedItems] = useState<{id: number, name: string}[]>([]);
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
     useEffect(() => {
         if (props.plantId) {
@@ -66,6 +70,15 @@ const AssetMultiSelect = (props: PlantSelectProps) => {
         } else setAssets([]);
     }, [props.plantId]);
 
+    useEffect(() => {
+        if (props.defaultValues) {
+            const defaultItems = assets
+                .filter(asset => props.defaultValues.includes(asset.psa_id))
+                .map(asset => asset.psa_id)
+            setSelectedItems(defaultItems);
+        }
+    }, [props.defaultValues, assets])
+
     const options = assets.map(asset => {
         return {
             id: asset.psa_id,
@@ -73,10 +86,10 @@ const AssetMultiSelect = (props: PlantSelectProps) => {
         };
     });
 
-    const handleChange = (items: {id: number, name: string}[]) => {
+    const handleChange = (items: number[]) => {
         setSelectedItems(items);
         props.onChange(items.map(item => item));
-    }
+    };
 
     return (
         <MultiSelect

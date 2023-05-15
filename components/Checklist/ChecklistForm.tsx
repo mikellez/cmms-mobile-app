@@ -63,6 +63,7 @@ const ChecklistForm = (props: ChecklistFormProps) => {
             <AssetMultiSelect
                 onChange={items => updateChecklist(items.join(","), "linkedassetids")}
                 plantId={props.checklist.plant_id}
+                defaultValues={props.checklist.linkedassetids ? props.checklist.linkedassetids.split(",").map(id => +id): []}
             />
 
             <FormControl.Label>Assign To</FormControl.Label>
