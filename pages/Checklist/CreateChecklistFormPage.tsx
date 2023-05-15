@@ -55,7 +55,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         return true;
     };
 
-    const updateChecklistDataJSON = async () => {
+    const updateChecklistDataJSON = () => {
         setChecklist(prevChecklist => {
             const newChecklist = {...prevChecklist};
             newChecklist.datajson = toDataJSON(sections);
@@ -63,8 +63,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         });
     };
 
-    if (level === 0) {
-        updateChecklistDataJSON().then(res => {
+    useEffect(() => {
+        if (isSubmitting) {
             if (!validateChecklistFormData(checklist)) {
                 setIncompleteModal(true); 
             } else {
@@ -72,14 +72,15 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                     setSuccessModal(true);
                 })   
             }
-        });
+        }
 
         setSubmitting(false);
-        setLevel(undefined); 
 
-        setTimeout(() => {
-            if (successModal) navigation.navigate("Maintenance");
-        }, 1000);
+    }, [checklist])
+
+    if (level === 0) {
+        updateChecklistDataJSON();
+        setLevel(undefined); 
     };
 
     useEffect(() => {

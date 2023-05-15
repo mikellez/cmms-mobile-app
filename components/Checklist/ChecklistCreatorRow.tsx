@@ -2,13 +2,13 @@ import React, { useCallback, useContext, useState, useEffect } from "react";
 import { Box, HStack, IconButton, Input, Actionsheet, useDisclose, VStack } from "native-base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ChecklistRow from "./classes/ChecklistRow";
-import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType } from "./Checks";
+import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType, FileUploadType } from "./Checks";
 import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
 import CheckType from "./classes/CheckType";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { View } from "react-native";
 
-const Choices = ["SingleChoice", "MultiChoice", "FreeText", "Signature"];
+const Choices = ["SingleChoice", "MultiChoice", "FreeText", "FileUpload", "Signature"];
 
 const ChecklistCreatorRow = ({
     row,
@@ -54,6 +54,8 @@ const ChecklistCreatorRow = ({
             case 2:
                 return new FreeTextType("", "");
             case 3:
+                return new FileUploadType("", "");
+            case 4:
                 return new SignatureType("", "");
         }
     }, []);

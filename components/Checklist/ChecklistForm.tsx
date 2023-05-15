@@ -61,7 +61,7 @@ const ChecklistForm = (props: ChecklistFormProps) => {
             /> */}
 
             <AssetMultiSelect
-                onChange={items => updateChecklist(items.join(","), "linkedasstids")}
+                onChange={items => updateChecklist(items.join(","), "linkedassetids")}
                 plantId={props.checklist.plant_id}
             />
 
