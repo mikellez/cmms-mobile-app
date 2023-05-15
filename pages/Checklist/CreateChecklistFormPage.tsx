@@ -63,6 +63,11 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         });
     };
 
+    const leavePage = () => {
+        console.log("callback")
+        navigation.navigate("Maintenance");
+    };
+
     useEffect(() => {
         if (isSubmitting) {
             if (!validateChecklistFormData(checklist)) {
@@ -155,6 +160,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 title="Success"
                 text="New checklist successfully created"
                 icon={ModalIcons.Warning}
+                onCloseCallback={leavePage}
             />
 
         </ModuleScreen>
