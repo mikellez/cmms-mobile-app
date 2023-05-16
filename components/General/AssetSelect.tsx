@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Select } from "native-base";
+import { View } from "react-native";
 import instance from "../../axios.config";
 import { CMMSAsset } from "../../types/interfaces";
+import MultiSelect from "react-native-multiple-select";
 
-interface PlantSelectProps {
+interface AssetSelectProps {
     plantId?: number
     value?: string,
-    onChange: (itemValue: string) => void
+    onChange: Function
+};
+
+interface AssetMultiSelectProps extends AssetSelectProps {
+    defaultValues?: number[],
 };
 
 const fetchAssets = async (plantId: number) : Promise<CMMSAsset[]> => {
@@ -19,7 +25,7 @@ const fetchAssets = async (plantId: number) : Promise<CMMSAsset[]> => {
     }
 };
 
-const AssetSelect = (props: PlantSelectProps) => {
+const AssetSelect = (props: AssetSelectProps) => {
     const [assets, setAssets] = useState<CMMSAsset[]>([]);
 
     useEffect(() => {
@@ -44,11 +50,59 @@ const AssetSelect = (props: PlantSelectProps) => {
         <Select
             placeholder="Select Asset" 
             selectedValue={props.value ? props.value : null}
-            onValueChange={props.onChange}
+            onValueChange={(value) => props.onChange(value)}
         >
             {options}
         </Select>
     );
 };
 
-export { AssetSelect };
+
+const AssetMultiSelect = (props: AssetMultiSelectProps) => {
+    const [assets, setAssets] = useState<CMMSAsset[]>([]);
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+    useEffect(() => {
+        if (props.plantId) {
+            fetchAssets(props.plantId).then(result => {
+                if (result) setAssets(result);
+            });
+        } else setAssets([]);
+    }, [props.plantId]);
+
+    useEffect(() => {
+        if (props.defaultValues) {
+            const defaultItems = assets
+                .filter(asset => props.defaultValues.includes(asset.psa_id))
+                .map(asset => asset.psa_id)
+            setSelectedItems(defaultItems);
+        }
+    }, [props.defaultValues, assets])
+
+    const options = assets.map(asset => {
+        return {
+            id: asset.psa_id,
+            name: asset.asset_name
+        };
+    });
+
+    const handleChange = (items: number[]) => {
+        setSelectedItems(items);
+        props.onChange(items.map(item => item));
+    };
+
+    return (
+        <MultiSelect
+            uniqueKey="id"
+            items={options}
+            selectedItems={selectedItems}
+            onSelectedItemsChange={handleChange}
+            styleItemsContainer={{maxHeight: 200}}
+            selectText=""
+            styleDropdownMenu={{ flex: 1, borderColor: "rgb(133, 133, 133))", borderWidth: 1, borderRadius: 5}}
+            styleSelectorContainer={{ flex: 1, borderColor: "rgb(133, 133, 133))", borderWidth: 1, borderRadius: 5}}
+        />
+    );
+};
+
+export { AssetSelect, AssetMultiSelect };

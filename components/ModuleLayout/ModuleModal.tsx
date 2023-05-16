@@ -15,13 +15,23 @@ enum ModalIcons {
 }
 
 interface ModuleSimpleModalProps extends ModuleModalProps {
-    text?: string;
-    icon?: ModalIcons;
-}
+    text: string,
+    icon?: ModalIcons
+    onCloseCallback?: Function
+};
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
+
+    const closeModal = () => {
+        props.setOpen(false);
+        if (props.onCloseCallback) props.onCloseCallback();
+    };
+
     return (
-        <NBModal isOpen={props.isOpen} onClose={() => props.setOpen(false)}>
+        <NBModal
+            isOpen={props.isOpen}
+            onClose={closeModal}
+        >
             <NBModal.Content>
                 <NBModal.CloseButton />
                 <NBModal.Body padding="4">
