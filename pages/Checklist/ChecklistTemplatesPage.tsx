@@ -5,6 +5,7 @@ import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistTemplate from "../../components/Checklist/ChecklistTemplate";
 import { FlatList } from "react-native";
 import { VStack } from "native-base";
+import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 
 const fetchChecklistTemplates = async (): Promise<CMMSChecklist[] | void> => {
     try{
@@ -33,9 +34,8 @@ const ChecklistTemplatesPage = ({navigation}) => {
 
     return (
         <ModuleScreen navigation={navigation}>
-            <ModuleHeader header="Checklist Templates">
+            <ChecklistHeader navigation={navigation} header={"Checklist Templates"}/>
 
-            </ModuleHeader>
                 <>
                     {templateElements}  
                 </>

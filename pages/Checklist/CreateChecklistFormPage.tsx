@@ -47,6 +47,14 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
 
     const user = useCurrentUser();
 
+    const editChecklist = async (checklist: CMMSChecklist) => {
+        try {
+            instance.patch(`/api/checklist/record/${checklist.checklist_id}`, {checklist });
+        } catch(err) {
+            console.log(err);
+        }
+    };
+
     const pageTitle = checklistType === ChecklistType.Template ? "Create Checklist" : "Edit Checklist";
     const backPage = checklistType === ChecklistType.Template ? "ChecklistTemplatesPage" : "Maintenance";
     const successModalText = checklistType === ChecklistType.Template ?
@@ -126,6 +134,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         }
     }, [checklistId, checklistType]);
 
+    const header = <ChecklistForm checklist={checklist} setChecklist={setChecklist}/>;
+    
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header={pageTitle}>
