@@ -54,6 +54,7 @@ const ReportScreen = ({ navigation }) => {
     username: ""
   });
 
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
 
@@ -75,11 +76,14 @@ const ReportScreen = ({ navigation }) => {
   }
 
   useEffect(() => {
+    setIsReady(false);
+
     if(isFocused) {
       fetchUser();
 
       fetchRequest(viewType)
       .then((res)=> setRequestItems(res))
+      .then(()=> setIsReady(true));
 
       setSections([])
     }
@@ -221,16 +225,21 @@ const ReportScreen = ({ navigation }) => {
         </Center>
       </Box>
 
-      <Accordion
-        activeSections={activeSections}
-        sections={requestItems}
-        touchableComponent={TouchableOpacity}
-        renderHeader={renderHeader}
-        renderContent={renderContent}
-        duration={100}
-        onChange={setSections}
-        renderAsFlatList={true}
-      />
+      {!isReady && <Center><Text>Loading ...</Text></Center>}
+      {isReady && requestItems.length === 0 && <Center><Text>No Requests</Text></Center>}
+
+      { isReady &&
+        <Accordion
+          activeSections={activeSections}
+          sections={requestItems}
+          touchableComponent={TouchableOpacity}
+          renderHeader={renderHeader}
+          renderContent={renderContent}
+          duration={100}
+          onChange={setSections}
+          renderAsFlatList={true}
+        />
+      }
 
       {/*<HStack px="5" py="5" w="100%" justifyContent="space-between">
         <HStack>
