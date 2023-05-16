@@ -1,8 +1,8 @@
 import React, { useState, createContext, useEffect } from "react";
-import { View, ScrollView } from "react-native";
+import { View } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
-import { Input, Icon, TextArea, VStack, Button, IconButton, HStack } from "native-base";
+import { Input, Icon, TextArea, VStack, Button, IconButton, HStack, ScrollView } from "native-base";
 import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistForm from "../../components/Checklist/ChecklistForm";
@@ -10,6 +10,7 @@ import ChecklistSection from "../../components/Checklist/classes/ChecklistSectio
 import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
 import instance from "../../axios.config";
 import { useCurrentUser } from "../../helper/hooks/SWR";
+import { ChecklistCreateContextProvider } from "../../context/checklistContext";
 
 const fetchSpecificChecklistTemplate = async (id: number): Promise<CMMSChecklist | void> => {
     try {
@@ -30,7 +31,7 @@ const submitChecklist = async (checklist: CMMSChecklist) => {
     };
 };
 
-const ChecklistFormContext = createContext(null);
+// const ChecklistFormContext = createContext(null);
 
 const CreateChecklistFormPage = ({ navigation, route }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
@@ -55,6 +56,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         return true;
     };
 
+    // updating checklist based on sections state edited by the level system
     const updateChecklistDataJSON = async () => {
         setChecklist(prevChecklist => {
             const newChecklist = {...prevChecklist};
@@ -103,6 +105,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         }
     }, [checklistId]);
 
+    const header = <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
+
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Create Checklist">
@@ -119,46 +123,44 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                     ></Button>
                 </HStack>
             </ModuleHeader>
-
-            <ScrollView>
-                <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
-                
-                <ChecklistFormContext.Provider value={{ sections, setSections, level, setLevel }}>
-                    <ChecklistCreator />
-                </ChecklistFormContext.Provider>
-                
-                <IconButton  
-                    _icon={{
-                        as: Feather,
-                        name: "send"
-                    }}
-                    colorScheme="white"
-                    variant="solid"
-                    backgroundColor="#C8102E"
-                    onPress={handleSubmit}
-                    disabled={isSubmitting}
-                />
-            </ScrollView>
-
-            <ModuleSimpleModal
-                isOpen={incompleteModal}
-                setOpen={setIncompleteModal}
-                title="Missing Details"
-                text="Ensure that all fields have been filled"
-                icon={ModalIcons.Warning}
+ 
+            <ChecklistCreateContextProvider sections={sections}
+                                        setSections={setSections}
+                                        level={level}
+                                        setLevel={setLevel}>
+                <ChecklistCreator header={header}/>
+            </ChecklistCreateContextProvider>   
+            
+            <IconButton  
+                _icon={{
+                    as: Feather,
+                    name: "send"
+                }}
+                colorScheme="white"
+                variant="solid"
+                backgroundColor="#C8102E"
+                onPress={handleSubmit}
+                disabled={isSubmitting}
             />
 
-            <ModuleSimpleModal
-                isOpen={successModal}
-                setOpen={setSuccessModal}
-                title="Success"
-                text="New checklist successfully created"
-                icon={ModalIcons.Warning}
-            />
+        <ModuleSimpleModal
+            isOpen={incompleteModal}
+            setOpen={setIncompleteModal}
+            title="Missing Details"
+            text="Ensure that all fields have been filled"
+            icon={ModalIcons.Warning}
+        />
+
+        <ModuleSimpleModal
+            isOpen={successModal}
+            setOpen={setSuccessModal}
+            title="Success"
+            text="New checklist successfully created"
+            icon={ModalIcons.Warning}
+        />
 
         </ModuleScreen>
     );
 };
 
 export default CreateChecklistFormPage;
-export { ChecklistFormContext }

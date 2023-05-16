@@ -3,7 +3,7 @@ import { ModuleScreen, ModuleHeader } from "../../components/ModuleLayout";
 import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistTemplate from "../../components/Checklist/ChecklistTemplate";
-import { ScrollView, StyleSheet } from "react-native";
+import { FlatList } from "react-native";
 import { VStack } from "native-base";
 
 const fetchChecklistTemplates = async (): Promise<CMMSChecklist[] | void> => {
@@ -25,26 +25,20 @@ const ChecklistTemplatesPage = ({navigation}) => {
         });
     }, []);
 
-    const templateElements = templates.map((template, index) => {
-        return (
-            <ChecklistTemplate
-                key={index}
-                checklist={template}
-                navigation={navigation}
-            />
-        )
-    })
+
+    const templateElements = <FlatList data={templates}
+                                        keyExtractor={template => template.checklist_id.toString()}
+                                        renderItem={({item}) => <ChecklistTemplate checklist={item}
+                                                                                   navigation={navigation}/>}/>
 
     return (
         <ModuleScreen navigation={navigation}>
             <ModuleHeader header="Checklist Templates">
 
             </ModuleHeader>
-            <ScrollView>
-                <VStack space={2}>
+                <>
                     {templateElements}  
-                </VStack>
-            </ScrollView>
+                </>
         </ModuleScreen>
     );
 };

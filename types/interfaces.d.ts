@@ -279,6 +279,21 @@ interface CMMSChecklist {
   datajson?: any;
 }
 
+interface CMMSCheck {
+  type: string;
+  question: string;
+  value: string;
+}
+
+interface CMMSRow {
+  description: string;
+  checks: CMMSCheck[];
+}
+interface CMMSSection {
+  description: string;
+  rows: CMMSRow[];
+}
+
 interface CMMSActivitylog {
   id: number;
   user_id: string;

@@ -3,13 +3,15 @@ import { Box, HStack, IconButton, Input, Actionsheet, useDisclose, VStack } from
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ChecklistRow from "./classes/ChecklistRow";
 import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType } from "./Checks";
-import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
+import { ChecklistCreateFormContext } from "../../context/checklistContext";
 import CheckType from "./classes/CheckType";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { View } from "react-native";
 
 const Choices = ["SingleChoice", "MultiChoice", "FreeText", "Signature"];
 
+
+// props: row (class) and rows setter (array)
 const ChecklistCreatorRow = ({
     row,
     setRows,
@@ -19,7 +21,7 @@ const ChecklistCreatorRow = ({
 }) => {
     const { isOpen, onOpen, onClose } = useDisclose();
     const [checks, setChecks] = useState<CheckType[]>([]);
-    const { level, setLevel } = useContext(ChecklistFormContext);
+    const { level, setLevel } = useContext(ChecklistCreateFormContext);
 
     const deleteRow = (rowId: string) => {
         setRows((prev) => prev.filter((item) => item.getId() != rowId));
@@ -37,6 +39,8 @@ const ChecklistCreatorRow = ({
         });
     };
 
+    // Dropdown menu to select new checks
+    // pass in addNewCheck prop to edit existing list of checks
     const actionSheetItems = Choices.map((choice, index) => {
         return (
             <Actionsheet.Item key={index} onPress={() => addNewCheck(index)}>
@@ -81,7 +85,9 @@ const ChecklistCreatorRow = ({
         setRows((prevRows) => {
             const newRows = [...prevRows];
             for (let i = 0; i < prevRows.length; i++) {
+                // row comes from props, part of the Component
                 if (prevRows[i].getId() === row.getId()) {
+                    // newRows[i] refers to a Row instance
                     appendChecks(newRows[i]);
                 }
             }
@@ -93,14 +99,17 @@ const ChecklistCreatorRow = ({
 
     const appendChecks = (row: ChecklistRow) => {
         row.removeAllChecks();
-
+        // checks is an array state as part of this component
+        // each element is a Checktype
         checks.forEach((check) => {
+            // row is a ChecklistRow instance containg array of checks
             row.addCheck(check);
         });
     };
 
     useEffect(() => {
         if (row.checks) {
+            // populate checks with inital checks
             setChecks(row.checks);
         } else setChecks([])
     }, [row])

@@ -168,6 +168,7 @@ const SignatureEditableForm = ({check, sectionId, rowId}: {
 }) => {
     const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
     const [finalSignature, setSignature] = useState("");
+    
 
     const onOK = (signature) => {
         // setSignature(signature);
@@ -176,13 +177,25 @@ const SignatureEditableForm = ({check, sectionId, rowId}: {
 
     return (
         <ModuleCardContainer>
-            { isDisabled ? <View>
-                <Image style={{width: 50, height: 50}} source={{uri: check.value}}/>
+            { isDisabled ?  
+            <>
+            <Text>Signature</Text>
+            <Text> </Text>
+            <View style={{  width: "100%", 
+                            height: 250, 
+                            borderColor: "grey",
+                            borderWidth: 3,
+                            borderStyle: "dashed",
+                            marginTop: 10,
+                            marginBottom: 15}}>
+                <Image style={{width: "100%", height: "100%"}} 
+                        source={{uri: check.value ? check.value : null}}/>
             </View>
+            </>
             : <>
             <Sign text="Sign above" onOK={onOK}></Sign>
             <View style={{  width: "100%", 
-                            height: 150, 
+                            height: 200, 
                             borderColor: "grey",
                             borderWidth: 3,
                             borderStyle: "dashed",
@@ -192,9 +205,9 @@ const SignatureEditableForm = ({check, sectionId, rowId}: {
                             width: "100%", 
                             height: "100%", 
                         }}
-                    source={{uri: check.value}}/>
+                    source={{uri: check.value ? check.value : null}}/>
             </View>
-            </>}
+        </>}
         </ModuleCardContainer>
     );
 }

@@ -1,19 +1,21 @@
 import React, {createContext} from "react";
-import ChecklistEditableForm from "../components/Checklist/ChecklistFillableForm";
-import ChecklistSection from "../components/Checklist/classes/ChecklistSection";
 
 const ChecklistEditableFormContext = createContext(null);
 
-const ChecklistEditableContext = ({sections, setSections, isDisabled}: 
-    {
-        sections: ChecklistSection[], 
-        setSections: React.Dispatch<React.SetStateAction<ChecklistSection[]>>, 
-        isDisabled?: boolean}
-) => {
+const ChecklistEditableProvider = ({sections, setSections, isDisabled, children}) => {
     return <ChecklistEditableFormContext.Provider value={{ sections, setSections, isDisabled }}>
-        <ChecklistEditableForm />
+        {children}
     </ChecklistEditableFormContext.Provider>
 }
 
-export { ChecklistEditableFormContext };
-export default ChecklistEditableContext;
+const ChecklistCreateFormContext = createContext(null);
+const ChecklistCreateContextProvider = ({sections, setSections, level, setLevel, children}) => {
+    return <ChecklistCreateFormContext.Provider value={{ sections, setSections, level, setLevel }}>
+                    {children}
+    </ChecklistCreateFormContext.Provider>
+}
+
+export { ChecklistEditableFormContext, 
+            ChecklistCreateFormContext, 
+            ChecklistCreateContextProvider };
+export default ChecklistEditableProvider;

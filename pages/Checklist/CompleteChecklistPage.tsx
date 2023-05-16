@@ -10,15 +10,17 @@ import { Table, Rows } from "react-native-table-component";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
 import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
-import ChecklistEditableContext from "../../context/checklistContext";
+import ChecklistEditableProvider from "../../context/checklistContext";
+import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 
 const completeChecklist = async (checklist: CMMSChecklist) => {
     try {
         await instance({
-            url: "/api/checklist/complete",
+            url: `/api/checklist/complete/${checklist.checklist_id}`,
             data: {
                 datajson: checklist.datajson
-            }
+            },
+            method: "patch"
         })
     }
     catch (err) {
@@ -44,12 +46,22 @@ const CompleteChecklistPage = ({navigation, route}) => {
         }
     }, [checklist])
 
+    const toDataJSON = (sections: ChecklistSection[]) => {
+        return sections.map(section => section.toJSON());
+    };
+
     const handleSubmit = () => {
         if (!checkIfChecklistIsComplete(sections)) {
             setIncompleteModal(true);
             
         } else {
+            setChecklist(prevChecklist => {
+                const newChecklist = {...prevChecklist};
+                newChecklist.datajson = toDataJSON(sections);
+                return newChecklist;
+            });
             setSuccessModal(true);
+            
             completeChecklist(checklist);
             setTimeout(() => {
                 navigation.navigate("Maintenance");
@@ -61,30 +73,28 @@ const CompleteChecklistPage = ({navigation, route}) => {
         return sections.every(section => section.isComplete());
     };
 
+    const header = <Center>
+        <ChecklistDetails checklist={checklist}></ChecklistDetails>
+    </Center>
+    const footer = <IconButton
+        _icon={{
+            as: Ionicons,
+            name: "checkmark-done"
+        }}
+        colorScheme="white"
+        variant="solid"
+        backgroundColor="#C8102E"
+        onPress={handleSubmit}
+    ></IconButton>
+
     return (
         <ModuleScreen navigation={navigation}>
-            <ModuleHeader header="Complete Checklist">
-
-            </ModuleHeader>
-            <ScrollView>
-                <Center>
-                    <ChecklistDetails checklist={checklist}></ChecklistDetails>
-                </Center>
-                <ChecklistEditableContext sections={sections} setSections={setSections} />
-
-                <IconButton
-                    _icon={{
-                        as: Ionicons,
-                        name: "checkmark-done"
-                    }}
-                    colorScheme="white"
-                    variant="solid"
-                    backgroundColor="#C8102E"
-                    onPress={handleSubmit}
-                ></IconButton>
+            <ChecklistHeader navigation={navigation} header={"Complete Checklist"}/>
                 
-            </ScrollView>
-            
+            <ChecklistEditableProvider sections={sections} setSections={setSections} isDisabled={false}>
+                <ChecklistEditableForm header={header} footer={footer}/>
+            </ChecklistEditableProvider>
+
             <ModuleSimpleModal 
                 isOpen={incompleteModal}
                 setOpen={setIncompleteModal}

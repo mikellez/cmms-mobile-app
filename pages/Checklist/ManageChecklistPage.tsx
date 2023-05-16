@@ -3,13 +3,13 @@ import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../..
 import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistTemplate from "../../components/Checklist/ChecklistTemplate";
-import { ScrollView, StyleSheet } from "react-native";
-import { VStack, Text, Center, TextArea, FormControl, Button, HStack, Modal } from "native-base";
-import { Table, Rows } from "react-native-table-component";
+import { Icon, VStack, Text, Center, TextArea, FormControl, Button, HStack, Modal } from "native-base";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
-import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
-import ChecklistEditableContext from "../../context/checklistContext";
+import ChecklistEditableProvider from "../../context/checklistContext";
+import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
+import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 import { Action } from "../../types/enums";
 
 const manageChecklist = async (url: "approve" | "reject", checklistId: number, remarks?: string) => {
@@ -37,7 +37,7 @@ const ManageChecklistPage = ({navigation, route}) => {
     }, [route.params])
 
     useEffect(() => {
-        console.log("hellodqwerqerqwerqwer world");
+        // console.log(JSON.parse(checklist.datajson));
         if (checklist && checklist.datajson) {
             setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)));
         }
@@ -73,41 +73,41 @@ const ManageChecklistPage = ({navigation, route}) => {
         }, 1000);
     };
 
+    const header = <Center>
+        <ChecklistDetails checklist={route.params}></ChecklistDetails>
+    </Center>
+
+    const footer = <VStack space={2}>
+        <FormControl.Label>Manager's Comments</FormControl.Label>
+        <TextArea 
+            autoCompleteType={true} 
+            value={managerComments}
+            onChangeText={text => setManagerComments(text)}
+        />
+        
+        <HStack width="full">
+            <Button 
+                width="45%" 
+                backgroundColor="#E64848"
+                onPress={(e) => handleButtonPress(Action.Reject)}
+            >Reject</Button>
+
+            <Button 
+                width="45%" 
+                marginLeft="auto" 
+                backgroundColor="#36AE7C"
+                onPress={(e) => handleButtonPress(Action.Approve)}
+            >Approve</Button>
+        </HStack>
+    </VStack>
+
     return (
         <ModuleScreen navigation={navigation}>
-            <ModuleHeader header="Manage Checklist">
-
-            </ModuleHeader>
-            <ScrollView>
-                <Center>
-                    <ChecklistDetails checklist={route.params}></ChecklistDetails>
-                </Center>
-                <ChecklistEditableContext sections={sections} setSections={setSections} isDisabled />
-
-                <VStack space={2}>
-                    <FormControl.Label>Manager's Comments</FormControl.Label>
-                    <TextArea 
-                        autoCompleteType={true} 
-                        value={managerComments}
-                        onChangeText={text => setManagerComments(text)}
-                    />
-                    
-                    <HStack width="full">
-                        <Button 
-                            width="45%" 
-                            backgroundColor="#E64848"
-                            onPress={(e) => handleButtonPress(Action.Reject)}
-                        >Reject</Button>
-
-                        <Button 
-                            width="45%" 
-                            marginLeft="auto" 
-                            backgroundColor="#36AE7C"
-                            onPress={(e) => handleButtonPress(Action.Approve)}
-                        >Approve</Button>
-                    </HStack>
-                </VStack>
-            </ScrollView>
+            <ChecklistHeader navigation={navigation} header={"Manage Checklist"}/>
+                
+            <ChecklistEditableProvider sections={sections} setSections={setSections} isDisabled>
+                <ChecklistEditableForm header={header} footer={footer}/>
+            </ChecklistEditableProvider>
 
             <ModuleSimpleModal
                 isOpen={warningModal}

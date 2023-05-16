@@ -5,15 +5,16 @@ import { Box, Input, HStack, IconButton, VStack, Row } from "native-base";
 import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistCreatorRow from "./ChecklistCreatorRow";
 import ChecklistRow from "./classes/ChecklistRow";
-import { ChecklistFormContext } from "../../pages/Checklist/CreateChecklistFormPage";
+import { ChecklistCreateFormContext } from "../../context/checklistContext";
 import { ModuleCardContainer } from "../ModuleLayout";
+import { FlatList } from "react-native";
 
 const ChecklistCreatorSection = ({section} : {
     section: ChecklistSection,
 }) => {
 
     const [rows, setRows] = useState<ChecklistRow[]>([]);
-    const { setSections, level, setLevel } = useContext(ChecklistFormContext);
+    const { setSections, level, setLevel } = useContext(ChecklistCreateFormContext);
 
     useEffect(() => {
         if (section.rows) {
@@ -21,15 +22,12 @@ const ChecklistCreatorSection = ({section} : {
         } else setRows([]);
     }, [section.rows]);
 
-    const rowElements = rows.map(row => {
-        return (
-            <ChecklistCreatorRow 
-                key={row.getId()}
-                row={row}
-                setRows={setRows}
-            />
-        );
-    });
+    
+    const rowElements = <FlatList data={rows}
+        keyExtractor={row => row.getId()}
+        renderItem={({item}) => <ChecklistCreatorRow 
+                                    row={item}
+                                    setRows={setRows}/>}/>
 
     const deleteSection = (sectionId: string) => {
         setSections(prev => prev.filter(item => item.getId() != sectionId));

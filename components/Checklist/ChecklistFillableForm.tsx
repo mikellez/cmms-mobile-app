@@ -7,13 +7,15 @@ import { CMMSChecklist } from "../../types/interfaces";
 import { ChecklistEditableFormContext } from "../../context/checklistContext";
 import { ModuleDivider } from "../ModuleLayout";
 
-const ChecklistEditableForm = () => {
+const ChecklistEditableForm = ({header, footer}) => {
     const { sections, setSections } = useContext(ChecklistEditableFormContext);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{marginBottom: 42}}>
             <ModuleDivider/>
             <FlatList 
+                ListHeaderComponent={header}
+                ListFooterComponent={footer}
                 data={sections}
                 keyExtractor={section => section.getId()}
                 renderItem={({ item }) => <ChecklistEditableFormSection section={item} />}

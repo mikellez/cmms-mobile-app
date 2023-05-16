@@ -15,6 +15,7 @@ const ListBox = ({ checklist, navigation }:
 ) => {
     
     const user = useCurrentUser();
+    console.log(user.data);
 
     const handlePress = () => {
         const clID = checklist.status_id;

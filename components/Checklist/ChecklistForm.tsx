@@ -45,6 +45,7 @@ const ChecklistForm = (props: ChecklistFormProps) => {
                 onChangeText={text => updateChecklist(text, "description")}
                 value={props.checklist.description}
                 maxLength={200}
+                autoCompleteType={false}
             />
 
             <FormControl.Label>Plant</FormControl.Label>
