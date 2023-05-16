@@ -25,8 +25,8 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
 
     const closeModal = () => {
         props.setOpen(false);
-        props.onCloseCallback();
-    }
+        if (props.onCloseCallback) props.onCloseCallback();
+    };
 
     return (
         <NBModal

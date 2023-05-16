@@ -5,7 +5,7 @@ import ChecklistSection from "./classes/ChecklistSection";
 import ChecklistCreatorSection from "./ChecklistCreatorSection";
 import { ChecklistCreateFormContext } from "../../context/checklistContext";
 
-const ChecklistCreator = ({header}) => {
+const ChecklistCreator = ({header, footer}) => {
     const { sections, setSections, level, setLevel } = useContext(ChecklistCreateFormContext)
 
     const addSection = () => {
@@ -19,6 +19,7 @@ const ChecklistCreator = ({header}) => {
     }
     
     const sectionElements = <FlatList ListHeaderComponent={header}
+                                    ListFooterComponent={footer}
                                     data={sections}
                                     keyExtractor={section => section.getId()}
                                     renderItem={({item}) => <ChecklistCreatorSection section={item}/>}/>

@@ -78,7 +78,15 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     const validateChecklistFormData = (checklist: CMMSChecklist) => {
-        return true;
+        return (
+            !!checklist.datajson &&
+            !!checklist.description &&
+            checklist.description.trim() != "" &&
+            !!checklist.chl_name &&
+            checklist.chl_name.trim() != "" &&
+            !!checklist.linkedassetids &&
+            checklist.linkedassetids != ""
+        );
     };
 
     const updateChecklistDataJSON = async () => {
@@ -135,6 +143,17 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     }, [checklistId, checklistType]);
 
     const header = <ChecklistForm checklist={checklist} setChecklist={setChecklist}/>;
+    const footer = <IconButton  
+            _icon={{
+                as: Feather,
+                name: "send"
+            }}
+            colorScheme="white"
+            variant="solid"
+            backgroundColor="#C8102E"
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+        />;
     
     return (
         <ModuleScreen navigation={navigation}>
@@ -157,10 +176,10 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                                         setSections={setSections}
                                         level={level}
                                         setLevel={setLevel}>
-                <ChecklistCreator header={header}/>
+                <ChecklistCreator header={header} footer={footer}/>
             </ChecklistCreateContextProvider>   
             
-            <IconButton  
+            {/* <IconButton  
                 _icon={{
                     as: Feather,
                     name: "send"
@@ -170,7 +189,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 backgroundColor="#C8102E"
                 onPress={handleSubmit}
                 disabled={isSubmitting}
-            />
+            /> */}
 
         <ModuleSimpleModal
             isOpen={incompleteModal}
@@ -186,6 +205,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 title="Success"
                 text="New checklist successfully created"
                 icon={ModalIcons.Warning}
+                onCloseCallback={leavePage}
             />
 
         </ModuleScreen>
