@@ -8,7 +8,7 @@ import CheckType from "./classes/CheckType";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { View } from "react-native";
 
-const Choices = ["SingleChoice", "MultiChoice", "FreeText", "Signature"];
+const Choices = ["SingleChoice", "MultiChoice", "FreeText", "FileUpload", "Signature"];
 
 
 // props: row (class) and rows setter (array)
@@ -58,6 +58,8 @@ const ChecklistCreatorRow = ({
             case 2:
                 return new FreeTextType("", "");
             case 3:
+                return new FileUploadType("", "");
+            case 4:
                 return new SignatureType("", "");
         }
     }, []);

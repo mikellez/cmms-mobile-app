@@ -11,18 +11,20 @@ import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
 import instance from "../../axios.config";
 import { useCurrentUser } from "../../helper/hooks/SWR";
 import { ChecklistCreateContextProvider } from "../../context/checklistContext";
+import { ChecklistType } from "../../types/enums";
 
-const fetchSpecificChecklistTemplate = async (id: number): Promise<CMMSChecklist | void> => {
+
+const fetchSpecificChecklist = async (id: number, type: ChecklistType): Promise<CMMSChecklist | void> => {
     try {
-        const response = instance.get("/api/checklist/template/" + id);
+        const response = instance.get(`/api/checklist/${type}/${id}`);
         return (await response).data;
     }
     catch (err) {
         console.log(err);
-    };
+    }
 };
 
-const submitChecklist = async (checklist: CMMSChecklist) => {
+const createChecklist = async (checklist: CMMSChecklist) => {
     try {
         instance.post("/api/checklist/record/", { checklist })
     }
@@ -31,7 +33,7 @@ const submitChecklist = async (checklist: CMMSChecklist) => {
     };
 };
 
-// const ChecklistFormContext = createContext(null);
+const ChecklistFormContext = createContext(null);
 
 const CreateChecklistFormPage = ({ navigation, route }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
@@ -40,8 +42,23 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     const [level, setLevel] = useState<number>();
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
-    const { checklistId } = route.params;
+
+    const { checklistId, checklistType } = route.params;
+
     const user = useCurrentUser();
+
+    const pageTitle = checklistType === ChecklistType.Template ? "Create Checklist" : "Edit Checklist";
+    const backPage = checklistType === ChecklistType.Template ? "ChecklistTemplatesPage" : "Maintenance";
+    const successModalText = checklistType === ChecklistType.Template ?
+        "New checklist successfully created" :
+        "Checklist successfully edited";
+
+    const APICall = async (checklist: CMMSChecklist) => {
+        if (checklistType === ChecklistType.Template) {
+            return await createChecklist(checklist);
+        }
+        return await editChecklist(checklist);
+    };
 
     const handleSubmit = () => {
         setLevel(3);
@@ -56,7 +73,6 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         return true;
     };
 
-    // updating checklist based on sections state edited by the level system
     const updateChecklistDataJSON = async () => {
         setChecklist(prevChecklist => {
             const newChecklist = {...prevChecklist};
@@ -65,28 +81,33 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         });
     };
 
-    if (level === 0) {
-        updateChecklistDataJSON().then(res => {
+    const leavePage = () => {
+        navigation.navigate("Maintenance");
+    };
+
+    useEffect(() => {
+        if (isSubmitting) {
             if (!validateChecklistFormData(checklist)) {
                 setIncompleteModal(true); 
             } else {
-                submitChecklist(checklist).then(res => {
+                APICall(checklist).then(res => {
                     setSuccessModal(true);
                 })   
             }
-        });
+        }
 
         setSubmitting(false);
-        setLevel(undefined); 
 
-        setTimeout(() => {
-            if (successModal) navigation.navigate("Maintenance");
-        }, 1000);
+    }, [checklist])
+
+    if (level === 0) {
+        updateChecklistDataJSON();
+        setLevel(undefined); 
     };
 
     useEffect(() => {
         if (checklistId) {
-            fetchSpecificChecklistTemplate(checklistId).then(data => {
+            fetchSpecificChecklist(checklistId, checklistType).then(data => {
                 if (data) {
                     setChecklist({
                         ...data,
@@ -103,13 +124,11 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 created_by_user_id: user.data.id,
             } as CMMSChecklist);
         }
-    }, [checklistId]);
-
-    const header = <ChecklistForm checklist={checklist} setChecklist={setChecklist} />
+    }, [checklistId, checklistType]);
 
     return (
         <ModuleScreen navigation={navigation}>
-            <ModuleHeader header="Create Checklist">
+            <ModuleHeader header={pageTitle}>
                 <HStack space={3}>
                     <Button 
                         w="30" 
@@ -119,7 +138,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                             <Icon as={AntDesign} name="arrowleft" size="sm"/>
                         } 
                         size="xs"
-                        onPress={() => navigation.navigate("ChecklistTemplatesPage")}
+                        onPress={() => navigation.navigate(backPage)}
                     ></Button>
                 </HStack>
             </ModuleHeader>
@@ -151,13 +170,13 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
             icon={ModalIcons.Warning}
         />
 
-        <ModuleSimpleModal
-            isOpen={successModal}
-            setOpen={setSuccessModal}
-            title="Success"
-            text="New checklist successfully created"
-            icon={ModalIcons.Warning}
-        />
+            <ModuleSimpleModal
+                isOpen={successModal}
+                setOpen={setSuccessModal}
+                title="Success"
+                text="New checklist successfully created"
+                icon={ModalIcons.Warning}
+            />
 
         </ModuleScreen>
     );

@@ -49,7 +49,7 @@ const ChecklistCreatorSection = ({section} : {
             return newSections;
         });
     };
-
+    
     const appendRows = (section: ChecklistSection) => {
         section.removeAllRows();
 

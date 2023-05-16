@@ -26,4 +26,15 @@ enum Role {
     Specialist = 4,
 };
 
-export {ChecklistID, RequestID, Action, Role};
+enum ChecklistType {
+    Record = "record",
+    Template = "template"
+};
+
+export {
+    ChecklistID, 
+    RequestID, 
+    Action, 
+    Role,
+    ChecklistType,
+};

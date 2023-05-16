@@ -8,7 +8,7 @@ import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
 import { ChecklistID } from "../../types/enums";
 import { useCurrentUser } from "../../helper/hooks/SWR";
-import { Role } from "../../types/enums";
+import { Role, ChecklistType } from "../../types/enums";
 
 const ListBox = ({ checklist, navigation }:
      { checklist: CMMSChecklist, navigation?: any }
@@ -30,7 +30,11 @@ const ListBox = ({ checklist, navigation }:
             )) 
         {
             navigation.navigate("ManageChecklistPage", checklist);
-        } else {
+        } 
+        else if (clID === ChecklistID.Pending) {
+            navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id, checklistType: ChecklistType.Record })
+        }
+        else {
             navigation.navigate("ViewChecklistPage", checklist);
         }
     }

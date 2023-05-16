@@ -3,11 +3,12 @@ import { ModuleCardContainer } from "../ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import { HStack, Text, VStack } from "native-base";
 import { Pressable, StyleSheet } from "react-native";
+import { ChecklistType } from "../../types/enums";
 
 const ChecklistTemplate = ({navigation, checklist}: {navigation: any, checklist: CMMSChecklist}) => {
     return (
         <Pressable onPress={() => {
-                navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id })
+                navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id, checklistType: ChecklistType.Template })
             }
         }
         >
