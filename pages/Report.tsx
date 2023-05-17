@@ -54,6 +54,7 @@ const ReportScreen = ({ navigation }) => {
     username: ""
   });
 
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
 
@@ -75,11 +76,14 @@ const ReportScreen = ({ navigation }) => {
   }
 
   useEffect(() => {
+    setIsReady(false);
+
     if(isFocused) {
       fetchUser();
 
       fetchRequest(viewType)
       .then((res)=> setRequestItems(res))
+      .then(()=> setIsReady(true));
 
       setSections([])
     }
@@ -170,10 +174,12 @@ const ReportScreen = ({ navigation }) => {
               <Text><Heading size="xs">Requested By:</Heading> {item?.request_name ?? 'NIL'}</Text>
               <HStack justifyContent="center" w="100%" flex={1}>
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="eyeo" color="#C8102E" />} onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}/>
+                  <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>
                   {
                     ['PENDING', 'ASSIGNED'].includes(item.status)
                     && <IconButton icon={<Icon size="lg" as={AntDesign} name="adduser" color="#C8102E" />} onPress={()=>navigation.navigate("AssignRequest", { id: item.request_id })}/>
                   }
+                  
                   {
                     ['COMPLETED', 'REJECTED'].includes(item.status)
                     && [1, 2].includes(role_id)
@@ -198,9 +204,7 @@ const ReportScreen = ({ navigation }) => {
 
       <ModuleHeader header="Report">
         <HStack >
-          <Button w="100" padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs">
-            Filter
-          </Button>
+          <Button padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="filter" size="sm"/>} size="xs"/>
         </HStack>
       </ModuleHeader>
 
@@ -221,16 +225,21 @@ const ReportScreen = ({ navigation }) => {
         </Center>
       </Box>
 
-      <Accordion
-        activeSections={activeSections}
-        sections={requestItems}
-        touchableComponent={TouchableOpacity}
-        renderHeader={renderHeader}
-        renderContent={renderContent}
-        duration={100}
-        onChange={setSections}
-        renderAsFlatList={true}
-      />
+      {!isReady && <Center><Text>Loading ...</Text></Center>}
+      {isReady && requestItems.length === 0 && <Center><Text>No Requests</Text></Center>}
+
+      { isReady &&
+        <Accordion
+          activeSections={activeSections}
+          sections={requestItems}
+          touchableComponent={TouchableOpacity}
+          renderHeader={renderHeader}
+          renderContent={renderContent}
+          duration={100}
+          onChange={setSections}
+          renderAsFlatList={true}
+        />
+      }
 
       {/*<HStack px="5" py="5" w="100%" justifyContent="space-between">
         <HStack>

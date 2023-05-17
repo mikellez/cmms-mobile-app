@@ -6,30 +6,48 @@ import { CMMSChecklist } from "../../types/interfaces";
 import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import { Swipeable } from "react-native-gesture-handler";
+import { ChecklistID } from "../../types/enums";
+import { useCurrentUser } from "../../helper/hooks/SWR";
+import { Role, ChecklistType } from "../../types/enums";
 
-const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
+const ListBox = ({ checklist, navigation }:
+     { checklist: CMMSChecklist, navigation?: any }
+) => {
+    
+    const user = useCurrentUser();
+    console.log(user.data);
 
-    const rightAction = () => {
-        return (
-            <View
-                style={styles.leftSwipeView}
-            >
-                <Text>Hello</Text>
-            </View>
-        )
+    const handlePress = () => {
+        const clID = checklist.status_id;
+        if (clID === ChecklistID.Assigned) 
+        {
+            navigation.navigate("CompleteChecklistPage", checklist);
+        } 
+        else if (
+            clID === ChecklistID.WorkDone && (
+                user.data.role_id === Role.Manager ||
+                user.data.role_id === Role.Admin
+            )) 
+        {
+            navigation.navigate("ManageChecklistPage", checklist);
+        } 
+        else if (clID === ChecklistID.Pending) {
+            navigation.navigate("CreateChecklistFormPage",  { checklistId: checklist.checklist_id, checklistType: ChecklistType.Record })
+        }
+        else {
+            navigation.navigate("ViewChecklistPage", checklist);
+        }
     }
-
+        
     return (
         <Pressable
-            onPress={() => {console.log("press")}}
+            onPress={handlePress}
         >
-            <Swipeable
-                renderRightActions={rightAction}
-            >
+
                 <ModuleCardContainer>
                     <HStack>
                         <VStack>
-                            <Text 
+                            <Text
                                 fontSize={14}
                                 fontWeight={600}
                             >
@@ -68,7 +86,6 @@ const ListBox = ({ checklist }: { checklist: CMMSChecklist }) => {
                         </Text>
                     </HStack>
                 </ModuleCardContainer>
-            </Swipeable>
         </Pressable>
     );
 };

@@ -262,7 +262,7 @@ interface CMMSChecklist {
   description: string;
   status_id: number;
   createdbyuser: string;
-  created_by_user_id: string | null;
+  created_by_user_id: number | null;
   created_by_user_email: string | null;
   assigneduser: string;
   assigned_user_email: string | null;
@@ -279,6 +279,21 @@ interface CMMSChecklist {
   history: string;
   status: string;
   datajson?: any;
+}
+
+interface CMMSCheck {
+  type: string;
+  question: string;
+  value: string;
+}
+
+interface CMMSRow {
+  description: string;
+  checks: CMMSCheck[];
+}
+interface CMMSSection {
+  description: string;
+  rows: CMMSRow[];
 }
 
 interface CMMSActivitylog {

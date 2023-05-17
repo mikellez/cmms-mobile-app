@@ -13,7 +13,7 @@ const CreateRequest = ({ route, navigation }) => {
               <Heading size="md" color="#C8102E">Create Request</Heading>
             </HStack>
           </HStack>
-          <RequestContainer route={route} navigation={navigation} action="create"/>
+          <RequestContainer route={route} navigation={navigation} action="create" type="guest"/>
         </VStack>
       </HStack>
 

@@ -1,6 +1,7 @@
-import { Alert, Box, Center, CloseIcon, HStack, Heading, IconButton, NativeBaseProvider, VStack, Text } from 'native-base';
+import { Alert, Box, Center, CloseIcon, HStack, Heading, IconButton, NativeBaseProvider, VStack, Text, Pressable, Icon } from 'native-base';
 import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
 
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ModuleCardContainer } from '../../components/ModuleLayout';
@@ -157,6 +158,14 @@ const OfflineRequest = ({ route, navigation }) => {
               })
             }
             </VStack>
+          <Pressable py="20" flex={1} onPress={()=>navigation.navigate("QRScan")}>
+            <Center>
+              <Icon mb="1" as={<MaterialCommunityIcons name="qrcode-scan" />} color="#C8102E" size="2xl" />
+            </Center>
+            <Center>
+              <Text>QR Scan</Text>
+            </Center>
+          </Pressable>
           </Center>
         </VStack>
       </HStack>

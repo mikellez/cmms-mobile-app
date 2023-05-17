@@ -32,6 +32,7 @@ import axios from 'axios';
 import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
+import { CMMSUser } from '../../types/interfaces';
 
 type FormValues = {
   name?: string;
@@ -83,11 +84,13 @@ export interface CMMSRequestPriority {
 const RequestContainer = ({ 
   route, 
   navigation, 
-  action 
+  action,
+  type
 } : { 
-  route?: RouteProp<{ params: { id: '', plant: '', asset: '' } }, 'params'>;
+  route?: RouteProp<{ params: { id: '', plant: '', asset: '', fault: '' } }, 'params'>;
   navigation?: any;
   action?: string;
+  type?: string;
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [prioritySelected, setPrioritySelected] = useState({});
@@ -101,8 +104,8 @@ const RequestContainer = ({
 
   const [formState, setFormState] = useState<FormValues>({
     name: "",
-    requestTypeID: 0,
-    faultTypeID: 0,
+    requestTypeID: ['guest', 'corrective'].includes(type) ? 3 : 1,
+    faultTypeID: route?.params?.fault || 0,
     description: "",
     plantLocationID: route?.params?.plant || 0,
     taggedAssetID: route?.params?.asset || 0,
@@ -120,9 +123,20 @@ const RequestContainer = ({
   const [assetTags, setAssetTags] = useState([]);
   const [priorities, setPriorities] = useState([]);
   const [assignUsers, setAssignUsers] = useState([]);
+  const [user, setUser] = useState<CMMSUser>({
+    id: 0,
+    role_id: 0,
+    role_name: "",
+    name: "",
+    email: "",
+    fname: "",
+    lname: "",
+    username: ""
+  });
 
   const [plant, setPlant] = useState(route?.params?.plant);
   const [asset, setAsset] = useState(route?.params?.asset);
+  const [id, setId] = useState(route?.params?.id);
 
 
   const getData = async (key) => {
@@ -138,13 +152,19 @@ const RequestContainer = ({
 
   const createRequest = async () => {
     const formData = new FormData();
-    formData.append("name", formState.name);
+    if(type === 'guest' && user?.id) {
+      formData.append("user_id", user.id);
+      formData.append("role_id", user.role_id);
+    } else if(type === 'guest') {
+      formData.append("name", formState.name);
+    }
     formData.append("description", formState.description);
     formData.append("faultTypeID", formState.faultTypeID.toString());
     formData.append("plantLocationID", formState.plantLocationID.toString());
     formData.append("requestTypeID", formState.requestTypeID.toString());
     formData.append("taggedAssetID", formState.taggedAssetID.toString());
     if (formState.image) formData.append("image", formState.image);
+    if (type==='corrective') formData.append("linkedRequestId", route?.params?.id);
 
     console.log('formData', formData);
     //setFormData(formData);
@@ -154,9 +174,19 @@ const RequestContainer = ({
         .post("/api/request/", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         })
-        .then((response) => {
-          alert("Request created successfully");
-          navigation.navigate("Report");
+        .then(async (response) => {
+          if(type === 'corrective') {
+            await completeRequest();            
+          } else {
+            alert("Request created successfully");
+          }
+
+          if(type==='guest' && !user?.id) {
+            alert("Please login to view your requests.");
+            navigation.navigate("Login");
+          } else {
+            navigation.navigate("Report");
+          }
           return response.data;
         })
         .catch((e) => {
@@ -464,7 +494,13 @@ const RequestContainer = ({
     });
   };
 
+  const fetchUser = async () => {
+    const user = await _retrieveData('user');
+    setUser(JSON.parse(user));
+  }
+
   useEffect(() => {
+    fetchUser();
 
     const checkConnection = async () => {
       const netInfoState = await NetInfo.fetch();
@@ -531,8 +567,11 @@ const RequestContainer = ({
       <FormGroup
         action={action}
 
+        id={id}
         plant={plant}
         asset={asset}
+        user={user}
+        type={type}
 
         requestItems={requestItems}
 
@@ -572,7 +611,7 @@ const RequestContainer = ({
 
         onNameChange={value=>handleChange("name", value)}
 
-        formState={formState}
+        setFormState={setFormState}
       />
       </>
 
