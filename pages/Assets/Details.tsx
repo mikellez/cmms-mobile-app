@@ -6,7 +6,6 @@ import { CMMSAssetDetails } from "../../types/interfaces";
 import AssetHierachy from "../../components/Assets/AssetHierarchy";
 import { Table, Rows } from "react-native-table-component";
 import RNFetchBlob from "rn-fetch-blob";
-import RNFS from "react-native-fs";
 
 const Details = ({ route, navigation }) => {
   const [psaId, setPsaId] = useState(route.params.psa_id);
@@ -21,7 +20,7 @@ const Details = ({ route, navigation }) => {
     setIsLoading(true);
     const sendRequest = async () => {
       const res = await instance.get("/api/assetDetails/" + psaId);
-      // console.log(res.data);
+      // console.log(res.data.uploaded_files);
       setAssetDetails(res.data[0]);
       setFileraw(res.data[0].uploaded_files);
       setIsLoading(false);
@@ -36,41 +35,52 @@ const Details = ({ route, navigation }) => {
     filevalue = fileraw.map((file) => file[1]);
   }
 
-  // const { config, fs } = RNFetchBlob;
-  // let { DownloadDir } = fs.dirs;
-  // let options = {
-  //   fileCache: true,
-  //   addAndroidDownloads: {
-  //     useDownloadManager: true,
-  //     notification: false,
-  //     path:
-  //       DownloadDir +
-  //       "/me_" +
-  //       Math.floor(new Date().getTime() + new Date().getSeconds() / 2),
-  //     description: "Downloading...",
-  //   },
-  // };
+  const downloadFile = async (index: number) => {
+    const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
+    // Get today's date to add the time suffix in filename
+    let date = new Date(); // File URL which we want to download
+    let FILE_URL = fileUrl; // Function to get extention of the file url
+    const response = await fetch(FILE_URL);
+    const contentType = response.headers.get("content-type");
+
+    let file_ext = `.${contentType.split("/")[1]}`; // config: To get response by passing the downloading related options // fs: Root directory path to download
+
+    const { config, fs } = RNFetchBlob;
+    let RootDir = fs.dirs.PictureDir;
+    let options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        path:
+          RootDir +
+          `/${filename[index].split(".")[0]}_` +
+          Math.floor(date.getTime() + date.getSeconds() / 2) +
+          file_ext,
+        description: "downloading file...",
+        notification: true, // useDownloadManager works with Android only
+        useDownloadManager: true,
+      },
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `attachment; filename=test`,
+      },
+    };
+    config(options)
+      .fetch("GET", FILE_URL)
+      .then((res) => {
+        // Alert after successful downloading
+        console.log("res -> ", JSON.stringify(res));
+        alert("File Downloaded Successfully.");
+      })
+      .catch((err) => {
+        console.log("err -> ", err);
+      });
+  };
 
   const filesToDownload = (
     <VStack>
       {filevalue.map((file, index) => {
         return (
-          <Link
-            key={index}
-            href={file}
-            onPress={async () => {
-              // config(options)
-              //   .fetch(
-              //     "GET",
-              //     "http://www.africau.edu/images/default/sample.pdf"
-              //   )
-              //   .then((res) => {
-              //     console.log("do some magic in here");
-              //   });
-              // await RNFS.downloadFile({ fromUrl: "", toFile: "" });
-            }}
-            // download={filename[index]}
-          >
+          <Link key={index} onPress={downloadFile.bind(null, index)}>
             {filename[index]}
           </Link>
         );

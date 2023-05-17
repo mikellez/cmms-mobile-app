@@ -68,7 +68,7 @@ const Assets = ({ navigation }) => {
     const data = await sendRequest(
       `/api/asset/mobile/${hierarchy.plant.id}/${
         hierarchy.system.id
-      }/${hierarchy.system_asset.replaceAll(" ", "_")}`
+      }/${hierarchy.system_asset.split(" ").join("_")}`
     );
     // console.log(data);
 
@@ -84,17 +84,22 @@ const Assets = ({ navigation }) => {
     const data = await sendRequest(
       `/api/asset/mobile/${hierarchy.plant.id}/${
         hierarchy.system.id
-      }/${hierarchy.system_asset.replaceAll(
-        " ",
-        "_"
-      )}/${hierarchy.system_asset_name.replaceAll(" ", "_")}`
+      }/${hierarchy.system_asset
+        .split(" ")
+        .join("_")}/${hierarchy.system_asset_name
+        .split(" ")
+        .join("_")
+        .split("/")
+        .join(",")}`
     );
-
-    // console.log(data);
 
     if (data) {
       setAssetTypes(data);
-      if (data.subComponents && data.subComponents.length > 0) {
+      if (
+        data.subComponents &&
+        data.subComponents.length > 0 &&
+        data.subComponents[0].system_asset_lvl7 !== ""
+      ) {
         setSubComponents(data.subComponents);
       }
     }
@@ -297,7 +302,7 @@ const Assets = ({ navigation }) => {
               />
             )}
 
-            {hierarchy.level == 5 && systemAssetNames && subComponents && (
+            {/* {hierarchy.level == 5 && systemAssetNames && subComponents && (
               <AssetLevels
                 data={sortData(subComponents, "system_asset_lvl7")}
                 onPress={(subComponent) =>
@@ -310,7 +315,7 @@ const Assets = ({ navigation }) => {
                   })
                 }
               />
-            )}
+            )} */}
 
             {showLevels &&
               assetTypes &&
@@ -338,7 +343,21 @@ const Assets = ({ navigation }) => {
               !hierarchy.asset_type &&
               !hierarchy.plant_asset_instrument && (
                 <AssetLevels
-                  data={sortData(assetTypes.pai, "pai")}
+                  data={sortData(
+                    [...assetTypes.pai].filter((asset) => {
+                      if (
+                        (hierarchy.sub_component1 &&
+                          hierarchy.sub_component1 === asset.prev_level) ||
+                        (hierarchy.system_asset_name &&
+                          hierarchy.system_asset_name === asset.prev_level) ||
+                        (hierarchy.system_asset &&
+                          hierarchy.system_asset === asset.prev_level)
+                      ) {
+                        return asset;
+                      }
+                    }),
+                    "pai"
+                  )}
                   navigation={navigation}
                 />
               )}
