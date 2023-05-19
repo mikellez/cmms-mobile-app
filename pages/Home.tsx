@@ -129,23 +129,21 @@ const HomeScreen = ({ navigation }) => {
 
     let promise1 = fetchData("request", plant, field, datetype, date).then((result) => {
       if (result) setRequestData(result);
-      console.log(result)
     });
 
     let promise2 = fetchData("request", plant, "status", datetype, date).then((result) => {
       if(result) {
         setRequest(prevState=> ({
           ...prevState,
-          totalPendingRequest: result?.filter((data) => data.id === 1)[0]?.value,
+          totalPendingRequest: result?.filter((data) => data.id === 1)[0]?.value || 0,
           totalOutstandingRequest: 
             result?.filter((data) => [2].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0),
+            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
           totalClosedRequest: 
             result?.filter((data) => [3, 4, 5, 6].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0),
+            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
         }));
 
-        console.log('request1', request)
       }
 
 
@@ -299,9 +297,6 @@ const HomeScreen = ({ navigation }) => {
     sections[0]?.data[1]?.total,
     sections[0]?.data[3]?.total,
   ]);
-
-  console.log('sections', sections)
-  console.log('request', requestData)
 
   return (
     <ModuleScreen navigation={navigation}>

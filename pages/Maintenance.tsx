@@ -7,6 +7,7 @@ import { ModuleHeader, ModuleScreen, ModuleActionSheet, ModuleActionSheetItem, M
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
 import { CMMSChecklist } from "../types/interfaces";
+import { useIsFocused } from '@react-navigation/native';
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -40,14 +41,18 @@ const fetchChecklist = async (viewType: string) => {
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        fetchChecklist(viewType)
-            .then(result => {
-                if (result) setChecklists(result);
-                else setChecklists([]);
-            })
-    }, [viewType, navigation]);
+        if(isFocused) {
+            fetchChecklist(viewType)
+                .then(result => {
+                    if (result) setChecklists(result);
+                    else setChecklists([]);
+                })
+
+        }
+    }, [viewType, navigation, isFocused]);
 
     const checklistElements = checklists.length > 0 
                                 ? <FlatList data={checklists}

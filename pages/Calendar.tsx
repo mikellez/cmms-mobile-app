@@ -42,6 +42,7 @@ const getChecklistSchedules = async (plantId: number) => {
         return response.data;
     } catch (err) {
         console.log(err);
+        console.log('Unable to fetch checklist')
     }
 };
 
@@ -55,6 +56,7 @@ const getCOPSchedules = async (plantId: number) => {
         return response.data;
     } catch (err) {
         console.log(err);
+        console.log('Unable to fetch cop')
     }
 };
 
@@ -81,9 +83,12 @@ const CalendarTab = ({ navigation }) => {
                 results.forEach((result) => {
                     result.calendar_dates.forEach((date) => {
                         const dots = markedDates[date]?.dots || [];
-                        const cond = dots.length === 0 || (dots > 0 && dots.filter(i => i.key !== 'checklist'));
+                        const notExistChecklist = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'checklist').length > 0);
 
-                        markedDates[date] = { dots: [...dots, (cond ? checklistCalConfig : {})] };
+                        if(notExistChecklist) {
+                            markedDates[date] = { dots: [...dots, checklistCalConfig ] };
+                        }
+
                         var newItems = items;
                         if (!newItems[0][date]) {
                             newItems[0][date] = [];
@@ -114,9 +119,12 @@ const CalendarTab = ({ navigation }) => {
                         ? new Date(result.changedDate).toISOString().split("T")[0]
                         : new Date(result.scheduledDate).toISOString().split("T")[0];
                     const dots = markedDates[date]?.dots || [];
-                    const cond = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop'));
+                    const notExistsCOP = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop').length > 0);
 
-                    markedDates[date] = { dots: [...dots, (cond ? copCalConfig : {})] };
+                    if(notExistsCOP) {
+                        markedDates[date] = { dots: [...dots, copCalConfig ] };
+                    }
+
                     var newItems = items;
                     if (!newItems[1][date]) {
                         newItems[1][date] = [];
@@ -224,8 +232,9 @@ const CalendarTab = ({ navigation }) => {
 
             <ModuleDivider />
             
-            { isCalendarView && <View style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                <VStack>
+            { isCalendarView && 
+            <View style={{ alignItems: 'center' }}>
+                <HStack >
                     <HStack>
                         <Icon
                             as={Octicons}
@@ -236,7 +245,7 @@ const CalendarTab = ({ navigation }) => {
                         <Text fontSize={10}>Checklist</Text>
 
                     </HStack>
-                    <HStack>
+                    <HStack marginLeft={10}>
                         <Icon
                             as={Octicons}
                             name="dot-fill"
@@ -246,7 +255,7 @@ const CalendarTab = ({ navigation }) => {
                         <Text fontSize={10}>Change of Parts</Text>
                     </HStack>
 
-                </VStack>
+                </HStack>
             </View>
             }
 

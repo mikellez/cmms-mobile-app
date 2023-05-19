@@ -23,12 +23,12 @@ import { CMMSUser, CMMSRequest } from "../types/interfaces";
 
 const requestlistViews: ModuleActionSheetItem[] = [
   {
-    label: "Pending",
-    value: "pending"
-  },
-  {
     label: "Assigned",
     value: "assigned"
+  },
+  {
+    label: "Pending",
+    value: "pending"
   },
   {
     label: "For Review",
