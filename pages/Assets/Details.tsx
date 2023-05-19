@@ -5,7 +5,7 @@ import instance from "../../axios.config";
 import { CMMSAssetDetails } from "../../types/interfaces";
 import AssetHierachy from "../../components/Assets/AssetHierarchy";
 import { Table, Rows } from "react-native-table-component";
-import RNFetchBlob from "rn-fetch-blob";
+//import RNFetchBlob from "react-native-fetch-blob";
 
 const Details = ({ route, navigation }) => {
   const [psaId, setPsaId] = useState(route.params.psa_id);
@@ -36,7 +36,7 @@ const Details = ({ route, navigation }) => {
   }
 
   const downloadFile = async (index: number) => {
-    const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
+    /*const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
     // Get today's date to add the time suffix in filename
     let date = new Date(); // File URL which we want to download
     let FILE_URL = fileUrl; // Function to get extention of the file url
@@ -74,6 +74,7 @@ const Details = ({ route, navigation }) => {
       .catch((err) => {
         console.log("err -> ", err);
       });
+      */
   };
 
   const filesToDownload = (

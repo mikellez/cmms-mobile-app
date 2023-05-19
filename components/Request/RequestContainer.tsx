@@ -18,7 +18,6 @@ import {
   Image, 
   Pressable} from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
