@@ -154,6 +154,7 @@ const RequestContainer = ({
     if(type === 'guest' && user?.id) {
       formData.append("user_id", user.id);
       formData.append("role_id", user.role_id);
+      formData.append("role_name", user.role_name);
     } else if(type === 'guest') {
       formData.append("name", formState.name);
     }
