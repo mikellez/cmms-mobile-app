@@ -31,6 +31,7 @@ const completeChecklist = async (checklist: CMMSChecklist) => {
 const CompleteChecklistPage = ({navigation, route}) => {
     const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
+    const [isSubmitting, setSubmitting] = useState<boolean>(false);
     const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
     const [successModal, setSuccessModal] = useState<boolean>(false);
 
@@ -44,28 +45,37 @@ const CompleteChecklistPage = ({navigation, route}) => {
             console.log(route.params)
             setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)))
         }
-    }, [checklist])
+
+        if (isSubmitting) {
+            completeChecklist(checklist);
+        }
+
+    }, [checklist, isSubmitting])
 
     const toDataJSON = (sections: ChecklistSection[]) => {
         return sections.map(section => section.toJSON());
     };
+
+    const updateChecklistDataJSON = (sections) => {
+        setChecklist(prevChecklist => {
+            const newChecklist = {...prevChecklist};
+            newChecklist.datajson = toDataJSON(sections);
+            return newChecklist;
+        });
+        setSubmitting(true);
+    }
 
     const handleSubmit = () => {
         if (!checkIfChecklistIsComplete(sections)) {
             setIncompleteModal(true);
             
         } else {
-            setChecklist(prevChecklist => {
-                const newChecklist = {...prevChecklist};
-                newChecklist.datajson = toDataJSON(sections);
-                return newChecklist;
-            });
             setSuccessModal(true);
-            
-            completeChecklist(checklist);
+            updateChecklistDataJSON(sections);
             setTimeout(() => {
+                    setSubmitting(false);
                 navigation.navigate("Maintenance");
-            }, 1000)
+            }, 1000);
         };
     };
 
