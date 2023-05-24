@@ -5,6 +5,7 @@ import instance from "../../axios.config";
 import { CMMSAssetDetails } from "../../types/interfaces";
 import AssetHierachy from "../../components/Assets/AssetHierarchy";
 import { Table, Rows } from "react-native-table-component";
+import { Linking } from "react-native";
 //import RNFetchBlob from "react-native-fetch-blob";
 
 const Details = ({ route, navigation }) => {
@@ -36,6 +37,19 @@ const Details = ({ route, navigation }) => {
   }
 
   const downloadFile = async (index: number) => {
+    const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
+
+    try {
+      // Open the file URL using the device's default app for handling the file type
+      const supported = await Linking.canOpenURL(fileUrl);
+      if (supported) {
+        await Linking.openURL(fileUrl);
+      } else {
+        console.log(`Cannot open URL: ${fileUrl}`);
+      }
+    } catch (error) {
+      console.log('Error opening URL:', error);
+    }
     /*const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
     // Get today's date to add the time suffix in filename
     let date = new Date(); // File URL which we want to download
