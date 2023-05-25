@@ -1,8 +1,8 @@
-import React, { useState, createContext, useEffect } from "react";
-import { View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
-import { Input, Icon, TextArea, VStack, Button, IconButton, HStack, ScrollView } from "native-base";
+import { Icon, Button, IconButton, HStack } from "native-base";
 import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistForm from "../../components/Checklist/ChecklistForm";
@@ -33,12 +33,11 @@ const createChecklist = async (checklist: CMMSChecklist) => {
     };
 };
 
-const ChecklistFormContext = createContext(null);
-
 const CreateChecklistFormPage = ({ navigation, route }) => {
     const [checklist, setChecklist] = useState({} as CMMSChecklist);
     const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
     const [successModal, setSuccessModal] = useState<boolean>(false);
+    const [loadingModal, setLoadingModal] = useState<boolean>(false);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     const [level, setLevel] = useState<number>();
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
@@ -69,9 +68,20 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     const handleSubmit = () => {
-        setLevel(3);
+        setLoadingModal(true);
         setSubmitting(true);
     };
+
+    console.log(loadingModal)
+
+    useEffect(() => {
+        if (loadingModal && isSubmitting) {
+            setTimeout(() => {
+                setLevel(3);
+            }, 2000)
+        }
+    }, [loadingModal, isSubmitting])
+
 
     const toDataJSON = (sections: ChecklistSection[]) => {
         return sections.map(section => section.toJSON());
@@ -102,11 +112,17 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     useEffect(() => {
+        if (checklist && !isSubmitting) {
+            setLoadingModal(false);
+        }   
+
         if (isSubmitting) {
             if (!validateChecklistFormData(checklist)) {
+                setLoadingModal(false);
                 setIncompleteModal(true); 
             } else {
                 APICall(checklist).then(res => {
+                    setLoadingModal(false);
                     setSuccessModal(true);
                 })   
             }
@@ -122,6 +138,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     useEffect(() => {
+        setLoadingModal(true);
+
         if (checklistId) {
             fetchSpecificChecklist(checklistId, checklistType).then(data => {
                 if (data) {
@@ -191,19 +209,31 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
                 disabled={isSubmitting}
             /> */}
 
-        <ModuleSimpleModal
-            isOpen={incompleteModal}
-            setOpen={setIncompleteModal}
-            title="Missing Details"
-            text="Ensure that all fields have been filled"
-            icon={ModalIcons.Warning}
-        />
+            <ModuleSimpleModal
+                isOpen={incompleteModal}
+                setOpen={setIncompleteModal}
+                title="Missing Details"
+                text="Ensure that all fields have been filled"
+                icon={ModalIcons.Warning}
+            />
+
+            <ModuleSimpleModal
+                isOpen={loadingModal}
+                setOpen={setLoadingModal}
+                title={ isSubmitting ? "Submitting Checklist" : "Loading Checklist" }
+                text=""
+                hideCloseButton
+            >
+                <View>
+                    <ActivityIndicator size="large" color="#C8102E" />
+                </View> 
+            </ModuleSimpleModal>
 
             <ModuleSimpleModal
                 isOpen={successModal}
                 setOpen={setSuccessModal}
                 title="Success"
-                text="New checklist successfully created"
+                text={successModalText}
                 icon={ModalIcons.Warning}
                 onCloseCallback={leavePage}
             />
@@ -211,5 +241,9 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         </ModuleScreen>
     );
 };
+
+const styles = StyleSheet.create({
+
+});
 
 export default CreateChecklistFormPage;

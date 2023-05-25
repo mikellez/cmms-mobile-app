@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState, useEffect } from "react";
 import { Box, HStack, IconButton, Input, Actionsheet, useDisclose, VStack } from "native-base";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ChecklistRow from "./classes/ChecklistRow";
-import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType } from "./Checks";
+import { FreeTextType, SignatureType, SingleChoiceType, MultiChoiceType, FileUploadType } from "./Checks";
 import { ChecklistCreateFormContext } from "../../context/checklistContext";
 import CheckType from "./classes/CheckType";
 import { ModuleCardContainer } from "../ModuleLayout";

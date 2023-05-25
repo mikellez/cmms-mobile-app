@@ -18,6 +18,7 @@ interface ModuleSimpleModalProps extends ModuleModalProps {
     text: string,
     icon?: ModalIcons
     onCloseCallback?: Function
+    hideCloseButton?: boolean
 };
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
@@ -32,10 +33,10 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
             isOpen={props.isOpen}
             onClose={closeModal}
         >
-            <NBModal.Content>
-                <NBModal.CloseButton />
+            <NBModal.Content style={styles.simpleModalContainer}>
+                { !props.hideCloseButton && <NBModal.CloseButton /> }
                 <NBModal.Body padding="4">
-                    <VStack space={2}>
+                    <VStack space={2} alignItems="center">
                         {props.icon && <Icon as={AntDesign} name={props.icon} size="4xl" />}
 
                         {props.title && (
@@ -100,6 +101,11 @@ const ModuleFullPageModal = (props: ModuleModalProps) => {
 };
 
 const styles = StyleSheet.create({
+
+    simpleModalContainer: {
+        alignItems: "center",
+    },
+
     modalView: {
         position: "absolute",
         bottom: 0,

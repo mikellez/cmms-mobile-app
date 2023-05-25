@@ -22,7 +22,7 @@ const ViewChecklistPage = ({navigation, route}) => {
     }, [route.params])
 
     useEffect(() => {
-        console.log(checklist.datajson);
+        // console.log(checklist.datajson);
         if (checklist && checklist.datajson) {
             setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)));
         }

@@ -41,8 +41,6 @@ const CompleteChecklistPage = ({navigation, route}) => {
 
     useEffect(() => {
         if (checklist && checklist.datajson) {
-            console.log("hello");
-            console.log(route.params)
             setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)))
         }
 
