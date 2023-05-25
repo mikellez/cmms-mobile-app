@@ -155,13 +155,17 @@ const Login = ({ navigation }) => {
     .catch((error) => {
 			console.log("Error login", error);
 			let reason:string = ""
-			if(error.response.status === 429)
-				reason = "Too many Login attempts. Try again later."
-			if(error.response.status === 401)
-				reason = "Username and password combination does not match."
-			
-      setIsError(true);
-			setErrorSubmitting(reason);
+      if(error?.response?.status) {
+
+        if(error.response.status === 429)
+          reason = "Too many Login attempts. Try again later."
+        if(error.response.status === 401)
+          reason = "Username and password combination does not match."
+        
+        setIsError(true);
+        setErrorSubmitting(reason);
+
+      }
 		});
 
 

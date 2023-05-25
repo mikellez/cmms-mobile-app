@@ -41,14 +41,18 @@ const fetchChecklist = async (viewType: string) => {
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const isFocused = useIsFocused();
 
     useEffect(() => {
+        setIsLoading(true);
         if(isFocused) {
             fetchChecklist(viewType)
                 .then(result => {
                     if (result) setChecklists(result);
                     else setChecklists([]);
+
+                    setIsLoading(false);
                 })
 
         }
@@ -90,7 +94,8 @@ const Maintenance = ({ navigation, route }) => {
 
             <View style={{marginBottom: 90}}>
                     <VStack space={3}>
-                        {checklistElements}
+                        {isLoading && <Text>Loading...</Text>}
+                        {!isLoading && checklistElements}
                     </VStack>
             </View>
         </ModuleScreen>

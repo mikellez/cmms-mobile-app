@@ -24,7 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 const HomeScreen = ({ navigation }) => {
   const items = [
     { name: 'Pending ', code: '#c21010', total: 0 },
-    { name: 'Outsanding ', code: 'purple', total: 0 },
+    { name: 'Outstanding ', code: 'purple', total: 0 },
     { name: 'Completed ', code: '#367e18', total: 0 },
   ];
 
@@ -86,7 +86,7 @@ const HomeScreen = ({ navigation }) => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [isChecklistReady, setIsChecklistReady] = useState<boolean>(false);
   const [isRequestReady, setIsRequestReady] = useState<boolean>(false);
-  const [plant, setPlant] = useState<number>(0);
+  const [plant, setPlant] = useState<number | string>("");
   const [field, setField] = useState<string>("status");
   const [pickerwithtype, setPickerWithType] = useState<{
     date: string,
@@ -114,6 +114,7 @@ const HomeScreen = ({ navigation }) => {
     lname: "",
     username: ""
   });
+  const [loadUser, setLoadUser] = useState<boolean>(false);
   const [viewType, setViewType] = useState<string>(dashboardViews[0].value as string);
   const [total, setTotal] = useState<number>(0);
 
@@ -122,6 +123,7 @@ const HomeScreen = ({ navigation }) => {
   const fetchUser = async () => {
     const user = await _retrieveData('user');
     setUser(JSON.parse(user));
+    setLoadUser(true);
   }
 
  const fetchRequests = async () => {
@@ -185,13 +187,12 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
 
-  useEffect(() => {
-
-    if(isFocused) {
+    if(loadUser && isFocused) {
       const { datetype, date } = pickerwithtype;
       const { role_id } = user;
+
+      setIsReady(false);
 
       if([3, 4].includes(role_id)) { // engineer, specialist
         getPlants("/api/getUserPlants").then(result => {
@@ -200,10 +201,16 @@ const HomeScreen = ({ navigation }) => {
             }
         })
 
-      }     
+      } else {
+        setPlant(0);
+      }
+    }
 
-      setIsReady(false);
+  }, [loadUser, isFocused])
 
+  useEffect(() => {
+
+    if(plant !== "") {
       switch(viewType) {
         case 'requests':
 
@@ -214,7 +221,7 @@ const HomeScreen = ({ navigation }) => {
               setSections([ 
               { title: "Title1", data: [
                 { name: 'Pending ', code: '#c21010', total: request.totalPendingRequest },
-                { name: 'Outsanding ', code: 'purple', total: request.totalOutstandingRequest },
+                { name: 'Outstanding ', code: 'purple', total: request.totalOutstandingRequest },
                 { name: 'Completed ', code: '#367e18', total: request.totalClosedRequest },
               ]}
               ]); 
@@ -237,8 +244,6 @@ const HomeScreen = ({ navigation }) => {
 
             setTotal(totalRequest)
 
-            setIsReady(true);
-
           });
 
           break;
@@ -252,7 +257,7 @@ const HomeScreen = ({ navigation }) => {
               setSections([ 
               { title: "Title1", data: [
                 { name: 'Pending ', code: '#c21010', total: checklist.totalPendingChecklist },
-                { name: 'Outsanding ', code: 'purple', total: checklist.totalOutstandingChecklist },
+                { name: 'Outstanding ', code: 'purple', total: checklist.totalOutstandingChecklist },
                 { name: 'Completed ', code: '#367e18', total: checklist.totalClosedChecklist },
               ]}
               ]); 
@@ -274,7 +279,6 @@ const HomeScreen = ({ navigation }) => {
 
             setTotal(totalChecklist)
 
-            setIsReady(true);
 
           });
 
@@ -283,10 +287,10 @@ const HomeScreen = ({ navigation }) => {
         case 'changeofparts':
           break;
       }
-
+      setIsReady(true);
     }
 
-  }, [plant, field, pickerwithtype, isFocused, viewType, 
+  }, [plant, field, pickerwithtype, viewType, 
     request?.totalClosedRequest, 
     request?.totalOutstandingRequest, 
     request?.totalPendingRequest, 
