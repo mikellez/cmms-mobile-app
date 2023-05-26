@@ -81,11 +81,12 @@ const CalendarTab = ({ navigation }) => {
                 results.forEach((result) => {
                     result.calendar_dates.forEach((date) => {
                         const dots = markedDates[date]?.dots || [];
-                        const cond =
-                            dots.length === 0 ||
-                            (dots > 0 && dots.filter((i) => i.key !== "checklist"));
 
-                        markedDates[date] = { dots: [...dots, cond ? checklistCalConfig : {}] };
+                        const notExistChecklist = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'checklist').length > 0);
+                        if (notExistChecklist) {
+                            markedDates[date] = { dots: [...dots, checklistCalConfig] };
+                        }
+                        
                         var newItems = items;
                         if (!newItems[0][date]) {
                             newItems[0][date] = [];
@@ -116,11 +117,12 @@ const CalendarTab = ({ navigation }) => {
                         ? new Date(result.changedDate).toISOString().split("T")[0]
                         : new Date(result.scheduledDate).toISOString().split("T")[0];
                     const dots = markedDates[date]?.dots || [];
-                    const cond =
-                        dots.length === 0 ||
-                        (dots.length > 0 && dots.filter((i) => i.key !== "cop"));
+                    
+                    const notExistCOP = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop').length > 0);
+                    if (notExistCOP) {
+                        markedDates[date] = { dots: [...dots, copCalConfig] };
+                    }
 
-                    markedDates[date] = { dots: [...dots, cond ? copCalConfig : {}] };
                     var newItems = items;
                     if (!newItems[1][date]) {
                         newItems[1][date] = [];
