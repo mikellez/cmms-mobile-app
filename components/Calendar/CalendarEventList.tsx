@@ -5,6 +5,7 @@ import { ScrollView } from "react-native";
 import ScheduleChecklistEvent from "./ScheduleChecklistEvent";
 import ScheduleCOPEvent from "./ScheduleCOPEvent";
 import { DateData } from "react-native-calendars";
+import uuid from "react-native-uuid";
 
 interface CalendarEventListProps {
     dateSelected: DateData;
@@ -17,11 +18,10 @@ const CalendarEventList = (props: CalendarEventListProps) => {
     const [ChecklistElements, setChecklistElements] = useState([]);
 
     useEffect(() => {
-        let key = 0;
         if (props.COPItems) {
             setCOPElements(
                 props.COPItems.map((item) => {
-                    return <ScheduleCOPEvent key={key++} COPSchedule={item} />;
+                    return <ScheduleCOPEvent key={uuid.v4() as string} COPSchedule={item} />;
                 })
             );
         } else {
@@ -31,7 +31,10 @@ const CalendarEventList = (props: CalendarEventListProps) => {
             setChecklistElements(
                 props.ChecklistItems.map((item) => {
                     return (
-                        <ScheduleChecklistEvent key={key++} checklistSchedule={item} />
+                        <ScheduleChecklistEvent
+                            key={uuid.v4() as string}
+                            checklistSchedule={item}
+                        />
                     );
                 })
             );

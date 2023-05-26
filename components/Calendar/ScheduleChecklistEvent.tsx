@@ -38,7 +38,7 @@ const ScheduleChecklistEvent = ({ checklistSchedule }: { checklistSchedule: CMMS
 
     const assignedUsersView = checklistSchedule.assignedUsers.map((user, index) => {
         return (
-            <Text>
+            <Text key={index + 1}>
                 {index + 1}.{user}
             </Text>
         );
@@ -89,11 +89,16 @@ const ScheduleChecklistEvent = ({ checklistSchedule }: { checklistSchedule: CMMS
                 isOpen={isModalOpen}
                 setOpen={setIsModalOpen}
             >
-                <Table >
+                <Table>
                     <Rows
                         data={tableData}
                         widthArr={widthArr}
-                        style={{ paddingTop: 5, paddingBottom: 5, borderTopColor: "#ffff", borderTopWidth: 1,  }}
+                        style={{
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderTopColor: "#ffff",
+                            borderTopWidth: 1,
+                        }}
                     ></Rows>
                 </Table>
             </ModuleSimpleModal>

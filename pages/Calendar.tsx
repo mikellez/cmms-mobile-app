@@ -70,8 +70,8 @@ const CalendarTab = ({ navigation }) => {
     const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
     const [dateSelected, setDateSelected] = useState<DateData>();
 
-    const checklistCalConfig = {key: 'checklist', color: 'green'};
-    const copCalConfig = {key: 'cop', color: 'purple'};
+    const checklistCalConfig = { key: "checklist", color: "green" };
+    const copCalConfig = { key: "cop", color: "purple" };
 
     const addItems = async (plantId) => {
         setItems([{}, {}]);
@@ -81,9 +81,11 @@ const CalendarTab = ({ navigation }) => {
                 results.forEach((result) => {
                     result.calendar_dates.forEach((date) => {
                         const dots = markedDates[date]?.dots || [];
-                        const cond = dots.length === 0 || (dots > 0 && dots.filter(i => i.key !== 'checklist'));
+                        const cond =
+                            dots.length === 0 ||
+                            (dots > 0 && dots.filter((i) => i.key !== "checklist"));
 
-                        markedDates[date] = { dots: [...dots, (cond ? checklistCalConfig : {})] };
+                        markedDates[date] = { dots: [...dots, cond ? checklistCalConfig : {}] };
                         var newItems = items;
                         if (!newItems[0][date]) {
                             newItems[0][date] = [];
@@ -114,9 +116,11 @@ const CalendarTab = ({ navigation }) => {
                         ? new Date(result.changedDate).toISOString().split("T")[0]
                         : new Date(result.scheduledDate).toISOString().split("T")[0];
                     const dots = markedDates[date]?.dots || [];
-                    const cond = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop'));
+                    const cond =
+                        dots.length === 0 ||
+                        (dots.length > 0 && dots.filter((i) => i.key !== "cop"));
 
-                    markedDates[date] = { dots: [...dots, (cond ? copCalConfig : {})] };
+                    markedDates[date] = { dots: [...dots, cond ? copCalConfig : {}] };
                     var newItems = items;
                     if (!newItems[1][date]) {
                         newItems[1][date] = [];
@@ -153,11 +157,16 @@ const CalendarTab = ({ navigation }) => {
         setChecklistItems(items[0][day.dateString]);
         setCOPItems(items[1][day.dateString]);
         setDateSelected(day);
-        console.log(markedDatesProp[day.dateString])
+        console.log(markedDatesProp[day.dateString]);
         setSelectDatesProp({
             ...markedDatesProp,
-            [day.dateString]: { ...markedDatesProp[day.dateString], selected: true, selectedColor: '#C8102E' }
+            [day.dateString]: {
+                ...markedDatesProp[day.dateString],
+                selected: true,
+                selectedColor: "#C8102E",
+            },
         });
+        setIsCalendarView(false);
     };
 
     const toggleCalendarView = () => {
@@ -223,46 +232,29 @@ const CalendarTab = ({ navigation }) => {
             </ModuleHeader>
 
             <ModuleDivider />
-            
-            { isCalendarView && <View style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                <VStack>
-                    <HStack>
-                        <Icon
-                            as={Octicons}
-                            name="dot-fill"
-                            size="xs"
-                            color="green.800"
-                        />
-                        <Text fontSize={10}>Checklist</Text>
-
-                    </HStack>
-                    <HStack>
-                        <Icon
-                            as={Octicons}
-                            name="dot-fill"
-                            size="xs"
-                            color="purple.800"
-                        />
-                        <Text fontSize={10}>Change of Parts</Text>
-                    </HStack>
-
-                </VStack>
-            </View>
-            }
 
             {isReady && isCalendarView && (
                 <View>
-                    <Calendar 
-                        markingType={'multi-dot'} 
-                        markedDates={selectDatesProp} 
-                        onDayPress={dayPress} 
-                        onDayLongPress={dayPress} 
-                        style={{ marginTop: 5, marginBottom: 20}}
+                    <Calendar
+                        markingType={"multi-dot"}
+                        markedDates={selectDatesProp}
+                        onDayPress={dayPress}
+                        onDayLongPress={dayPress}
                         theme={{
-                            todayTextColor: '#C8102E',
-                            arrowColor: '#C8102E',
+                            todayTextColor: "#C8102E",
+                            arrowColor: "#C8102E",
                         }}
-                        />
+                    />
+                    <HStack style={{ justifyContent: "flex-end" }}>
+                        <HStack style={{ marginHorizontal: 5 }}>
+                            <Icon as={Octicons} name="dot-fill" size="xs" color="green.800" />
+                            <Text fontSize={10}>Checklist</Text>
+                        </HStack>
+                        <HStack style={{ marginHorizontal: 5 }}>
+                            <Icon as={Octicons} name="dot-fill" size="xs" color="purple.800" />
+                            <Text fontSize={10}>Change of Parts</Text>
+                        </HStack>
+                    </HStack>
                     <ModuleDivider />
                 </View>
             )}
