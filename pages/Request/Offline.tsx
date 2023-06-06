@@ -1,6 +1,6 @@
 import { Alert, Box, Center, CloseIcon, HStack, Heading, IconButton, NativeBaseProvider, VStack, Text, Pressable, Icon } from 'native-base';
 import { useEffect, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
+import { checkConnection, subscribeToConnectionChanges} from '../../helper/NetInfo';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
 
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
@@ -29,17 +29,11 @@ const OfflineRequest = ({ route, navigation }) => {
 
 
   useEffect(() => {
-    const checkConnection = async () => {
-      const netInfoState = await NetInfo.fetch();
-      setIsConnected(netInfoState.isConnected);
-    };
-
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsConnected(state.isConnected);
-    });
+    subscribeToConnectionChanges(setIsConnected);
 
     const fetchData = async () => {
-      await checkConnection();
+      await checkConnection(setIsConnected);
+
       const promise = Promise.all([fetchLists('faultTypes'), fetchLists('plants'), fetchLists('requestTypes'), fetchLists('assetTags'), fetchLists('offlineRequests')])
       .then((res) => {
         setFaultTypes(res[0]);

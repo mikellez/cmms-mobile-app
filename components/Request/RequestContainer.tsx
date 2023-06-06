@@ -32,6 +32,7 @@ import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
 import { CMMSUser } from '../../types/interfaces';
+import { checkConnection, subscribeToConnectionChanges } from '../../helper/NetInfo';
 
 type FormValues = {
   name?: string;
@@ -502,18 +503,11 @@ const RequestContainer = ({
   useEffect(() => {
     fetchUser();
 
-    const checkConnection = async () => {
-      const netInfoState = await NetInfo.fetch();
-      setIsConnected(netInfoState.isConnected);
-    };
-
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsConnected(state.isConnected);
-    });
+    const subscribe = subscribeToConnectionChanges(setIsConnected);
 
     const fetchData = async () => {
       try {
-        await checkConnection();
+        await checkConnection(setIsConnected);
         // Do something else that depends on the network status
         fetchFaultTypes();
         fetchRequestTypes();
@@ -538,7 +532,7 @@ const RequestContainer = ({
     }
 
     return () => {
-      unsubscribe();
+      subscribe();
     };
 
   }, [isConnected])
