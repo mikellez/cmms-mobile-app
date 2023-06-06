@@ -3,6 +3,9 @@
     "name": "cmms-mobile-app",
     "slug": "cmms-mobile-app",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +25,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.cmmsmobileapp"
+      "package": "com.cmmsmobileapp",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
