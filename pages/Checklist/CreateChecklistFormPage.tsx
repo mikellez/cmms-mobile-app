@@ -12,7 +12,7 @@ import instance from "../../axios.config";
 import { useCurrentUser } from "../../helper/hooks/SWR";
 import { ChecklistCreateContextProvider } from "../../context/checklistContext";
 import { ChecklistType } from "../../types/enums";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fetchSpecificChecklist = async (id: number, type: ChecklistType): Promise<CMMSChecklist | void> => {
     try {
@@ -26,10 +26,18 @@ const fetchSpecificChecklist = async (id: number, type: ChecklistType): Promise<
 
 const createChecklist = async (checklist: CMMSChecklist) => {
     try {
+        // throw("async test");
         instance.post("/api/checklist/record/", { checklist })
     }
     catch (err) {
         console.log(err);
+        let cachedChecklists = await AsyncStorage.getItem("@checklist");
+        const parsedChecklists = cachedChecklists == null ? [] : JSON.parse(cachedChecklists) as Array<CMMSChecklist>;
+        parsedChecklists.push(checklist);
+        console.log(parsedChecklists);
+        cachedChecklists = JSON.stringify(parsedChecklists);
+        console.log(cachedChecklists);
+        await AsyncStorage.setItem("@checklist", cachedChecklists);
     };
 };
 

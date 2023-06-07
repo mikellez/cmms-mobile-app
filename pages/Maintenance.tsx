@@ -7,6 +7,8 @@ import { ModuleHeader, ModuleScreen, ModuleActionSheet, ModuleActionSheetItem, M
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
 import { CMMSChecklist } from "../types/interfaces";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -37,11 +39,39 @@ const fetchChecklist = async (viewType: string) => {
     };
 };
 
+const sendCachedChecklist = async () => {
+    console.log("here");
+    const cachedChecklists = await AsyncStorage.getItem("@checklist");
+    console.log(cachedChecklists);
+    if (cachedChecklists != null) {
+        const cachedChecklistsArray = JSON.parse(cachedChecklists);
+        console.log(cachedChecklistsArray);
+        let error = false;
+        for (const checklist in cachedChecklistsArray) {
+            try {
+                console.log("Sending");
+                console.log(checklist);
+                await instance.post("/api/checklist/record/", { checklist: cachedChecklistsArray[checklist] })
+                console.log("Finished sending");
+            } catch (e) {
+                console.log("error")
+                console.log(e);
+                error = true;
+            }
+        }
+        if (!error) {
+            await AsyncStorage.removeItem("@checklist");
+            console.log("Cached checklists sent");
+        }
+    }
+}
+
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
 
     useEffect(() => {
+        sendCachedChecklist();
         fetchChecklist(viewType)
             .then(result => {
                 if (result) setChecklists(result);
