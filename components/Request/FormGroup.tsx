@@ -42,7 +42,6 @@ const FormGroup = ({
   onNameChange,
   setFormState
 }) => {
-  console.log(requestItems)
 
   const [formData, setFormData] = useState({
     guest_name: "",

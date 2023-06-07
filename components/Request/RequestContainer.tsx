@@ -33,6 +33,7 @@ import { ModuleScreen } from '../ModuleLayout/ModuleScreen';
 import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
 import { CMMSUser } from '../../types/interfaces';
+import { checkConnection, subscribeToConnectionChanges } from '../../helper/NetInfo';
 
 type FormValues = {
   name?: string;
@@ -138,18 +139,6 @@ const RequestContainer = ({
   const [asset, setAsset] = useState(route?.params?.asset);
   const [id, setId] = useState(route?.params?.id);
 
-
-  const getData = async (key) => {
-    try {
-      const data = await AsyncStorage.getItem(key)
-      return data != null ? JSON.parse(data) : null;
-
-    } catch(err) {
-      console.log(err)
-      // error reading value
-    }
-  }
-
   const createRequest = async () => {
     const formData = new FormData();
     if(type === 'guest' && user?.id) {
@@ -196,20 +185,21 @@ const RequestContainer = ({
         });
 
     } else {
-      let data = await getData('offlineRequests');
-      console.log('prev offlineRequests', data)
-      if(!data) {
-        data = [];
+      let data = [];
+      let value = await _retrieveData('offlineRequests');
+      if(value) {
+        data = JSON.parse(value);
       }
+      console.log('prev offlineRequests', data)
 
       const newRequest = {
         id: data.length + 1,
         name: formState.name,
         description: formState.description,
         faultTypeID: formState.faultTypeID,
-        plantLocationID: plant,
+        plantLocationID: plant || formState.plantLocationID,
         requestTypeID: formState.requestTypeID,
-        taggedAssetID: asset,
+        taggedAssetID: asset || formState.taggedAssetID,
         image: formState.image
       }
       console.log('newRequest', newRequest)
@@ -464,20 +454,27 @@ const RequestContainer = ({
   }
 
   const fetchAssignUser = async (plant_id) => {
-    try {
+    if(isConnected) {
+      try {
 
-      await instance.get(`/api/getAssignedUsers/${plant_id}`)
-      .then((res)=> {
-        setAssignUsers(res.data.map(item => ({ ...item, detail: item.name + ' | ' + item.email })));
-      })
-      .catch((err)=> {
+        await instance.get(`/api/getAssignedUsers/${plant_id}`)
+        .then((res)=> {
+          _storeData('assignUsers', res.data);
+          setAssignUsers(res.data.map(item => ({ ...item, detail: item.name + ' | ' + item.email })));
+        })
+        .catch((err)=> {
+          console.log(err)
+          console.log('Unable fetch assign users')
+        })
+      } catch(err) {
         console.log(err)
+        // error reading value
         console.log('Unable fetch assign users')
-      })
-    } catch(err) {
-      console.log(err)
-      // error reading value
-      console.log('Unable fetch assign users')
+      }
+
+    } else {
+      const value = await _retrieveData('assignUsers');
+      setAssignUsers(JSON.parse(value));
     }
 
   }
@@ -502,18 +499,11 @@ const RequestContainer = ({
   useEffect(() => {
     fetchUser();
 
-    const checkConnection = async () => {
-      const netInfoState = await NetInfo.fetch();
-      setIsConnected(netInfoState.isConnected);
-    };
-
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsConnected(state.isConnected);
-    });
+    const subscribe = subscribeToConnectionChanges(setIsConnected);
 
     const fetchData = async () => {
       try {
-        await checkConnection();
+        await checkConnection(setIsConnected);
         // Do something else that depends on the network status
         fetchFaultTypes();
         fetchRequestTypes();
@@ -538,7 +528,7 @@ const RequestContainer = ({
     }
 
     return () => {
-      unsubscribe();
+      subscribe();
     };
 
   }, [isConnected])
