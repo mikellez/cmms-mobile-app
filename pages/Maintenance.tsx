@@ -6,8 +6,10 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import { ModuleHeader, ModuleScreen, ModuleActionSheet, ModuleActionSheetItem, ModuleDivider, ModuleFullPageModal, ModuleSimpleModal, ModalIcons } from "../components/ModuleLayout";
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
-import { CMMSChecklist } from "../types/interfaces";
+import { CMMSChecklist, CMMSUser } from "../types/interfaces";
 import { useIsFocused } from '@react-navigation/native';
+import { _retrieveData } from "../helper/AsyncStorage";
+import { Role } from "../types/enums";
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -38,11 +40,39 @@ const fetchChecklist = async (viewType: string) => {
     };
 };
 
+
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const isFocused = useIsFocused();
+    const [showDropdown, setShowDropdown] = useState<boolean>(true);
+    
+    const [user, setUser] = useState<CMMSUser>({
+        id: 0,
+        role_id: 0,
+        role_name: "",
+        name: "",
+        email: "",
+        fname: "",
+        lname: "",
+        username: ""
+    });
+
+    const fetchUser = async () => {
+        const user = await _retrieveData('user');
+        setUser(JSON.parse(user));
+    }
+
+    useEffect(() => {
+        fetchUser();
+        const { role_id } = user;
+
+        if(role_id === Role.Specialist) {
+        setViewType("assigned");
+        setShowDropdown(false);
+        }
+    }, []);
 
     useEffect(() => {
         setIsLoading(true);
@@ -84,11 +114,11 @@ const Maintenance = ({ navigation, route }) => {
             </ModuleHeader>
 
         
-            <ModuleActionSheet 
+            {showDropdown && <ModuleActionSheet 
                 items={checklistViews}
                 value={viewType}
                 setValue={setViewType}
-            />
+            />}
 
             <ModuleDivider />
 

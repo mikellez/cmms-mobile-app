@@ -20,6 +20,7 @@ import { set } from "react-native-reanimated";
 import { Center } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
 import { useIsFocused } from "@react-navigation/native";
+import { Role } from "../types/enums";
 
 const HomeScreen = ({ navigation }) => {
   const items = [
@@ -117,6 +118,7 @@ const HomeScreen = ({ navigation }) => {
   const [loadUser, setLoadUser] = useState<boolean>(false);
   const [viewType, setViewType] = useState<string>(dashboardViews[0].value as string);
   const [total, setTotal] = useState<number>(0);
+  const [showChart, setShowChart] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
@@ -194,7 +196,7 @@ const HomeScreen = ({ navigation }) => {
 
       setIsReady(false);
 
-      if([3, 4].includes(role_id)) { // engineer, specialist
+      if([Role.Engineer, Role.Specialist].includes(role_id)) { // engineer, specialist
         getPlants("/api/getUserPlants").then(result => {
             if (result) {
               setPlant(result[0].plant_id)
@@ -204,12 +206,17 @@ const HomeScreen = ({ navigation }) => {
       } else {
         setPlant(0);
       }
+
+      if(role_id === Role.Specialist) { // specialist
+        setShowChart(false);
+      } else {
+        setShowChart(true);
+      }
     }
 
   }, [loadUser, isFocused])
 
   useEffect(() => {
-
     if(plant !== "") {
       switch(viewType) {
         case 'requests':
@@ -331,8 +338,8 @@ const HomeScreen = ({ navigation }) => {
         sections={sections}      
         renderSectionFooter={({ section }) => (
           <>
-            {!isReady && <Center><Text>Loading ...</Text></Center>}
-            {isReady && <CustomPieChart data={chartData} accessor="total" absolute={false} total={total}/> }
+            {!isReady && showChart && <Center><Text>Loading ...</Text></Center>}
+            {isReady && showChart && <CustomPieChart data={chartData} accessor="total" absolute={false} total={total}/> }
           </>
         )}
         />
