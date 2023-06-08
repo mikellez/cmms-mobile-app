@@ -279,7 +279,6 @@ interface CMMSChecklist {
   history: string;
   status: string;
   datajson?: any;
-  activity_log: {[key: string]: string}[];
 }
 
 interface CMMSCheck {
