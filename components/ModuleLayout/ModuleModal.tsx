@@ -10,8 +10,16 @@ interface ModuleModalProps extends React.PropsWithChildren {
 }
 
 enum ModalIcons {
+<<<<<<< HEAD
     Warning = "warning",
     Success = "checkcircleo",
+=======
+  Warning = "warning",
+  Success = "checkcircleo",
+  Offline = "wifi-off",
+  Exit = "logout",
+  History = "HistoryOutlined",
+>>>>>>> 209545d7d48cc67cf258f99b6f5349de3beb8062
 }
 
 interface ModuleSimpleModalProps extends ModuleModalProps {
