@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, StyleSheet, Pressable } from "react-native";
 import { Text, IconButton, HStack, View, Modal as NBModal, Icon, VStack } from "native-base";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import Feather from "react-native-vector-icons/Feather"
 
 interface ModuleModalProps extends React.PropsWithChildren {
     title?: string;
@@ -12,15 +13,49 @@ interface ModuleModalProps extends React.PropsWithChildren {
 enum ModalIcons {
     Warning = "warning",
     Success = "checkcircleo",
+    Offline = "wifi-off",
 }
 
 interface ModuleSimpleModalProps extends ModuleModalProps {
     text: string,
+    feather?: boolean,
     icon?: ModalIcons
     onCloseCallback?: Function
 };
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
+
+    const closeModal = () => {
+        props.setOpen(false);
+        if (props.onCloseCallback) props.onCloseCallback();
+    };
+
+    return (
+        <NBModal
+            isOpen={props.isOpen}
+            onClose={closeModal}
+        >
+            <NBModal.Content>
+                <NBModal.CloseButton />
+                <NBModal.Body padding="4">
+                    <VStack space={2}>
+                        {props.icon && <Icon as={props.feather ? Feather :AntDesign} name={props.icon} size="4xl" />}
+
+                        {props.title && (
+                            <Text fontSize="18" fontWeight={600}>
+                                {props.title}
+                            </Text>
+                        )}
+                        {props.text && <Text>{props.text}</Text>}
+                    </VStack>
+                    <View>{props.children}</View>
+                </NBModal.Body>
+            </NBModal.Content>
+        </NBModal>
+    );
+};
+
+const ModuleButtonModal = (props: ModuleSimpleModalProps) => {
 
     const closeModal = () => {
         props.setOpen(false);
@@ -144,4 +179,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export { ModuleSimpleModal, ModuleFullPageModal, ModalIcons };
+export { ModuleSimpleModal, ModuleButtonModal, ModuleFullPageModal, ModalIcons };

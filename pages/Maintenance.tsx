@@ -8,7 +8,8 @@ import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
 import { CMMSChecklist } from "../types/interfaces";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { _retrieveData, _clear } from "../helper/AsyncStorage";
+import { checkConnection } from "../helper/NetInfo";
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -39,38 +40,50 @@ const fetchChecklist = async (viewType: string) => {
     };
 };
 
-const sendCachedChecklist = async () => {
-    console.log("here");
-    const cachedChecklists = await AsyncStorage.getItem("@checklist");
-    console.log(cachedChecklists);
-    if (cachedChecklists != null) {
-        const cachedChecklistsArray = JSON.parse(cachedChecklists);
-        console.log(cachedChecklistsArray);
-        let error = false;
-        for (const checklist in cachedChecklistsArray) {
-            try {
-                console.log("Sending");
-                console.log(checklist);
-                await instance.post("/api/checklist/record/", { checklist: cachedChecklistsArray[checklist] })
-                console.log("Finished sending");
-            } catch (e) {
-                console.log("error")
-                console.log(e);
-                error = true;
-            }
-        }
-        if (!error) {
-            await AsyncStorage.removeItem("@checklist");
-            console.log("Cached checklists sent");
-        }
-    }
-}
+
 
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
+    const [sendCached, setSendCached] = useState<boolean>(false);
+    const [isConnected, setIsConnected] = useState<boolean>(true);
+
+    const sendCachedChecklist = async () => {
+        const cachedChecklists = await _retrieveData("checklist");
+        if (cachedChecklists != null) {
+            const cachedChecklistsArray = JSON.parse(cachedChecklists);
+            let error = false;
+            await checkConnection(setIsConnected);
+            if (isConnected) {
+
+                for (const index in cachedChecklistsArray) {
+                    try {
+                        const checklist = cachedChecklistsArray[index];
+                        console.log("Sending");
+                    await instance({
+                        url: `/api/checklist/complete/${checklist.checklist_id}`,
+                        data: {
+                            datajson: checklist.datajson
+                        },
+                        method: "patch"
+                    });
+                    console.log("Finished sending");
+                    } catch (e) {
+                        console.log(e);
+                        error = true;
+                    }
+                }
+                if (!error) {
+                    await AsyncStorage.removeItem("@checklist");
+                    console.log("Cached checklists sent");
+                    setSendCached(true);
+                }
+            }
+        }
+    }
 
     useEffect(() => {
+
         sendCachedChecklist();
         fetchChecklist(viewType)
             .then(result => {
@@ -118,6 +131,14 @@ const Maintenance = ({ navigation, route }) => {
                         {checklistElements}
                     </VStack>
             </View>
+            <ModuleSimpleModal
+                isOpen={sendCached}
+                setOpen={setSendCached}
+                title="Cached Checklists have been sent"
+                text="Checklists that were not sent previously due to network errors have been submitted"
+                icon={ModalIcons.Success}
+            >
+            </ModuleSimpleModal>
         </ModuleScreen>
     );
 };

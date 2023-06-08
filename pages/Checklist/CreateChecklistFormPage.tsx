@@ -12,7 +12,8 @@ import instance from "../../axios.config";
 import { useCurrentUser } from "../../helper/hooks/SWR";
 import { ChecklistCreateContextProvider } from "../../context/checklistContext";
 import { ChecklistType } from "../../types/enums";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { _addToDataArray } from "../../helper/AsyncStorage";
+import { subscribeToConnectionChanges, checkConnection } from "../../helper/NetInfo";
 
 const fetchSpecificChecklist = async (id: number, type: ChecklistType): Promise<CMMSChecklist | void> => {
     try {
@@ -31,13 +32,6 @@ const createChecklist = async (checklist: CMMSChecklist) => {
     }
     catch (err) {
         console.log(err);
-        let cachedChecklists = await AsyncStorage.getItem("@checklist");
-        const parsedChecklists = cachedChecklists == null ? [] : JSON.parse(cachedChecklists) as Array<CMMSChecklist>;
-        parsedChecklists.push(checklist);
-        console.log(parsedChecklists);
-        cachedChecklists = JSON.stringify(parsedChecklists);
-        console.log(cachedChecklists);
-        await AsyncStorage.setItem("@checklist", cachedChecklists);
     };
 };
 
@@ -50,6 +44,9 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     const [sections, setSections] = useState<ChecklistSection[]>([]);
     const [level, setLevel] = useState<number>();
     const [isSubmitting, setSubmitting] = useState<boolean>(false);
+    // const [offlineModal, setOfflineModal] = useState<boolean>(false);
+    // const [isConnected, setIsConnected] = useState<boolean>(false);
+    
 
     const { checklistId, checklistType } = route.params;
 
@@ -77,6 +74,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     };
 
     const handleSubmit = () => {
+        // console.log("Connected: " + isConnected);
         setLevel(3);
         setSubmitting(true);
     };
@@ -111,6 +109,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
 
     useEffect(() => {
         if (isSubmitting) {
+            // checkConnection(setIsConnected);
             if (!validateChecklistFormData(checklist)) {
                 setIncompleteModal(true); 
             } else {
@@ -149,6 +148,17 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
             } as CMMSChecklist);
         }
     }, [checklistId, checklistType]);
+
+    // const confirmOffline = () => {
+    //     _addToDataArray("checklist", checklist)
+    //         .then(res => {
+    //             setOfflineModal(false);
+    //             setSuccessModal(true);
+    //         })
+    // };
+    // const leaveOffline = () => {
+    //     setOfflineModal(false);
+    // };
 
     const header = <ChecklistForm checklist={checklist} setChecklist={setChecklist}/>;
     const footer = <IconButton  
@@ -207,14 +217,37 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
             icon={ModalIcons.Warning}
         />
 
-            <ModuleSimpleModal
-                isOpen={successModal}
-                setOpen={setSuccessModal}
-                title="Success"
-                text="New checklist successfully created"
-                icon={ModalIcons.Warning}
-                onCloseCallback={leavePage}
-            />
+        <ModuleSimpleModal
+            isOpen={successModal}
+            setOpen={setSuccessModal}
+            title="Success"
+            text="New checklist successfully created"
+            icon={ModalIcons.Warning}
+            onCloseCallback={leavePage}
+        />
+
+        {/* <ModuleSimpleModal 
+            isOpen={offlineModal}
+            setOpen={setOfflineModal}
+            title="You are currently offline"
+            text="Do you want to proceed? Your checklist will be stored and submitted automatically when internet connection is available"
+            icon={ModalIcons.Offline}
+            feather={true}
+        >
+            <HStack flexDirection="row">
+                <VStack >
+                    <Button backgroundColor="#C70F2B" marginTop={2} marginRight={2} onPress={confirmOffline}>
+                        Confirm
+                    </Button>
+                </VStack>
+                <VStack>
+                    <Button backgroundColor="#C70F2B" marginTop={2} onPress={leaveOffline}>
+                        Cancel
+                    </Button>
+
+                </VStack>
+            </HStack>
+        </ModuleSimpleModal> */}
 
         </ModuleScreen>
     );
