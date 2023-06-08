@@ -67,7 +67,7 @@ const Header = ({ navigation }) => {
         setOpen={setModalVisible}
         title="Logout"
         text="Do you want to Logout now?"
-        icon={ModalIcons.Exit}
+        icon={"Exit"}
       >
         <HStack flexDirection="row" marginTop={8}>
           <Button backgroundColor="#C70F2B" onPress={confirmLogout}>

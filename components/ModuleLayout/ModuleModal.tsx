@@ -17,19 +17,28 @@ interface ModuleModalProps extends React.PropsWithChildren {
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+interface ModuleSimpleModalProps extends ModuleModalProps {
+  text: string;
+  icon?: string;
+  onCloseCallback?: Function;
+}
+
+enum ModalPackage {
+  AD = AntDesign,
+  Fea = Feather,
+}
+const ModalIcon = {
+  Warning: { icon: "warning", package: AntDesign },
+  Success: { icon: "checkcircleo", package: AntDesign },
+  Offline: { icon: "wifi-off", package: Feather },
+  Exit: { icon: "logout", package: AntDesign },
+};
 
 enum ModalIcons {
   Warning = "warning",
   Success = "checkcircleo",
   Offline = "wifi-off",
   Exit = "logout",
-}
-
-interface ModuleSimpleModalProps extends ModuleModalProps {
-  text: string;
-  feather?: boolean;
-  icon?: ModalIcons;
-  onCloseCallback?: Function;
 }
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
@@ -46,8 +55,8 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
           <VStack space={2}>
             {props.icon && (
               <Icon
-                as={props.feather ? Feather : AntDesign}
-                name={props.icon}
+                as={ModalIcon[props.icon]["package"]}
+                name={ModalIcon[props.icon]["icon"]}
                 size="4xl"
               />
             )}
@@ -191,4 +200,5 @@ export {
   ModuleButtonModal,
   ModuleFullPageModal,
   ModalIcons,
+  ModalPackage,
 };

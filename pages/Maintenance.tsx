@@ -19,7 +19,6 @@ import { CMMSChecklist, CMMSUser } from "../types/interfaces";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { _retrieveData, _clear } from "../helper/AsyncStorage";
 import { checkConnection } from "../helper/NetInfo";
-import { _retrieveData } from "../helper/AsyncStorage";
 import { Role } from "../types/enums";
 
 const checklistViews: ModuleActionSheetItem[] = [
@@ -172,7 +171,7 @@ const Maintenance = ({ navigation, route }) => {
         setOpen={setSendCached}
         title="Cached Checklists have been sent"
         text="Checklists that were not sent previously due to network errors have been submitted"
-        icon={ModalIcons.Success}
+        icon={"Success"}
       ></ModuleSimpleModal>
     </ModuleScreen>
   );
