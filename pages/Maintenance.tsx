@@ -10,6 +10,7 @@ import { CMMSChecklist } from "../types/interfaces";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { _retrieveData, _clear } from "../helper/AsyncStorage";
 import { checkConnection } from "../helper/NetInfo";
+import ChecklistHistory from "../components/Checklist/ChecklistHistory";
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -47,6 +48,8 @@ const Maintenance = ({ navigation, route }) => {
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
     const [sendCached, setSendCached] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(true);
+    const [isHistory, setIsHistory] = useState<boolean>(false);
+    const [historyCL, setHistoryCL] = useState<CMMSChecklist>();
 
     const sendCachedChecklist = async () => {
         const cachedChecklists = await _retrieveData("checklist");
@@ -96,7 +99,9 @@ const Maintenance = ({ navigation, route }) => {
                                 ? <FlatList data={checklists}
                                             keyExtractor={cl => cl.checklist_id.toString()}
                                             renderItem={({item}) => <ListBox checklist={item}
-                                                                            navigation={navigation}/>}/> 
+                                                                            navigation={navigation}
+                                                                            setIsHistory={setIsHistory}
+                                                                            setHistoryCL={setHistoryCL}/>}/> 
                                 : <Text>No Checklist Found</Text>
 
     return (
@@ -138,6 +143,17 @@ const Maintenance = ({ navigation, route }) => {
                 text="Checklists that were not sent previously due to network errors have been submitted"
                 icon={ModalIcons.Success}
             >
+            </ModuleSimpleModal>
+            {/* <ModuleFullPageModal title="title" isOpen={isHistory} setOpen={setIsHistory}>
+                <Text>Hello</Text>
+            </ModuleFullPageModal> */}
+            <ModuleSimpleModal 
+                isOpen={isHistory}
+                setOpen={setIsHistory}
+                title="View History"
+                text=""
+            >
+                <ChecklistHistory checklist={historyCL}></ChecklistHistory>
             </ModuleSimpleModal>
         </ModuleScreen>
     );

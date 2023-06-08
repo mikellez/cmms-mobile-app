@@ -14,6 +14,7 @@ enum ModalIcons {
     Warning = "warning",
     Success = "checkcircleo",
     Offline = "wifi-off",
+    History = "HistoryOutlined",
 }
 
 interface ModuleSimpleModalProps extends ModuleModalProps {
@@ -34,12 +35,13 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
         <NBModal
             isOpen={props.isOpen}
             onClose={closeModal}
+            size="xl"
         >
             <NBModal.Content>
                 <NBModal.CloseButton />
                 <NBModal.Body padding="4">
                     <VStack space={2}>
-                        {props.icon && <Icon as={props.feather ? Feather :AntDesign} name={props.icon} size="4xl" />}
+                        {props.icon && <Icon as={props.feather ? Feather : AntDesign} name={props.icon} size="4xl" />}
 
                         {props.title && (
                             <Text fontSize="18" fontWeight={600}>
