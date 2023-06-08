@@ -45,32 +45,14 @@ const ListBox = ({ checklist, navigation }:
         >
 
                 <ModuleCardContainer>
-                    <VStack>
-                        <HStack>
-                            <VStack style={{maxWidth: 250}}>
-                                <Text style={{flex: 1, textAlign: "left"}}
-                                    fontSize={14}
-                                    fontWeight={600}
-                                >
-                                    {checklist.chl_name}
-                                </Text>
-                            </VStack>
-                            <VStack marginLeft="auto">
-
-                                <Text marginLeft="auto">
-                                    {shortDate(new Date(checklist.created_date))}
-                                </Text>
-                            </VStack>
-                        </HStack>
-                        <HStack>
-
-                        <VStack style={{alignSelf: "flex-start"}}>
-                            {/* <Text style={{flex: 1, flexWrap: 'wrap'}}
+                    <HStack>
+                        <VStack>
+                            <Text
                                 fontSize={14}
                                 fontWeight={600}
-                                >
+                            >
                                 {checklist.chl_name}
-                            </Text> */}
+                            </Text>
 
                             <HStack alignItems="center">
                                 <Icon as={EntypoIcon} name="location-pin" size="sm"></Icon>
@@ -86,7 +68,7 @@ const ListBox = ({ checklist, navigation }:
                                 fontSize={12}
                                 fontWeight={600}
                                 style={{color: getChecklistStatusColor(checklist.status_id)}}
-                                >
+                            >
                                 {checklist.status}
                             </Text>
 
@@ -98,14 +80,11 @@ const ListBox = ({ checklist, navigation }:
                                 Assigned To: {checklist.assigneduser}
                             </Text>
                         </VStack>
-                        </HStack>
-                        {/* <VStack marginLeft="auto">
 
                         <Text marginLeft="auto">
                             {shortDate(new Date(checklist.created_date))}
                         </Text>
-                        </VStack> */}
-                    </VStack>
+                    </HStack>
                 </ModuleCardContainer>
         </Pressable>
     );

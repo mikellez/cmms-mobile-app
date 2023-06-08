@@ -42,6 +42,7 @@ const getChecklistSchedules = async (plantId: number) => {
         return response.data;
     } catch (err) {
         console.log(err);
+        console.log('Unable to fetch checklist')
     }
 };
 
@@ -55,6 +56,7 @@ const getCOPSchedules = async (plantId: number) => {
         return response.data;
     } catch (err) {
         console.log(err);
+        console.log('Unable to fetch cop')
     }
 };
 
@@ -70,8 +72,8 @@ const CalendarTab = ({ navigation }) => {
     const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
     const [dateSelected, setDateSelected] = useState<DateData>();
 
-    const checklistCalConfig = { key: "checklist", color: "green" };
-    const copCalConfig = { key: "cop", color: "purple" };
+    const checklistCalConfig = {key: 'checklist', color: 'green'};
+    const copCalConfig = {key: 'cop', color: 'purple'};
 
     const addItems = async (plantId) => {
         setItems([{}, {}]);
@@ -81,12 +83,12 @@ const CalendarTab = ({ navigation }) => {
                 results.forEach((result) => {
                     result.calendar_dates.forEach((date) => {
                         const dots = markedDates[date]?.dots || [];
-
                         const notExistChecklist = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'checklist').length > 0);
-                        if (notExistChecklist) {
-                            markedDates[date] = { dots: [...dots, checklistCalConfig] };
+
+                        if(notExistChecklist) {
+                            markedDates[date] = { dots: [...dots, checklistCalConfig ] };
                         }
-                        
+
                         var newItems = items;
                         if (!newItems[0][date]) {
                             newItems[0][date] = [];
@@ -117,10 +119,10 @@ const CalendarTab = ({ navigation }) => {
                         ? new Date(result.changedDate).toISOString().split("T")[0]
                         : new Date(result.scheduledDate).toISOString().split("T")[0];
                     const dots = markedDates[date]?.dots || [];
-                    
-                    const notExistCOP = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop').length > 0);
-                    if (notExistCOP) {
-                        markedDates[date] = { dots: [...dots, copCalConfig] };
+                    const notExistsCOP = dots.length === 0 || (dots.length > 0 && dots.filter(i => i.key !== 'cop').length > 0);
+
+                    if(notExistsCOP) {
+                        markedDates[date] = { dots: [...dots, copCalConfig ] };
                     }
 
                     var newItems = items;
@@ -159,16 +161,11 @@ const CalendarTab = ({ navigation }) => {
         setChecklistItems(items[0][day.dateString]);
         setCOPItems(items[1][day.dateString]);
         setDateSelected(day);
-        console.log(markedDatesProp[day.dateString]);
+        console.log(markedDatesProp[day.dateString])
         setSelectDatesProp({
             ...markedDatesProp,
-            [day.dateString]: {
-                ...markedDatesProp[day.dateString],
-                selected: true,
-                selectedColor: "#C8102E",
-            },
+            [day.dateString]: { ...markedDatesProp[day.dateString], selected: true, selectedColor: '#C8102E' }
         });
-        setIsCalendarView(false);
     };
 
     const toggleCalendarView = () => {
@@ -234,29 +231,47 @@ const CalendarTab = ({ navigation }) => {
             </ModuleHeader>
 
             <ModuleDivider />
+            
+            { isCalendarView && 
+            <View style={{ alignItems: 'center' }}>
+                <HStack >
+                    <HStack>
+                        <Icon
+                            as={Octicons}
+                            name="dot-fill"
+                            size="xs"
+                            color="green.800"
+                        />
+                        <Text fontSize={10}>Checklist</Text>
+
+                    </HStack>
+                    <HStack marginLeft={10}>
+                        <Icon
+                            as={Octicons}
+                            name="dot-fill"
+                            size="xs"
+                            color="purple.800"
+                        />
+                        <Text fontSize={10}>Change of Parts</Text>
+                    </HStack>
+
+                </HStack>
+            </View>
+            }
 
             {isReady && isCalendarView && (
                 <View>
-                    <Calendar
-                        markingType={"multi-dot"}
-                        markedDates={selectDatesProp}
-                        onDayPress={dayPress}
-                        onDayLongPress={dayPress}
+                    <Calendar 
+                        markingType={'multi-dot'} 
+                        markedDates={selectDatesProp} 
+                        onDayPress={dayPress} 
+                        onDayLongPress={dayPress} 
+                        style={{ marginTop: 5, marginBottom: 20}}
                         theme={{
-                            todayTextColor: "#C8102E",
-                            arrowColor: "#C8102E",
+                            todayTextColor: '#C8102E',
+                            arrowColor: '#C8102E',
                         }}
-                    />
-                    <HStack style={{ justifyContent: "flex-end" }}>
-                        <HStack style={{ marginHorizontal: 5 }}>
-                            <Icon as={Octicons} name="dot-fill" size="xs" color="green.800" />
-                            <Text fontSize={10}>Checklist</Text>
-                        </HStack>
-                        <HStack style={{ marginHorizontal: 5 }}>
-                            <Icon as={Octicons} name="dot-fill" size="xs" color="purple.800" />
-                            <Text fontSize={10}>Change of Parts</Text>
-                        </HStack>
-                    </HStack>
+                        />
                     <ModuleDivider />
                 </View>
             )}

@@ -10,9 +10,18 @@ const AssetLevels = ({
   onPress?: (obj: any) => void;
   navigation?: any;
 }) => {
+  const filteredData = data.filter((item) => {
+    if (
+      item.system_asset_lvl5 === null &&
+      item.system_asset_lvl5 !== undefined
+    ) {
+    } else {
+      return item;
+    }
+  });
   return (
     <>
-      {data.map((item) => (
+      {filteredData.map((item) => (
         <Button
           w="xs"
           marginY="1"

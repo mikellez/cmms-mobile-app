@@ -3,7 +3,7 @@ import { API_URL } from "@env";
 import * as RootNavigation from "./RootNavigation.js";
 
 const instance = axios.create({
-        baseURL: `http://10.0.2.2:3001`
+        baseURL: `http://192.168.20.93:3001`
 });
 
 // Add an interceptor to catch errors
@@ -15,18 +15,20 @@ instance.interceptors.response.use(
     console.log(error);
     if (!error.response) {
       // Network error, redirect to login
+      alert('There seems to be something wrong with network. Please connect to VPN or try again later.');
       RootNavigation.navigate("Login");
-      return Promise.reject(error);
+      //return Promise.reject(error);
     }
 
-    const { status } = error.response;
+    const { status } = error?.response;
 
-    if (status === 401 || status === 403) {
+    if (status && (status === 401 || status === 403)) {
       // Authentication error, redirect to login
+      alert('There seems to be something wrong with authentication. Please connect try again later.');
       RootNavigation.navigate("Login");
     }
 
-    return Promise.reject(error);
+    //return Promise.reject(error);
   }
 );
 

@@ -21,8 +21,9 @@ const QRScanIndex = ({ route, navigation }) => {
   const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    const plant = parseInt(data.split("/")[3]);
-    const asset = parseInt(data.split("/")[4]);
+    const splitData = data.split("/");
+    const plant = parseInt(splitData[(splitData.length-2)]);
+    const asset = parseInt(splitData[(splitData.length-1)]);
 
     /*await instance.post(`/api/login`, {username: 'admin', password: '123Az!!!'})
     .catch((err) => {

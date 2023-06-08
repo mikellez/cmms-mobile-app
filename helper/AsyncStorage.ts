@@ -15,21 +15,6 @@ const _storeData = async (key, value) => {
   } 
 }
 
-const _addToDataArray = async(key, value) => {
-  try {
-    console.log("AsyncStorage storing");
-    let arr = await AsyncStorage.getItem("@" + key);
-    const parsedArr = arr == null ? [] : JSON.parse(arr);
-    parsedArr.push(value);
-    arr = JSON.stringify(parsedArr);
-    await AsyncStorage.setItem("@" + key, arr);
-  } catch (err) {
-    // Error saving data
-    console.log(err);
-    console.log('Unable to update data array');
-  }
-}
-
 const _retrieveData = async (key) => {
   try {
     return await AsyncStorage.getItem('@'+key);
@@ -53,7 +38,6 @@ const _clear = () => {
 
 export {
   _storeData,
-  _addToDataArray,
   _retrieveData,
   _clear
 }

@@ -92,8 +92,6 @@ const FormGroup = ({
     fetchRequest();
   }, []);
 
-  console.log(reqItems)
-
   const data = [
     {
       id: 0,

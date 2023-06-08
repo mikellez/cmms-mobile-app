@@ -18,7 +18,6 @@ import {
   Image, 
   Pressable} from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
-import RNFetchBlob from 'rn-fetch-blob';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -144,6 +143,7 @@ const RequestContainer = ({
     if(type === 'guest' && user?.id) {
       formData.append("user_id", user.id);
       formData.append("role_id", user.role_id);
+      formData.append("role_name", user.role_name);
     } else if(type === 'guest') {
       formData.append("name", formState.name);
     }
@@ -500,7 +500,6 @@ const RequestContainer = ({
     fetchUser();
 
     const subscribe = subscribeToConnectionChanges(setIsConnected);
-    console.log(isConnected);
 
     const fetchData = async () => {
       try {
