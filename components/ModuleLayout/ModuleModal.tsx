@@ -39,6 +39,7 @@ enum ModalIcons {
   Success = "checkcircleo",
   Offline = "wifi-off",
   Exit = "logout",
+  History = "HistoryOutlined",
 }
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
