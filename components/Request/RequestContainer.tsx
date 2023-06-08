@@ -500,6 +500,7 @@ const RequestContainer = ({
     fetchUser();
 
     const subscribe = subscribeToConnectionChanges(setIsConnected);
+    console.log(isConnected);
 
     const fetchData = async () => {
       try {

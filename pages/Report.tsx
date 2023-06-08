@@ -13,13 +13,16 @@ import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
 import Constants from 'expo-constants';
 import { useIsFocused } from '@react-navigation/native';
+import { Table, Rows } from "react-native-table-component";
 
 import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
-import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen } from "../components/ModuleLayout";
+import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen, ModuleSimpleModal } from "../components/ModuleLayout";
 import App from "./App";
 import { _retrieveData } from "../helper/AsyncStorage";
 import { CMMSUser, CMMSRequest } from "../types/interfaces";
+import { Role } from "../types/enums";
+import { set } from "react-native-reanimated";
 
 const requestlistViews: ModuleActionSheetItem[] = [
   {
@@ -41,6 +44,7 @@ const requestlistViews: ModuleActionSheetItem[] = [
 ];
 
 const ReportScreen = ({ navigation }) => {
+
   const isFocused = useIsFocused();
 
   const [user, setUser] = useState<CMMSUser>({
@@ -57,6 +61,19 @@ const ReportScreen = ({ navigation }) => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
+  const [showDropdown, setShowDropdown] = useState<boolean>(true);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [historyData, setHistoryData] = useState([]);
+
+  useEffect(() => {
+    fetchUser();
+    const { role_id } = user;
+
+    if(role_id === Role.Specialist) {
+      setViewType("assigned");
+      setShowDropdown(false);
+    }
+  }, [user.role_id]);
 
   const fetchRequest = async (viewType) => {
 
@@ -66,6 +83,7 @@ const ReportScreen = ({ navigation }) => {
       return response.data.rows;
     } catch (e) {
       console.log(e)
+      console.log('Unable to fetch requests')
     }
     
   };
@@ -88,6 +106,24 @@ const ReportScreen = ({ navigation }) => {
       setSections([])
     }
   }, [isFocused, viewType]);
+
+  const showHistoryDetail = (data) => {
+    const historyData = [];
+    for(let i = 0; i < data.length; i++){
+      historyData.push(["No: ", i+1]);
+      historyData.push(["Status: ", data[i].activity_type]);
+      historyData.push(["Action: ", data[i].activity]);
+      historyData.push(["Date: ", data[i].date]);
+      historyData.push(["Role: ", data[i].role]);
+      historyData.push(["Name: ", data[i].name]);
+      historyData.push(["", ""]);
+    }
+
+    console.log(historyData);
+
+    setHistoryData(historyData);
+    setShowHistory(true);
+  }
 
 
   const [state, setState] = useState({
@@ -190,6 +226,7 @@ const ReportScreen = ({ navigation }) => {
                     ['ASSIGNED'].includes(item.status) &&
                     <IconButton icon={<Icon size="lg" as={AntDesign} name="check" color="#C8102E" />} onPress={()=>navigation.navigate("CompleteRequest", { id: item.request_id })}/>
                   }
+                  <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="history" color="#C8102E" />} onPress={()=>showHistoryDetail(item.activity_log)}/>
               </HStack>
 
             </VStack>
@@ -198,6 +235,8 @@ const ReportScreen = ({ navigation }) => {
       </Animatable.View>
     );
   }
+
+  const widthArr = [120, 150];
 
   return (
     <ModuleScreen navigation={navigation}>
@@ -208,11 +247,11 @@ const ReportScreen = ({ navigation }) => {
         </HStack>
       </ModuleHeader>
 
-      <ModuleActionSheet 
+      {showDropdown && <ModuleActionSheet 
           items={requestlistViews}
           value={viewType}
           setValue={setViewType}
-      />
+      />}
 
       <Box backgroundColor="#F9F7F7" px="1" py="1" marginTop="10" marginBottom="10" rounded="md" _text={{ fontSize: 'md', fontWeight: 'medium', textAlign: 'center' }} borderWidth={1} borderStyle={'dashed'} borderColor='#C8102E'>
         <Center>
@@ -240,6 +279,18 @@ const ReportScreen = ({ navigation }) => {
           renderAsFlatList={true}
         />
       }
+      <ModuleSimpleModal
+        title="History"
+        isOpen={showHistory}
+        setOpen={setShowHistory} text={""}      >
+          <Table >
+              <Rows
+                  data={historyData}
+                  widthArr={widthArr}
+                  style={{ paddingTop: 5, paddingBottom: 5, borderTopColor: "#ffff", borderTopWidth: 1,  }}
+              ></Rows>
+          </Table>
+      </ModuleSimpleModal>
 
       {/*<HStack px="5" py="5" w="100%" justifyContent="space-between">
         <HStack>
