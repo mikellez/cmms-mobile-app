@@ -13,14 +13,43 @@ import {
   ModuleSimpleModal,
   ModalIcons,
 } from "../components/ModuleLayout";
+import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import {
+  ModuleHeader,
+  ModuleScreen,
+  ModuleActionSheet,
+  ModuleActionSheetItem,
+  ModuleDivider,
+  ModuleFullPageModal,
+  ModuleSimpleModal,
+  ModalIcons,
+} from "../components/ModuleLayout";
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
-import { CMMSChecklist } from "../types/interfaces";
+import { CMMSChecklist, CMMSUser } from "../types/interfaces";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { _retrieveData, _clear } from "../helper/AsyncStorage";
 import { checkConnection } from "../helper/NetInfo";
+import { Role } from "../types/enums";
 
 const checklistViews: ModuleActionSheetItem[] = [
+  {
+    label: "Assigned",
+    value: "assigned",
+  },
+  {
+    label: "Pending",
+    value: "pending",
+  },
+  {
+    label: "For Review",
+    value: "record",
+  },
+  {
+    label: "Approved",
+    value: "approved",
+  },
   {
     label: "Assigned",
     value: "assigned",
@@ -84,6 +113,33 @@ const Maintenance = ({ navigation, route }) => {
           await AsyncStorage.removeItem("@checklist");
           console.log("Cached checklists sent");
           setSendCached(true);
+          const [showDropdown, setShowDropdown] = useState<boolean>(true);
+
+          const [user, setUser] = useState<CMMSUser>({
+            id: 0,
+            role_id: 0,
+            role_name: "",
+            name: "",
+            email: "",
+            fname: "",
+            lname: "",
+            username: "",
+          });
+
+          const fetchUser = async () => {
+            const user = await _retrieveData("user");
+            setUser(JSON.parse(user));
+          };
+
+          useEffect(() => {
+            fetchUser();
+            const { role_id } = user;
+
+            if (role_id === Role.Specialist) {
+              setViewType("assigned");
+              setShowDropdown(false);
+            }
+          }, []);
         }
       }
     }
@@ -96,7 +152,26 @@ const Maintenance = ({ navigation, route }) => {
       else setChecklists([]);
     });
   }, [viewType, navigation]);
+  useEffect(() => {
+    sendCachedChecklist();
+    fetchChecklist(viewType).then((result) => {
+      if (result) setChecklists(result);
+      else setChecklists([]);
+    });
+  }, [viewType, navigation]);
 
+  const checklistElements =
+    checklists.length > 0 ? (
+      <FlatList
+        data={checklists}
+        keyExtractor={(cl) => cl.checklist_id.toString()}
+        renderItem={({ item }) => (
+          <ListBox checklist={item} navigation={navigation} />
+        )}
+      />
+    ) : (
+      <Text>No Checklist Found</Text>
+    );
   const checklistElements =
     checklists.length > 0 ? (
       <FlatList
@@ -132,6 +207,13 @@ const Maintenance = ({ navigation, route }) => {
           setValue={setViewType}
         />
       )}
+      {showDropdown && (
+        <ModuleActionSheet
+          items={checklistViews}
+          value={viewType}
+          setValue={setViewType}
+        />
+      )}
 
       <ModuleDivider />
 
@@ -143,7 +225,7 @@ const Maintenance = ({ navigation, route }) => {
         setOpen={setSendCached}
         title="Cached Checklists have been sent"
         text="Checklists that were not sent previously due to network errors have been submitted"
-        icon={ModalIcons.Success}
+        icon={"Success"}
       ></ModuleSimpleModal>
     </ModuleScreen>
   );
