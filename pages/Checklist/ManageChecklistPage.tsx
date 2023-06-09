@@ -1,9 +1,23 @@
 import React, { useEffect, useState, createContext } from "react";
-import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
+import {
+  ModuleScreen,
+  ModuleHeader,
+  ModuleSimpleModal,
+} from "../../components/ModuleLayout";
 import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistTemplate from "../../components/Checklist/ChecklistTemplate";
-import { Icon, VStack, Text, Center, TextArea, FormControl, Button, HStack, Modal } from "native-base";
+import {
+  Icon,
+  VStack,
+  Text,
+  Center,
+  TextArea,
+  FormControl,
+  Button,
+  HStack,
+  Modal,
+} from "native-base";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
@@ -12,129 +26,147 @@ import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableF
 import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 import { Action } from "../../types/enums";
 
-const manageChecklist = async (url: "approve" | "reject", checklistId: number, remarks?: string) => {
-    try {
-        await instance.patch(`/api/checklist/${url}/${checklistId}`, { remarks });
-    }
-    catch (err) {
-        console.log(err);
-    }
+const manageChecklist = async (
+  url: "approve" | "reject",
+  checklistId: number,
+  remarks?: string
+) => {
+  try {
+    await instance.patch(`/api/checklist/${url}/${checklistId}`, { remarks });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const ManageChecklistPage = ({navigation, route}) => {
-    const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
-    const [sections, setSections] = useState<ChecklistSection[]>([]);
-    const [managerComments, setManagerComments] = useState<string>("");
-    const [warningModal, setWarningModal] = useState<boolean>(false);
-    const [approveModal, setApproveModal] = useState<boolean>(false);
-    const [rejectModal, setRejectModal] = useState<boolean>(false);
-    
-    useEffect(() => {
-        console.log(route.params)
-        if (route.params) {
-            setChecklist(route.params);
-        }
-    }, [route.params])
+const ManageChecklistPage = ({ navigation, route }) => {
+  const [checklist, setChecklist] = useState<CMMSChecklist>(
+    {} as CMMSChecklist
+  );
+  const [sections, setSections] = useState<ChecklistSection[]>([]);
+  const [managerComments, setManagerComments] = useState<string>("");
+  const [warningModal, setWarningModal] = useState<boolean>(false);
+  const [approveModal, setApproveModal] = useState<boolean>(false);
+  const [rejectModal, setRejectModal] = useState<boolean>(false);
 
-    useEffect(() => {
-        // console.log(JSON.parse(checklist.datajson));
-        if (checklist && checklist.datajson) {
-            setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)));
-        }
-    }, [checklist])
-
-    const handleButtonPress = (action: Action) => {
-        if (action === Action.Approve) {
-            approveChecklist();
-        } else if (action === Action.Reject) {
-            rejectChecklist();
-        }
+  useEffect(() => {
+    console.log(route.params);
+    if (route.params) {
+      setChecklist(route.params);
     }
+  }, [route.params]);
 
-    const approveChecklist = () => {
-        manageChecklist("approve", checklist.checklist_id)
-        setApproveModal(true);
-        leavePage();
-    };
+  useEffect(() => {
+    // console.log(JSON.parse(checklist.datajson));
+    if (checklist && checklist.datajson) {
+      setSections(
+        checklist.datajson.map((section) => ChecklistSection.fromJSON(section))
+      );
+    }
+  }, [checklist]);
 
-    const rejectChecklist = () => {
-        if (managerComments.trim().length === 0) {
-            setWarningModal(true);
-            return;
-        } 
-        setRejectModal(true);
-        manageChecklist("reject", checklist.checklist_id, managerComments);
-        leavePage();
-    };
+  const handleButtonPress = (action: Action) => {
+    if (action === Action.Approve) {
+      approveChecklist();
+    } else if (action === Action.Reject) {
+      rejectChecklist();
+    }
+  };
 
-    const leavePage = () => {
-        setTimeout(() => {
-            navigation.navigate("Maintenance");
-        }, 1000);
-    };
+  const approveChecklist = () => {
+    manageChecklist("approve", checklist.checklist_id);
+    setApproveModal(true);
+    leavePage();
+  };
 
-    const header = <Center>
-        <ChecklistDetails checklist={route.params}></ChecklistDetails>
+  const rejectChecklist = () => {
+    if (managerComments.trim().length === 0) {
+      setWarningModal(true);
+      return;
+    }
+    setRejectModal(true);
+    manageChecklist("reject", checklist.checklist_id, managerComments);
+    leavePage();
+  };
+
+  const leavePage = () => {
+    setTimeout(() => {
+      navigation.navigate("Maintenance");
+    }, 1000);
+  };
+
+  const header = (
+    <Center>
+      <ChecklistDetails checklist={route.params}></ChecklistDetails>
     </Center>
+  );
 
-    const footer = <VStack space={2}>
-        <FormControl.Label>Manager's Comments</FormControl.Label>
-        <TextArea 
-            autoCompleteType={true} 
-            value={managerComments}
-            onChangeText={text => setManagerComments(text)}
-        />
-        
-        <HStack width="full">
-            <Button 
-                width="45%" 
-                backgroundColor="#E64848"
-                onPress={(e) => handleButtonPress(Action.Reject)}
-            >Reject</Button>
+  const footer = (
+    <VStack space={2}>
+      <FormControl.Label>Manager's Comments</FormControl.Label>
+      <TextArea
+        autoCompleteType={true}
+        value={managerComments}
+        onChangeText={(text) => setManagerComments(text)}
+      />
 
-            <Button 
-                width="45%" 
-                marginLeft="auto" 
-                backgroundColor="#36AE7C"
-                onPress={(e) => handleButtonPress(Action.Approve)}
-            >Approve</Button>
-        </HStack>
+      <HStack width="full">
+        <Button
+          width="45%"
+          backgroundColor="#E64848"
+          onPress={(e) => handleButtonPress(Action.Reject)}
+        >
+          Reject
+        </Button>
+
+        <Button
+          width="45%"
+          marginLeft="auto"
+          backgroundColor="#36AE7C"
+          onPress={(e) => handleButtonPress(Action.Approve)}
+        >
+          Approve
+        </Button>
+      </HStack>
     </VStack>
+  );
 
-    return (
-        <ModuleScreen navigation={navigation}>
-            <ChecklistHeader navigation={navigation} header={"Manage Checklist"}/>
-                
-            <ChecklistEditableProvider sections={sections} setSections={setSections} isDisabled>
-                <ChecklistEditableForm header={header} footer={footer}/>
-            </ChecklistEditableProvider>
+  return (
+    <ModuleScreen navigation={navigation}>
+      <ChecklistHeader navigation={navigation} header={"Manage Checklist"} />
 
-            <ModuleSimpleModal
-                isOpen={warningModal}
-                setOpen={setWarningModal}
-                title="Missing Comments"
-                text="Please provide comments for rejection."
-                icon={ModalIcons.Warning}
-            />
+      <ChecklistEditableProvider
+        sections={sections}
+        setSections={setSections}
+        isDisabled
+      >
+        <ChecklistEditableForm header={header} footer={footer} />
+      </ChecklistEditableProvider>
 
-            <ModuleSimpleModal
-                isOpen={approveModal}
-                setOpen={setApproveModal}
-                title="Done"
-                text="Checklist has been approved."
-                icon={ModalIcons.Success}
-            />
+      <ModuleSimpleModal
+        isOpen={warningModal}
+        setOpen={setWarningModal}
+        title="Missing Comments"
+        text="Please provide comments for rejection."
+        icon={"Warning"}
+      />
 
-            <ModuleSimpleModal
-                isOpen={rejectModal}
-                setOpen={setRejectModal}
-                title="Done"
-                text="Checklist has been rejected."
-                icon={ModalIcons.Success}
-            />
+      <ModuleSimpleModal
+        isOpen={approveModal}
+        setOpen={setApproveModal}
+        title="Done"
+        text="Checklist has been approved."
+        icon={"Success"}
+      />
 
-        </ModuleScreen>
-    );
+      <ModuleSimpleModal
+        isOpen={rejectModal}
+        setOpen={setRejectModal}
+        title="Done"
+        text="Checklist has been rejected."
+        icon={"Success"}
+      />
+    </ModuleScreen>
+  );
 };
 
 export default ManageChecklistPage;
