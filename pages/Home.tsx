@@ -1,7 +1,6 @@
 import React, { Component, useEffect, useState } from "react";
 import {
   Switch,
-  ScrollView,
   StyleSheet,
   Text,
   View,
