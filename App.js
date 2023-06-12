@@ -18,7 +18,7 @@ import GuestCreateRequest from "./pages/Request/GuestCreate";
 import Calendar from "./pages/Calendar";
 import AssignRequest from "./pages/Request/Assign";
 import ManageRequest from "./pages/Request/Manage";
-import OfflineRequest from "./pages/Request/Offline";
+import OfflineRequest from "./pages/Request/OfflineRequest";
 import CorrectiveRequest from "./pages/Request/Corrective";
 import QRScan from "./pages/QRScan/index";
 import Maintenance from "./pages/Maintenance";

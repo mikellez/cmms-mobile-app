@@ -24,6 +24,7 @@ import { CMMSUser, CMMSRequest, CMMSOffline } from "../types/interfaces";
 import { Role } from "../types/enums";
 import { set } from "react-native-reanimated";
 import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const requestlistViews: ModuleActionSheetItem[] = [
   {
@@ -47,28 +48,16 @@ const requestlistViews: ModuleActionSheetItem[] = [
 const ReportScreen = ({ navigation }) => {
 
   const isFocused = useIsFocused();
-
-  const [user, setUser] = useState<CMMSUser>({
-    id: 0,
-    role_id: 0,
-    role_name: "",
-    name: "",
-    email: "",
-    fname: "",
-    lname: "",
-    username: ""
-  });
-
   const [isReady, setIsReady] = useState<boolean>(false);
   const [requestItems, setRequestItems] = useState([]);
   const [viewType, setViewType] = useState<string>(requestlistViews[0].value as string);
   const [showDropdown, setShowDropdown] = useState<boolean>(true);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyData, setHistoryData] = useState([]);
-  const isOffline = useSelector<CMMSOffline, boolean>((state) => state.offline);
+  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
+  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
 
   useEffect(() => {
-    fetchUser();
     const { role_id } = user;
 
     if(isOffline) {
@@ -95,16 +84,10 @@ const ReportScreen = ({ navigation }) => {
     
   };
 
-  const fetchUser = async () => {
-    const user = await _retrieveData('user');
-    setUser(JSON.parse(user));
-  }
-
   useEffect(() => {
     setIsReady(false);
 
     if(isFocused && !isOffline) {
-      fetchUser();
 
       fetchRequest(viewType)
       .then((res)=> setRequestItems(res))

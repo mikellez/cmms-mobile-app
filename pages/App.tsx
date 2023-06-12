@@ -4,7 +4,7 @@ import Footer from "./Footer";
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useState } from "react";
 import { subscribeToConnectionChanges } from "../helper/NetInfo";
-import Offline from "../components/Offline";
+import OfflineHandling from "../components/OfflineHandling";
 import { setOfflineMode } from "../redux/features/offlineSlice";
 import { useDispatch } from "react-redux";
 
@@ -15,10 +15,10 @@ const App = ({ children, navigation, layout }) => {
   return (
     <NativeBaseProvider>
       <Flex flex={1} justifyContent="space-between" backgroundColor={"white"} paddingTop={insets.top}>
+        <OfflineHandling navigation={navigation}/>
         {!(layout && layout === 'empty')
         ? ( 
           <>
-            <Offline/>
             <Header navigation={navigation}/> 
             {children} 
             <Footer navigation={navigation}/>

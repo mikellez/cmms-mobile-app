@@ -19,6 +19,7 @@ import { Center } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
 import { useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const HomeScreen = ({ navigation }) => {
 
@@ -104,27 +105,12 @@ const HomeScreen = ({ navigation }) => {
   }>({ totalPendingChecklist: 0, totalOutstandingChecklist: 0, totalClosedChecklist: 0 });
   const [checklistData, setChecklistData] = useState<CMMSDashboardData[]>();
   const [requestData, setRequestData] = useState<CMMSDashboardData[]>([]);
-  const [user, setUser] = useState<CMMSUser>({
-    id: 0,
-    role_id: 0,
-    role_name: "",
-    name: "",
-    email: "",
-    fname: "",
-    lname: "",
-    username: ""
-  });
   const [loadUser, setLoadUser] = useState<boolean>(false);
   const [viewType, setViewType] = useState<string>(dashboardViews[0].value as string);
   const [total, setTotal] = useState<number>(0);
+  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
 
   const isFocused = useIsFocused();
-
-  const fetchUser = async () => {
-    const user = await _retrieveData('user');
-    setUser(JSON.parse(user));
-    setLoadUser(true);
-  }
 
  const fetchRequests = async () => {
     const { datetype, date } = pickerwithtype; 
@@ -186,11 +172,11 @@ const HomeScreen = ({ navigation }) => {
   }
 
   useEffect(() => {
-    fetchUser();
 
-    if(loadUser && isFocused) {
+    if(isFocused) {
       const { datetype, date } = pickerwithtype;
       const { role_id } = user;
+      alert(role_id)
 
       setIsReady(false);
 
@@ -206,7 +192,7 @@ const HomeScreen = ({ navigation }) => {
       }
     }
 
-  }, [loadUser, isFocused])
+  }, [isFocused])
 
   useEffect(() => {
 

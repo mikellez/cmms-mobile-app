@@ -6,6 +6,7 @@ import { Text } from "react-native";
 import { Center, Icon, VStack } from "native-base";
 import { useRoute } from '@react-navigation/native';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { RootState } from "../redux/store";
 
 
 /*const dispatch = useDispatch();
@@ -19,7 +20,7 @@ useEffect(() => {
 
 const Wrapper = ({ children, layout }) => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const isOffline = useSelector((state) => state.offline);
+  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
   const route = useRoute();
   const offlineLayout = ['Home', 'Asset', 'Calendar'].includes(route.name);
 

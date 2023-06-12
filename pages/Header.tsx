@@ -47,11 +47,11 @@ const Header = ({ navigation }) => {
         borderBottomWidth={2}
       >
         <HStack alignItems="center">
-          <IconButton
+          {/*<IconButton
             icon={
               <Icon size="lg" as={MaterialIcons} name="menu" color="#C8102E" />
             }
-          />
+          />*/}
         </HStack>
         <HStack alignItems="center">
           <Image

@@ -14,6 +14,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { _storeData, _retrieveData } from '../helper/AsyncStorage';
 import instance from '../axios.config';
 import { API_URL } from '@env';
+import { login, logout } from '../redux/features/userSlice';
+import { useDispatch } from 'react-redux';
 
 const Login = ({ navigation }) => {
   const [errorSubmitting, setErrorSubmitting] = useState<string>("");
@@ -26,6 +28,8 @@ const Login = ({ navigation }) => {
   const [faultTypes, setFaultTypes] = useState([]);
   const [plants, setPlants] = useState([]);
   const [assets, setAssets] = useState([]);
+
+  const dispatch = useDispatch();
 
   const fetchFaultTypes = async () => {
     if(isConnected) {
@@ -148,7 +152,8 @@ const Login = ({ navigation }) => {
       await instance.get(`/api/user`)
       .then(async (res)=>{
         setIsError(false);
-        await setData('@user', JSON.stringify(res.data));
+        dispatch(login(res.data));
+        await _storeData('user', JSON.stringify(res.data));
         navigation.navigate('Home');
       })
     })
@@ -173,7 +178,9 @@ const Login = ({ navigation }) => {
 
   const handleLogout = async () => {
     await instance.post(`/api/logout`)
-    .then((res)=> {
+    .then(async (res)=> {
+      dispatch(logout());
+      await _storeData('user', "");
       alert('logout');
     })
 
