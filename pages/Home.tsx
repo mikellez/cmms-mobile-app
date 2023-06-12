@@ -37,7 +37,7 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchData = async (
     type: string,
-    plant: number,
+    plant: number | string,
     field: string,
     datetype: string,
     date: string
