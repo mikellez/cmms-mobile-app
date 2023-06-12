@@ -16,7 +16,9 @@ import {
   VStack, 
   WarningOutlineIcon,
   Image, 
-  Pressable} from 'native-base';
+  Pressable,
+  Alert,
+  Box} from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import mime from "mime";
 import ImagePreview from '../../components/ImagePreview';
@@ -141,8 +143,8 @@ const RequestContainer = ({
   const createRequest = async () => {
     const formData = new FormData();
     if(type === 'guest' && user?.id) {
-      formData.append("user_id", user.id);
-      formData.append("role_id", user.role_id);
+      formData.append("user_id", user.id.toString());
+      formData.append("role_id", user.role_id.toString());
       formData.append("role_name", user.role_name);
     } else if(type === 'guest') {
       formData.append("name", formState.name);
@@ -552,7 +554,28 @@ const RequestContainer = ({
 
 
     <>
-      { !isConnected && <Text>Offline</Text> }
+      { !isConnected &&
+        <Alert w="100%" status="danger">
+          <VStack space={1} flexShrink={1} w="100%" alignItems="center">
+            <Alert.Icon size="md" />
+            <Text fontSize="md" fontWeight="medium" _dark={{
+            color: "coolGray.800"
+          }}>
+              You are now in offline mode
+            </Text>
+
+            <Box _text={{
+            textAlign: "center"
+          }} _dark={{
+            _text: {
+              color: "coolGray.600"
+            }
+          }}>
+              You can still submit your requests by clicking the submit button below.
+            </Box>
+          </VStack>
+        </Alert>
+        }
 
       <FormGroup
         action={action}

@@ -8,6 +8,7 @@ import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
 import { CMMSChecklist } from "../types/interfaces";
 import { useIsFocused } from '@react-navigation/native';
+import { useSelector } from "react-redux";
 
 const checklistViews: ModuleActionSheetItem[] = [
     {
@@ -43,10 +44,11 @@ const Maintenance = ({ navigation, route }) => {
     const [viewType, setViewType] = useState<string>(checklistViews[0].value as string);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const isFocused = useIsFocused();
+    const isOffline = useSelector(state => state.offline);
 
     useEffect(() => {
         setIsLoading(true);
-        if(isFocused) {
+        if(isFocused && !isOffline) {
             fetchChecklist(viewType)
                 .then(result => {
                     if (result) setChecklists(result);

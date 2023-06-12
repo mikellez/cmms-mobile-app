@@ -151,6 +151,8 @@ interface CMMSRequest {
   completion_file?: any;
   rejection_comments: string;
   total?: number;
+  image?: string;
+  completion_comments?: string;
 }
 
 interface CMMSRequestTypes {

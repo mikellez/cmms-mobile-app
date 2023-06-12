@@ -249,7 +249,7 @@ const FormGroup = ({
       label: "Completion Comment",
       name: "completionComment",
       placeholder: "Completion Comment",
-      defaultValue: reqItems?.completion_comment || '',
+      defaultValue: reqItems?.completion_comments || '',
       onChangeText: onCompletionCommentChange,
       isDisabled: action === "manage",
       isReadOnly: action === "manage",

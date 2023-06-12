@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { FlatGrid, SectionGrid } from 'react-native-super-grid';
 import { PieChart } from "react-native-charts-kit";
-//import { PieChart } from "react-native-gifted-charts";
 
 import instance from "../axios.config";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleScreen } from "../components/ModuleLayout";
@@ -20,8 +19,10 @@ import { set } from "react-native-reanimated";
 import { Center } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
 import { useIsFocused } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const HomeScreen = ({ navigation }) => {
+
   const items = [
     { name: 'Pending ', code: '#c21010', total: 0 },
     { name: 'Outstanding ', code: 'purple', total: 0 },

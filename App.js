@@ -25,6 +25,8 @@ import Maintenance from "./pages/Maintenance";
 import CompleteRequest from "./pages/Request/Complete";
 import Assets from "./pages/Assets/index";
 import Details from "./pages/Assets/Details";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,33 +36,35 @@ export default function App() {
       {/*<View style={styles.container}>
         <Login/>
       </View>*/}
-      <Stack.Navigator
-        initialRouteName="LoginScreen"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Report" component={Report} />
-        <Stack.Screen name="ViewRequest" component={ViewRequest} />
-        <Stack.Screen name="CreateRequest" component={CreateRequest} />
-        <Stack.Screen name="CorrectiveRequest" component={CorrectiveRequest} />
-        <Stack.Screen name="Calendar" component={Calendar} />
-        
-        <Stack.Screen name="AssignRequest" component={AssignRequest} />
-        <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
-        <Stack.Screen name="ManageRequest" component={ManageRequest} />
-        <Stack.Screen name="QRScan" component={QRScan} />
-        <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
-        <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
-        <Stack.Screen name="Maintenance" component={Maintenance} />
-        <Stack.Screen name="CreateChecklistFormPage" component={CreateChecklistFormPage} />
-        <Stack.Screen name="ChecklistTemplatesPage" component={ChecklistTemplatesPage} />
-        <Stack.Screen name="ManageChecklistPage" component={ManageChecklistPage} />
-        <Stack.Screen name="CompleteChecklistPage" component={CompleteChecklistPage} />
-        <Stack.Screen name="ViewChecklistPage" component={ViewChecklistPage} />
-        <Stack.Screen name="ViewAsset" component={Assets} />
-        <Stack.Screen name="AssetDetails" component={Details} />
-      </Stack.Navigator>
+      <Provider store={store}>
+        <Stack.Navigator
+          initialRouteName="LoginScreen"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Report" component={Report} />
+          <Stack.Screen name="ViewRequest" component={ViewRequest} />
+          <Stack.Screen name="CreateRequest" component={CreateRequest} />
+          <Stack.Screen name="CorrectiveRequest" component={CorrectiveRequest} />
+          <Stack.Screen name="Calendar" component={Calendar} />
+          
+          <Stack.Screen name="AssignRequest" component={AssignRequest} />
+          <Stack.Screen name="CompleteRequest" component={CompleteRequest} />
+          <Stack.Screen name="ManageRequest" component={ManageRequest} />
+          <Stack.Screen name="QRScan" component={QRScan} />
+          <Stack.Screen name="GuestCreateRequest" component={GuestCreateRequest} />
+          <Stack.Screen name="OfflineRequest" component={OfflineRequest} />
+          <Stack.Screen name="Maintenance" component={Maintenance} />
+          <Stack.Screen name="CreateChecklistFormPage" component={CreateChecklistFormPage} />
+          <Stack.Screen name="ChecklistTemplatesPage" component={ChecklistTemplatesPage} />
+          <Stack.Screen name="ManageChecklistPage" component={ManageChecklistPage} />
+          <Stack.Screen name="CompleteChecklistPage" component={CompleteChecklistPage} />
+          <Stack.Screen name="ViewChecklistPage" component={ViewChecklistPage} />
+          <Stack.Screen name="ViewAsset" component={Assets} />
+          <Stack.Screen name="AssetDetails" component={Details} />
+        </Stack.Navigator>
+      </Provider>
     </NavigationContainer>
   );
 }

@@ -1,4 +1,4 @@
-import { Alert, Box, Center, CloseIcon, HStack, Heading, IconButton, NativeBaseProvider, VStack, Text, Pressable, Icon, FlatList } from 'native-base';
+import { Alert, Box, Center, CloseIcon, HStack, Heading, IconButton, NativeBaseProvider, VStack, Text, Pressable, Icon, FlatList, Button } from 'native-base';
 import { useEffect, useState } from 'react';
 import { checkConnection, subscribeToConnectionChanges} from '../../helper/NetInfo';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
@@ -165,14 +165,19 @@ const OfflineRequest = ({ route, navigation }) => {
                 </ModuleCardContainer>
               )}
               ListFooterComponent={() => (
-                <Pressable py="20" flex={1} onPress={()=>navigation.navigate("QRScan")}>
-                  <Center>
-                    <Icon mb="1" as={<MaterialCommunityIcons name="qrcode-scan" />} color="#C8102E" size="2xl" />
-                  </Center>
-                  <Center>
-                    <Text>QR Scan</Text>
-                  </Center>
-                </Pressable>
+                <VStack>
+                  <Button marginTop="5" padding={2} bg="#C8102E" size="xs" onPress={()=>navigation.goBack()}>
+                    Back
+                  </Button>
+                  <Pressable py="10" mb="10" flex={1} onPress={()=>navigation.navigate("QRScan")}>
+                    <Center>
+                      <Icon mb="1" as={<MaterialCommunityIcons name="qrcode-scan" />} color="#C8102E" size="2xl" />
+                    </Center>
+                    <Center>
+                      <Text>QR Scan</Text>
+                    </Center>
+                  </Pressable>
+                </VStack>
               )}
 
             />
