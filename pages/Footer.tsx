@@ -2,9 +2,10 @@ import { Center, HStack, Icon, Text, Pressable } from "native-base";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelector } from "react-redux";
+import { CMMSOffline } from "../types/interfaces";
 
 const Footer = ({ navigation }) => {
-    const isOffline = useSelector((state) => state.offline);
+    const isOffline = useSelector<CMMSOffline, boolean>((state) => state.offline);
 
     return (
         <HStack bg="#D9D9D9" alignItems="center" safeAreaBottom shadow={6}>

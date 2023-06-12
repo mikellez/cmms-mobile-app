@@ -20,7 +20,7 @@ import ListBox from "../components/Request/ListBox";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen, ModuleSimpleModal } from "../components/ModuleLayout";
 import App from "./App";
 import { _retrieveData } from "../helper/AsyncStorage";
-import { CMMSUser, CMMSRequest } from "../types/interfaces";
+import { CMMSUser, CMMSRequest, CMMSOffline } from "../types/interfaces";
 import { Role } from "../types/enums";
 import { set } from "react-native-reanimated";
 import { useSelector } from "react-redux";
@@ -65,7 +65,7 @@ const ReportScreen = ({ navigation }) => {
   const [showDropdown, setShowDropdown] = useState<boolean>(true);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [historyData, setHistoryData] = useState([]);
-  const isOffline = useSelector(state => state.offline);
+  const isOffline = useSelector<CMMSOffline, boolean>((state) => state.offline);
 
   useEffect(() => {
     fetchUser();

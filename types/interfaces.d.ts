@@ -399,6 +399,10 @@ interface CMMSChangePassword {
     id: number
 }
 
+interface CMMSOffline {
+  offline: boolean;
+}
+
 export {
   CMMSBaseType,
   CMMSUser,
@@ -434,5 +438,6 @@ export {
   CMMSEvent,
   CMMSUserSettings,
   CMMSUserInfo,
-  CMMSChangePassword
+  CMMSChangePassword,
+  CMMSOffline
 };

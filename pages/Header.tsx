@@ -9,12 +9,13 @@ import instance from "../axios.config";
 import { navigationRef } from "../RootNavigation";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import { CMMSOffline } from "../types/interfaces";
 
 const Header = ({ navigation }) => {
   //console.log(DeviceInfo.getDeviceId())
   //console.log(DeviceInfo.getDeviceId())
   const [modalVisible, setModalVisible] = useState(false);
-  const isOffline = useSelector((state) => state.offline);
+  const isOffline = useSelector<CMMSOffline, boolean>((state) => state.offline);
 
   const onPress = async () => {
     await instance.post(`/api/logout`)
