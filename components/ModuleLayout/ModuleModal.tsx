@@ -16,6 +16,7 @@ interface ModuleModalProps extends React.PropsWithChildren {
   title?: string;
   isOpen: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  hideCloseButton?: boolean;
 }
 interface ModuleSimpleModalProps extends ModuleModalProps {
   text?: string;
@@ -28,6 +29,7 @@ const ModalIcon = {
   Success: { icon: "checkcircleo", package: AntDesign },
   Offline: { icon: "wifi-off", package: Feather },
   Exit: { icon: "logout", package: AntDesign },
+  Close: { icon: AntDesign, close: "close" },
 };
 
 const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
@@ -39,7 +41,7 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
   return (
     <NBModal isOpen={props.isOpen} onClose={closeModal}>
       <NBModal.Content>
-        <NBModal.CloseButton />
+        {!props.hideCloseButton && <NBModal.CloseButton />}
         <NBModal.Body padding="4">
           <VStack space={2}>
             {props.icon && (
@@ -94,19 +96,21 @@ const ModuleFullPageModal = (props: ModuleModalProps) => {
       >
         <HStack alignItems="center">
           <Text style={styles.title}>{props.title}</Text>
-          <IconButton
-            _icon={{
-              as: AntDesign,
-              name: "close",
-            }}
-            _pressed={{
-              onPress: closeModal,
-            }}
-            variant="ghost"
-            size="lg"
-            style={styles.button}
-            colorScheme="black"
-          />
+          {props.hideCloseButton && (
+            <IconButton
+              _icon={{
+                as: ModalIcon["Close"]["package"],
+                name: ModalIcon["Close"]["icon"],
+              }}
+              _pressed={{
+                onPress: closeModal,
+              }}
+              variant="ghost"
+              size="lg"
+              style={styles.button}
+              colorScheme="black"
+            />
+          )}
         </HStack>
 
         <View>{props.children}</View>

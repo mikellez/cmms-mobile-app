@@ -68,12 +68,17 @@ const Header = ({ navigation }) => {
         title="Logout"
         text="Do you want to Logout now?"
         icon={"Exit"}
+        hideCloseButton={true}
       >
         <HStack flexDirection="row" marginTop={8}>
           <Button backgroundColor="#C70F2B" onPress={confirmLogout}>
             Confirm
           </Button>
-          <Button backgroundColor="#C70F2B" marginLeft={5}>
+          <Button
+            backgroundColor="#C70F2B"
+            marginLeft={5}
+            onPress={() => setModalVisible(false)}
+          >
             Cancel
           </Button>
         </HStack>
