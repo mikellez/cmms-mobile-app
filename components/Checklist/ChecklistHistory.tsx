@@ -18,7 +18,8 @@ const ChecklistHistory = (props: ChecklistHistoryProps) => {
         renderItem={({ item }) => <ChecklistHistoryRow history={item} />}
       ></FlatList>
     );
-  }
+  } 
+  return null;
 };
 
 export default ChecklistHistory;

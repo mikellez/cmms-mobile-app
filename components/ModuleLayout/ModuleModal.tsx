@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, StyleSheet, Pressable } from "react-native";
+import { Modal, StyleSheet, Pressable, SafeAreaView } from "react-native";
 import {
   Text,
   IconButton,
@@ -57,40 +57,16 @@ const ModuleSimpleModal = (props: ModuleSimpleModalProps) => {
             )}
             {props.text && <Text>{props.text}</Text>}
           </VStack>
-          <View>{props.children}</View>
-        </NBModal.Body>
-      </NBModal.Content>
-    </NBModal>
-  );
-};
+          <VStack>
 
-const ModuleButtonModal = (props: ModuleSimpleModalProps) => {
-  const closeModal = () => {
-    props.setOpen(false);
-    if (props.onCloseCallback) props.onCloseCallback();
-  };
-
-  return (
-    <NBModal isOpen={props.isOpen} onClose={closeModal}>
-      <NBModal.Content>
-        <NBModal.CloseButton />
-        <NBModal.Body padding="4">
-          <VStack space={2}>
-            {props.icon && <Icon as={AntDesign} name={props.icon} size="4xl" />}
-
-            {props.title && (
-              <Text fontSize="18" fontWeight={600}>
-                {props.title}
-              </Text>
-            )}
-            {props.text && <Text>{props.text}</Text>}
+            {props.children}
           </VStack>
-          <View>{props.children}</View>
         </NBModal.Body>
       </NBModal.Content>
     </NBModal>
   );
 };
+
 
 const ModuleFullPageModal = (props: ModuleModalProps) => {
   const closeModal = () => {
@@ -139,6 +115,43 @@ const ModuleFullPageModal = (props: ModuleModalProps) => {
   );
 };
 
+const ModuleChecklistModal = (props: ModuleSimpleModalProps) => {
+  const closeModal = () => {
+    props.setOpen(false);
+    if (props.onCloseCallback) props.onCloseCallback();
+  };
+
+  return (
+    <NBModal isOpen={props.isOpen} onClose={closeModal}>
+      <NBModal.Content>
+        <NBModal.CloseButton />
+        <NBModal.Body padding="4">
+          <VStack space={2}>
+            {props.icon && (
+              <Icon
+                as={ModalIcon[props.icon]["package"]}
+                name={ModalIcon[props.icon]["icon"]}
+                size="4xl"
+              />
+            )}
+
+            {props.title && (
+              <Text fontSize="18" fontWeight={600}>
+                {props.title}
+              </Text>
+            )}
+            {props.text && <Text>{props.text}</Text>}
+          </VStack>
+          <VStack>
+
+            {props.children}
+          </VStack>
+        </NBModal.Body>
+      </NBModal.Content>
+    </NBModal>
+  );
+};
+
 const styles = StyleSheet.create({
   modalView: {
     position: "absolute",
@@ -183,4 +196,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { ModuleSimpleModal, ModuleButtonModal, ModuleFullPageModal };
+export { ModuleSimpleModal, ModuleFullPageModal };
