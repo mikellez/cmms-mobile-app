@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, SafeAreaView, ActivityIndicator } from "react-native";
-import { HStack, Button, Icon, VStack, Text, IconButton } from "native-base";
+import { HStack, Button, Icon, VStack, Text, IconButton, Center } from "native-base";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {
@@ -76,8 +76,7 @@ const Maintenance = ({ navigation, route }) => {
         console.log(newData)
         setCurrentPage(currentPage + 1);
         setData(newData);
-        //alert(jsonData.length)
-        setIsEndReached(jsonData.length < 0);
+        setIsEndReached(jsonData.length < 10);
         setIsLoading(false);
         setIsListLoading(false);
 
@@ -187,7 +186,7 @@ const Maintenance = ({ navigation, route }) => {
   }
 
   const renderFooter = () => {
-    if (isEndReached) return (<Text>No more checklists</Text>);
+    if (isEndReached) return (<Center><Text>No more checklists</Text></Center>);
     if (!isListLoading) return null;
 
     return (
