@@ -74,9 +74,11 @@ const ListBox = ({
                 fontSize={14}
                 fontWeight={600}
               >
-                {checklist.checklist_id}
+                ID: {checklist.checklist_id}
               </Text>
             </VStack>
+          </HStack>
+          <HStack>
             <VStack style={{ maxWidth: 250 }}>
               <Text
                 style={{ flex: 1, textAlign: "left" }}
