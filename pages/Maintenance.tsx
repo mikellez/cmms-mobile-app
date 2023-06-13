@@ -23,6 +23,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Role } from "../types/enums";
 import { useCurrentUser } from "../helper/hooks/SWR";
 import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const checklistViews: ModuleActionSheetItem[] = [
   {
@@ -64,6 +65,8 @@ const Maintenance = ({ navigation, route }) => {
     const [restricted, setRestricted] = useState<boolean>(false);
     const isFocused = useIsFocused();
     const user = useCurrentUser();
+    const isOffline = useSelector<RootState, boolean>((state) => state.offline);
+
 
 
     const sendCachedChecklist = async () => {
@@ -125,24 +128,21 @@ const Maintenance = ({ navigation, route }) => {
 
     useEffect(() => {
 
-        if (isFocused) {
-            checkConnection(setIsConnected)
-                .then(res => {
-                    if (isConnected) {
+        if (isFocused && !isOffline) {
+            // checkConnection(setIsConnected)
+            //     .then(res => {
+            //         if (isConnected) {
                         sendCachedChecklist().then((res) => {
                             fetchChecklist(viewType).then((result) => {
                             if (result) setChecklists(result);
                             else setChecklists([]);
                             });
                         });
-                    } else { // Offline, create a way to navigate from ListBox to Complete
+                    } else { // Offline
                         offlineFilterChecklist();
                     }
-                });
 
-        }
-    
-  }, [viewType, isFocused]);
+        }, [viewType, isFocused]);
 
   useEffect(() => {
 

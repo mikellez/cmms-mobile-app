@@ -21,6 +21,9 @@ import {
   subscribeToConnectionChanges,
 } from "../../helper/NetInfo";
 import { _addToDataArray } from "../../helper/AsyncStorage";
+import { useSelector } from "react-redux";
+
+
 
 const completeChecklist = async (checklist: CMMSChecklist) => {
   try {
