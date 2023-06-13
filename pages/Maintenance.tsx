@@ -76,7 +76,7 @@ const Maintenance = ({ navigation, route }) => {
         console.log(newData)
         setCurrentPage(currentPage + 1);
         setData(newData);
-        alert(jsonData.length)
+        //alert(jsonData.length)
         setIsEndReached(jsonData.length < 0);
         setIsLoading(false);
         setIsListLoading(false);
