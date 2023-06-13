@@ -41,7 +41,7 @@ const ReportScreen = ({ route, navigation }) => {
   console.log(requestItems)
 
   return (
-    <App navigation={navigation}>
+    <App navigation={navigation} >
 
       <HStack flex={1} >
         <VStack flex={1} px={3} py={3}>

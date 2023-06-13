@@ -38,7 +38,6 @@ const ListBox = ({
   setHistoryCL: React.Dispatch<React.SetStateAction<CMMSChecklist>>;
 }) => {
   const user = useCurrentUser();
-  console.log(user.data);
 
   const handlePress = () => {
     const clID = checklist.status_id;
@@ -69,6 +68,15 @@ const ListBox = ({
       <ModuleCardContainer>
         <VStack>
           <HStack>
+            <VStack style={{ maxWidth: 250 }}>
+              <Text
+                style={{ flex: 1, textAlign: "left" }}
+                fontSize={14}
+                fontWeight={600}
+              >
+                {checklist.checklist_id}
+              </Text>
+            </VStack>
             <VStack style={{ maxWidth: 250 }}>
               <Text
                 style={{ flex: 1, textAlign: "left" }}

@@ -64,7 +64,8 @@ function OfflineHandling({ navigation }) {
     if(isConnected) {
       fetchOfflineRequests()
       .then((res)=> {
-        if(res.length > 0) {
+        console.log(res)
+        if(res && res.length > 0) {
           submitRequests(res);
           _storeData('offlineRequests', []);
         }
