@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList, SafeAreaView, ActivityIndicator } from "react-native";
+import { View, StyleSheet, FlatList, SafeAreaView, ActivityIndicator, GestureResponderEvent } from "react-native";
 import { HStack, Button, Icon, VStack, Text, IconButton, Center } from "native-base";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -178,7 +178,7 @@ const Maintenance = ({ navigation, route }) => {
     
   }, [viewType, isFocused]);
 
-  const handleActionChange = (value: string) => {
+  const handleActionChange = (e: GestureResponderEvent, value: string) => {
     setViewType(value);
     setCurrentPage(1);
     setData([]);

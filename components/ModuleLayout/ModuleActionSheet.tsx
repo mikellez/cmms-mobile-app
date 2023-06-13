@@ -22,7 +22,7 @@ const ModuleActionSheet = (props: ModuleActionSheetProps) => {
         return (
             <Actionsheet.Item 
                 key={item.value}
-                onPress={(e) => props.onSelect ? props.onSelect(e, item) : handleSelect(item)}
+                onPress={(e) => props.onSelect ? onSelect(e, item.value) : handleSelect(item)}
                 style={{
                     backgroundColor: item.value === props.value ? "#F0EEED" : "white",
                 }}
@@ -32,6 +32,11 @@ const ModuleActionSheet = (props: ModuleActionSheetProps) => {
             </Actionsheet.Item> 
         );
     });
+
+    const onSelect = (event: GestureResponderEvent, item: any) => {
+        props.onSelect(event, item);
+        closeActionSheet();
+    }
 
     const handleSelect = (item: ModuleActionSheetItem) => {
         props.setValue(item.value);
