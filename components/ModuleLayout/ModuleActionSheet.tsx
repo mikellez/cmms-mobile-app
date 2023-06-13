@@ -4,7 +4,7 @@ import { GestureResponderEvent } from "react-native";
 
 interface ModuleActionSheetProps {
     items: ModuleActionSheetItem[],
-    onSelect?: (event: GestureResponderEvent) => void,
+    onSelect?: (event: GestureResponderEvent, item: any) => void,
     value: string | number;
     setValue: React.Dispatch<React.SetStateAction<string | number>>
 };
@@ -22,7 +22,7 @@ const ModuleActionSheet = (props: ModuleActionSheetProps) => {
         return (
             <Actionsheet.Item 
                 key={item.value}
-                onPress={() => props.onSelect(item) || handleSelect(item)}
+                onPress={(e) => props.onSelect ? props.onSelect(e, item) : handleSelect(item)}
                 style={{
                     backgroundColor: item.value === props.value ? "#F0EEED" : "white",
                 }}
