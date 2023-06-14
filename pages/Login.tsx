@@ -191,7 +191,7 @@ const Login = ({ navigation }) => {
       <Center w="100%">
         <Box safeArea p="2" py="8" w="90%" maxW="290">
           <Heading height={100} fontWeight="600" color="coolGray.800" _dark={{ color: "warmGray.50" }}>
-            <Image height={100} size={'2xl'} style={{ resizeMode: 'contain' }} alt="fallback text" source={ require('../assets/keppellogo.png')} />
+            <Image height={100} size={'2xl'} style={{ resizeMode: 'contain' }} alt="" source={ require('../assets/keppellogo.png')} />
           </Heading>
 
           <VStack space={3} mt="20">
