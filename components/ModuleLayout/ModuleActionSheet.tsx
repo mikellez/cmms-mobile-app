@@ -22,7 +22,7 @@ const ModuleActionSheet = (props: ModuleActionSheetProps) => {
         return (
             <Actionsheet.Item 
                 key={item.value}
-                onPress={() => handleSelect(item)}
+                onPress={() => props.onSelect(item) || handleSelect(item)}
                 style={{
                     backgroundColor: item.value === props.value ? "#F0EEED" : "white",
                 }}

@@ -1,11 +1,12 @@
-import { Center, Image, Link, ScrollView, Text, VStack } from "native-base";
-import { ModuleScreen } from "../../components/ModuleLayout";
+import { Button, Center, HStack, Icon, Image, Link, ScrollView, Text, VStack } from "native-base";
+import { ModuleHeader, ModuleScreen } from "../../components/ModuleLayout";
 import { useEffect, useState } from "react";
 import instance from "../../axios.config";
 import { CMMSAssetDetails } from "../../types/interfaces";
 import AssetHierachy from "../../components/Assets/AssetHierarchy";
 import { Table, Rows } from "react-native-table-component";
 import { Linking } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 //import RNFetchBlob from "react-native-fetch-blob";
 
 const Details = ({ route, navigation }) => {
@@ -131,6 +132,12 @@ const Details = ({ route, navigation }) => {
 
   return (
     <ModuleScreen navigation={navigation}>
+      <ModuleHeader header="Asset">
+        <HStack >
+          <Button padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="arrow-left" size="sm"/>} size="xs" onPress={()=>navigation.goBack()}/>
+        </HStack>
+      </ModuleHeader>
+
       <ScrollView>
         <Center>
           <Text underline fontSize={18} marginBottom={5}>

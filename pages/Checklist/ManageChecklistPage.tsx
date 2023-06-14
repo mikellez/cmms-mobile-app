@@ -17,6 +17,7 @@ import {
   Button,
   HStack,
   Modal,
+  KeyboardAvoidingView,
 } from "native-base";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
@@ -101,33 +102,35 @@ const ManageChecklistPage = ({ navigation, route }) => {
   );
 
   const footer = (
-    <VStack space={2}>
-      <FormControl.Label>Manager's Comments</FormControl.Label>
-      <TextArea
-        autoCompleteType={true}
-        value={managerComments}
-        onChangeText={(text) => setManagerComments(text)}
-      />
+    <KeyboardAvoidingView>
+      <VStack space={2} my={20}>
+        <FormControl.Label>Manager's Comments</FormControl.Label>
+        <TextArea
+          autoCompleteType={true}
+          value={managerComments}
+          onChangeText={(text) => setManagerComments(text)}
+        />
 
-      <HStack width="full">
-        <Button
-          width="45%"
-          backgroundColor="#E64848"
-          onPress={(e) => handleButtonPress(Action.Reject)}
-        >
-          Reject
-        </Button>
+        <HStack width="full">
+          <Button
+            width="45%"
+            backgroundColor="#E64848"
+            onPress={(e) => handleButtonPress(Action.Reject)}
+          >
+            Reject
+          </Button>
 
-        <Button
-          width="45%"
-          marginLeft="auto"
-          backgroundColor="#36AE7C"
-          onPress={(e) => handleButtonPress(Action.Approve)}
-        >
-          Approve
-        </Button>
-      </HStack>
-    </VStack>
+          <Button
+            width="45%"
+            marginLeft="auto"
+            backgroundColor="#36AE7C"
+            onPress={(e) => handleButtonPress(Action.Approve)}
+          >
+            Approve
+          </Button>
+        </HStack>
+      </VStack>
+    </KeyboardAvoidingView>
   );
 
   return (

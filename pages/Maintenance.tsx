@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList, SafeAreaView } from "react-native";
-import { HStack, Button, Icon, VStack, Text, IconButton } from "native-base";
+import { View, StyleSheet, FlatList, SafeAreaView, ActivityIndicator } from "react-native";
+import { HStack, Button, Icon, VStack, Text, IconButton, Center, Alert, Box } from "native-base";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {
@@ -24,6 +24,7 @@ import { Role } from "../types/enums";
 import { useCurrentUser } from "../helper/hooks/SWR";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { set } from "react-native-reanimated";
 
 const checklistViews: ModuleActionSheetItem[] = [
   {
@@ -44,14 +45,6 @@ const checklistViews: ModuleActionSheetItem[] = [
   },
 ];
 
-const fetchChecklist = async (viewType: string) => {
-  try {
-    const response = await instance.get(`/api/checklist/${viewType}`);
-    return response.data.rows;
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 const Maintenance = ({ navigation, route }) => {
     const [checklists, setChecklists] = useState<CMMSChecklist[]>([]);
@@ -65,7 +58,45 @@ const Maintenance = ({ navigation, route }) => {
     const [restricted, setRestricted] = useState<boolean>(false);
     const isFocused = useIsFocused();
     const user = useCurrentUser();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isEndReached, setIsEndReached] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isListLoading, setIsListLoading] = useState(false);
+    const [data, setData] = useState([]);
     const isOffline = useSelector<RootState, boolean>((state) => state.offline);
+
+
+    const fetchChecklist = async (viewType: string) => {
+      //alert(currentPage)
+      if (isEndReached) return;
+
+      setIsListLoading(true);
+
+      try {
+        const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}`);
+        const jsonData = response.data.rows;
+        const newData = [...data, ...jsonData]; // Append new data to existing data array
+        console.log(newData)
+        setCurrentPage(currentPage + 1);
+        setData(newData);
+        setIsEndReached(jsonData.length < 10);
+        setIsLoading(false);
+        setIsListLoading(false);
+
+        return response.data.rows;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    const handleLoadMore = () => {
+      if (!isLoading && !isOffline) {
+        fetchChecklist(viewType).then((result) => {
+          if (result) setChecklists(result);
+          else setChecklists([]);
+        });
+      }
+    };
 
 
 
@@ -73,10 +104,6 @@ const Maintenance = ({ navigation, route }) => {
         const cachedChecklists = await _retrieveData("checklist");
         if (cachedChecklists != null) {
             const cachedChecklistsArray = JSON.parse(cachedChecklists);
-        // let error = false;
-        //   await checkConnection(setIsConnected);
-        //   console.log(isConnected);
-        //   if (isConnected) {
             for (const index in cachedChecklistsArray) {
                 try {
                     const checklist = cachedChecklistsArray[index];
@@ -111,24 +138,24 @@ const Maintenance = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        const subscribe = subscribeToConnectionChanges(setIsConnected);
-        if (isConnected) {
-            sendCachedChecklist().then((res) => {
-                fetchChecklist(viewType).then((result) => {
-                  if (result) setChecklists(result);
-                  else setChecklists([]);
-                });
-              });
+        // const subscribe = subscribeToConnectionChanges(setIsConnected);
+        if (!isOffline) {
+            // sendCachedChecklist().then((res) => {
+            //     fetchChecklist(viewType).then((result) => {
+            //       if (result) setChecklists(result);
+            //       else setChecklists([]);
+            //     });
+            //   });
         }
-
-        return () => {
-            subscribe();
-        }
-    }, [isConnected])
+    }, [isOffline])
 
     useEffect(() => {
 
         if (isFocused && !isOffline) {
+            setIsLoading(true);
+            setData([]);
+            setCurrentPage(1);
+
             // checkConnection(setIsConnected)
             //     .then(res => {
             //         if (isConnected) {
@@ -144,15 +171,32 @@ const Maintenance = ({ navigation, route }) => {
 
         }, [viewType, isFocused]);
 
-  useEffect(() => {
+  // const handleActionChange = (value: string) => {
+  //   setViewType(value);
+  //   setCurrentPage(1);
+  //   setData([]);
+  //   setIsLoading(true);
+  // }
 
-  })
+  const renderFooter = () => {
+    if (isEndReached) return (<Center><Text>No more checklists</Text></Center>);
+    if (!isListLoading) return null;
+
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  };
 
   const checklistElements =
-    checklists.length > 0 ? (
+    data.length > 0 ? (
       <FlatList
-        data={checklists}
-        keyExtractor={(cl) => cl.checklist_id.toString()}
+        data={data}
+        //keyExtractor={(cl) => cl.checklist_id.toString()}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5} // Adjust the threshold as needed
         renderItem={({ item }) => (
           <ListBox
             checklist={item}
@@ -161,6 +205,7 @@ const Maintenance = ({ navigation, route }) => {
             setHistoryCL={setHistoryCL}
           />
         )}
+        ListFooterComponent={renderFooter}
       />
     ) : (
       <Text>No Checklist Found</Text>
@@ -180,18 +225,38 @@ const Maintenance = ({ navigation, route }) => {
           ></Button>
         </HStack>
       </ModuleHeader>
+      {isOffline && <Alert w="100%" status="danger">
+          <VStack space={1} flexShrink={1} w="100%" alignItems="center">
+            <Alert.Icon size="md" />
+            <Text fontSize="md" fontWeight="medium" _dark={{
+            color: "coolGray.800"
+          }}>
+              You are now in offline mode
+            </Text>
+
+            <Box _text={{
+            textAlign: "center"
+          }} _dark={{
+            _text: {
+              color: "coolGray.600"
+            }
+          }}>
+              You can still access and complete your checklists that have loaded.
+            </Box>
+          </VStack>
+        </Alert>}
 
       {user.data && user.data.role_id !== 4 && <ModuleActionSheet
         items={checklistViews}
         value={viewType}
         setValue={setViewType}
+        // onSelect={handleActionChange}
       />}
-      <Text>Connection status: {isConnected ? "Connected": "Not Connected"}</Text>
 
-      <ModuleDivider />
+      <ModuleDivider/>
 
-      <View style={{ marginBottom: 90 }}>
-        <VStack space={3}>{checklistElements}</VStack>
+      <View style={{ marginBottom: isOffline? 200 : 90 }}>
+        <VStack space={3}>{isLoading ? <Text>Loading...</Text> : checklistElements}</VStack>
       </View>
       <ModuleSimpleModal
         isOpen={sendCached}

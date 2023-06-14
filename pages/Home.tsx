@@ -176,7 +176,6 @@ const HomeScreen = ({ navigation }) => {
     if(isFocused) {
       const { datetype, date } = pickerwithtype;
       const { role_id } = user;
-      alert(role_id)
 
       setIsReady(false);
 
