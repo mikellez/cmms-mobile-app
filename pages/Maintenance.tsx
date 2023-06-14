@@ -14,16 +14,17 @@ import {
 } from "../components/ModuleLayout";
 import ListBox from "../components/Checklist/ListBox";
 import instance from "../axios.config";
-import { CMMSChecklist } from "../types/interfaces";
+import { CMMSChecklist, CMMSUser } from "../types/interfaces";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { _retrieveData, _clear } from "../helper/AsyncStorage";
+import { _retrieveData, _clear, _storeData } from "../helper/AsyncStorage";
 import { checkConnection, subscribeToConnectionChanges } from "../helper/NetInfo";
 import ChecklistHistory from "../components/Checklist/ChecklistHistory";
 import { useIsFocused } from "@react-navigation/native";
 import { Role } from "../types/enums";
-import { useCurrentUser } from "../helper/hooks/SWR";
 import { useSelector } from "react-redux";
 import { set } from "react-native-reanimated";
+import { RootState } from "../redux/store";
+import RNFS from 'react-native-fs';
 
 const checklistViews: ModuleActionSheetItem[] = [
   {
@@ -51,43 +52,79 @@ const Maintenance = ({ navigation, route }) => {
         checklistViews[0].value as string
     );
     const [sendCached, setSendCached] = useState<boolean>(false);
-    const [isConnected, setIsConnected] = useState<boolean>(true);
+    //const [isConnected, setIsConnected] = useState<boolean>(true);
     const [isHistory, setIsHistory] = useState<boolean>(false);
     const [historyCL, setHistoryCL] = useState<CMMSChecklist>();
     const [restricted, setRestricted] = useState<boolean>(false);
     const isFocused = useIsFocused();
-    const user = useCurrentUser();
+    const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
     const [currentPage, setCurrentPage] = useState(1);
     const [isEndReached, setIsEndReached] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isListLoading, setIsListLoading] = useState(false);
     const [data, setData] = useState([]);
+    const isOffline = useSelector<RootState, boolean>((state) => state.offline);
 
-    const fetchChecklist = async (viewType: string) => {
-      //alert(currentPage)
-      if (isEndReached) return;
-
-      setIsListLoading(true);
+    const storeFile = async (checklist) => {
+      const filePath = RNFS.DocumentDirectoryPath + '/checklist.txt';
+      const fileContent = JSON.stringify(checklist);
 
       try {
-        const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}`);
-        const jsonData = response.data.rows;
-        const newData = [...data, ...jsonData]; // Append new data to existing data array
-        console.log(newData)
-        setCurrentPage(currentPage + 1);
-        setData(newData);
-        setIsEndReached(jsonData.length < 10);
-        setIsLoading(false);
-        setIsListLoading(false);
+        await RNFS.writeFile(filePath, fileContent);
+        console.log('File stored successfully!');
+      } catch (error) {
+        console.log('Error storing file:', error);
+      }
+    };
 
-        return response.data.rows;
-      } catch (err) {
-        console.log(err);
+    const readFile = async () => {
+      const filePath = RNFS.DocumentDirectoryPath + '/checklist.txt';
+
+      try {
+        const content = await RNFS.readFile(filePath);
+        console.log('File content retrieved successfully!');
+        return content;
+      } catch (error) {
+        console.log('Error reading file:', error);
+      }
+    };
+
+
+    const fetchChecklist = async (viewType: string) => {
+      setIsListLoading(true);
+
+      if(!isOffline) {
+        if (isEndReached) return;
+
+        try {
+          const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}`);
+          const jsonData = response.data.rows;
+          const newData = [...data, ...jsonData]; // Append new data to existing data array
+          console.log(newData)
+          setCurrentPage(currentPage + 1);
+          setData(newData);
+          setIsEndReached(jsonData.length < 10);
+          setIsLoading(false);
+          setIsListLoading(false);
+
+          await storeFile(newData);
+
+          return response.data.rows;
+        } catch (err) {
+          console.log(err);
+          console.log('Unable to call checklists')
+        }
+
+      } else {
+        const cachedChecklisting = await readFile();
+        console.log('cachedchecklisting', cachedChecklisting)
+        setData(JSON.parse(cachedChecklisting));
+        setIsLoading(false);
       }
     };
 
     const handleLoadMore = () => {
-      if (!isLoading && isConnected) {
+      if (!isLoading && !isOffline) {
         fetchChecklist(viewType).then((result) => {
           if (result) setChecklists(result);
           else setChecklists([]);
@@ -97,6 +134,8 @@ const Maintenance = ({ navigation, route }) => {
 
 
     const sendCachedChecklist = async () => {
+        if(isOffline) return;
+
         const cachedChecklists = await _retrieveData("checklist");
         if (cachedChecklists != null) {
             const cachedChecklistsArray = JSON.parse(cachedChecklists);
@@ -120,7 +159,8 @@ const Maintenance = ({ navigation, route }) => {
                     console.log("Cached checklists sent");
                     setSendCached(true);
                 } catch (e) {
-                    console.log(e);
+                  console.log(e);
+                  console.log('Unable to complete checklist')
                 }
             }
         }
@@ -138,43 +178,32 @@ const Maintenance = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-        const subscribe = subscribeToConnectionChanges(setIsConnected);
-        if (isConnected) {
-            sendCachedChecklist().then((res) => {
-                fetchChecklist(viewType).then((result) => {
-                  if (result) setChecklists(result);
-                  else setChecklists([]);
-                });
-              });
-        }
+      sendCachedChecklist().then((res) => {
+          fetchChecklist(viewType).then((result) => {
+            if (result) setChecklists(result);
+            else setChecklists([]);
+          });
+        });
 
-        return () => {
-            subscribe();
-        }
-    }, [isConnected])
+    }, [isOffline])
 
     useEffect(() => {
 
-        if (isFocused) {
-            setIsLoading(true);
-            setData([]);
-            setCurrentPage(1);
+      if (isFocused) {
+        setIsLoading(true);
+        setData([]);
+        setCurrentPage(1);
 
-            checkConnection(setIsConnected)
-                .then(res => {
-                    if (isConnected) {
-                        sendCachedChecklist().then((res) => {
-                            fetchChecklist(viewType).then((result) => {
-                            if (result) setChecklists(result);
-                            else setChecklists([]);
-                            });
-                        });
-                    } else { // Offline, create a way to navigate from ListBox to Complete
-                        offlineFilterChecklist();
-                    }
-                });
+        sendCachedChecklist().then((res) => {
+            fetchChecklist(viewType).then((result) => {
+            if (result) setChecklists(result);
+            else setChecklists([]);
+            });
+        });
 
-        }
+        if(isOffline) offlineFilterChecklist();
+
+      }
     
   }, [viewType, isFocused]);
 
@@ -218,6 +247,7 @@ const Maintenance = ({ navigation, route }) => {
       <Text>No Checklist Found</Text>
     );
 
+
   return (
     <ModuleScreen navigation={navigation}>
       <ModuleHeader header="Maintenance">
@@ -233,7 +263,7 @@ const Maintenance = ({ navigation, route }) => {
         </HStack>
       </ModuleHeader>
 
-      {user.data && user.data.role_id !== 4 && <ModuleActionSheet
+      {user && user.role_id !== 4 && <ModuleActionSheet
         items={checklistViews}
         value={viewType}
         setValue={setViewType}

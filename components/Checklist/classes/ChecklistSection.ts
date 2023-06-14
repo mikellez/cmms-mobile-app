@@ -6,6 +6,7 @@ class ChecklistSection {
     private _id: string;
     description: string;
     rows: ChecklistRow[];
+    required: string[] = ['SingleChoice', 'MultiChoice'];
 
     constructor(description?: string, rows?: ChecklistRow[]) {
         this._id = uuid.v4() as string;
@@ -43,7 +44,9 @@ class ChecklistSection {
 		let result: boolean = true;
 		this.rows.forEach(row => {
 			row.checks.forEach(check => {
-				if (!check.value || check.value.trim() === "") result = false;
+                if(this.required.includes(check.type)) {
+				    if (!check.value || check.value.trim() === "") result = false;
+                }
 			});
 		});
 		return result;
