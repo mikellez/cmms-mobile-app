@@ -24,7 +24,7 @@ import { Role } from "../types/enums";
 import { useSelector } from "react-redux";
 import { set } from "react-native-reanimated";
 import { RootState } from "../redux/store";
-import RNFS from 'react-native-fs';
+import * as FileSystem from 'expo-file-system';
 
 const checklistViews: ModuleActionSheetItem[] = [
   {
@@ -66,11 +66,11 @@ const Maintenance = ({ navigation, route }) => {
     const isOffline = useSelector<RootState, boolean>((state) => state.offline);
 
     const storeFile = async (checklist) => {
-      const filePath = RNFS.DocumentDirectoryPath + '/checklist.txt';
+      const filePath = FileSystem.documentDirectory + '/checklist.txt';
       const fileContent = JSON.stringify(checklist);
 
       try {
-        await RNFS.writeFile(filePath, fileContent);
+        await FileSystem.writeAsStringAsync(filePath, fileContent);
         console.log('File stored successfully!');
       } catch (error) {
         console.log('Error storing file:', error);
@@ -78,10 +78,10 @@ const Maintenance = ({ navigation, route }) => {
     };
 
     const readFile = async () => {
-      const filePath = RNFS.DocumentDirectoryPath + '/checklist.txt';
+      const filePath = FileSystem.documentDirectory + '/checklist.txt';
 
       try {
-        const content = await RNFS.readFile(filePath);
+        const content = await FileSystem.readAsStringAsync(filePath);
         console.log('File content retrieved successfully!');
         return content;
       } catch (error) {
@@ -117,7 +117,6 @@ const Maintenance = ({ navigation, route }) => {
 
       } else {
         const cachedChecklisting = await readFile();
-        console.log('cachedchecklisting', cachedChecklisting)
         setData(JSON.parse(cachedChecklisting));
         setIsLoading(false);
       }
