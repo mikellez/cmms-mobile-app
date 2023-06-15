@@ -100,7 +100,7 @@ const Maintenance = ({ navigation, route }) => {
           const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}`);
           const jsonData = response.data.rows;
           const newData = [...data, ...jsonData]; // Append new data to existing data array
-          console.log(newData)
+          //console.log(newData)
           setCurrentPage(currentPage + 1);
           setData(newData);
           setIsEndReached(jsonData.length < 10);
@@ -118,6 +118,7 @@ const Maintenance = ({ navigation, route }) => {
       } else {
         const cachedChecklisting = await readFile();
         setData(JSON.parse(cachedChecklisting));
+        setIsLoading(false);
         setIsLoading(false);
       }
     };
@@ -163,6 +164,8 @@ const Maintenance = ({ navigation, route }) => {
                 }
             }
         }
+
+        return;
     };
 
     const offlineFilterChecklist = async () => {
@@ -177,34 +180,41 @@ const Maintenance = ({ navigation, route }) => {
     }
 
     useEffect(() => {
-      sendCachedChecklist().then((res) => {
-          fetchChecklist(viewType).then((result) => {
-            if (result) setChecklists(result);
-            else setChecklists([]);
-          });
-        });
 
-    }, [isOffline])
+      const fetchData = async () => {
 
-    useEffect(() => {
+        await sendCachedChecklist();
 
-      if (isFocused) {
-        setIsLoading(true);
-        setData([]);
-        setCurrentPage(1);
+        const result = await fetchChecklist(viewType);
+        if (result) {
+          setChecklists(result);
+        } else {
+          setChecklists([]);
+        }
 
-        sendCachedChecklist().then((res) => {
-            fetchChecklist(viewType).then((result) => {
-            if (result) setChecklists(result);
-            else setChecklists([]);
-            });
-        });
+        if (isOffline) {
+          offlineFilterChecklist();
+        }
+      };
 
-        if(isOffline) offlineFilterChecklist();
+      fetchData();
 
-      }
+    }, [isOffline, isLoading])
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      setIsEndReached(false);
+      setData([]);
+      setCurrentPage(1);
+    };
+
+    if (isFocused) {
+      fetchData();
+    }
     
-  }, [viewType, isFocused]);
+  }, [viewType, isFocused, isOffline]);
 
   const handleActionChange = (e: GestureResponderEvent, value: string) => {
     setViewType(value);
@@ -214,7 +224,7 @@ const Maintenance = ({ navigation, route }) => {
   }
 
   const renderFooter = () => {
-    if (isEndReached) return (<Center><Text>No more checklists</Text></Center>);
+    if (isEndReached || isOffline) return (<Center><Text>No more checklists</Text></Center>);
     if (!isListLoading) return null;
 
     return (

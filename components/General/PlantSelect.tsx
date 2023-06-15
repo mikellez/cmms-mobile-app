@@ -31,6 +31,10 @@ const PlantSelect = (props: PlantSelectProps) => {
         const url = props.accessControl ? "/api/getUserPlants" : "/api/getPlants";
         fetchPlants(url).then((result) => {
             setPlants(result);
+            if (props.accessControl && result.length > 0) {
+                const defaultValue = result[0].plant_id.toString();
+                props.onChange(defaultValue);
+            }
         });
     }, []);
 
@@ -44,14 +48,17 @@ const PlantSelect = (props: PlantSelectProps) => {
         );
     });
 
+    const selectedValue = props.value ? props.value : props.accessControl && plants[0] ? plants[0].plant_id.toString() : null;
+
     return (
         <Select
             placeholder="Select Plant"
-            selectedValue={props.value ? props.value : null}
+            selectedValue={selectedValue}
             onValueChange={props.onChange}
             minW={props.minWidth || 110}
             maxH={props.maxHeight}
             style={props.style}
+            defaultValue={plants[0] ? plants[0].plant_id.toString() : null}
         >
             {props.selectAllPlants && <Select.Item key={0} label={"View All Plants"} value={"0"} />}
             {options}
