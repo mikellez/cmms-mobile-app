@@ -21,6 +21,8 @@ import {
   subscribeToConnectionChanges,
 } from "../../helper/NetInfo";
 import { _addToDataArray } from "../../helper/AsyncStorage";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const completeChecklist = async (checklist: CMMSChecklist) => {
   try {
@@ -43,9 +45,10 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   const [sections, setSections] = useState<ChecklistSection[]>([]);
   const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
   const [successModal, setSuccessModal] = useState<boolean>(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  //const [isConnected, setIsConnected] = useState<boolean>(false);
   const [offlineModal, setOfflineModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
 
   // useEffect(() => {
   //     const subscribe = subscribeToConnectionChanges(setIsConnected);
@@ -60,18 +63,16 @@ const CompleteChecklistPage = ({ navigation, route }) => {
 
   useEffect(() => {
     if (isSubmitting) {
-      checkConnection(setIsConnected).then(() => {
-        console.log("Connected: " + isConnected);
-        if (isConnected) {
-          setSuccessModal(true);
+      console.log("Connected: " + isOffline);
+      if (!isOffline) {
+        setSuccessModal(true);
 
-          completeChecklist(checklist).then((res) => {
-            navigation.navigate("Maintenance");
-          });
-        } else {
-          setOfflineModal(true);
-        }
-      });
+        completeChecklist(checklist).then((res) => {
+          navigation.navigate("Maintenance");
+        });
+      } else {
+        setOfflineModal(true);
+      }
     } else if (checklist && checklist.datajson) {
       console.log("hello");
       console.log(route.params);
