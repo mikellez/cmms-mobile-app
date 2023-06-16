@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState, createContext, useRef } from "react";
 import {
   ModuleScreen,
   ModuleHeader,
@@ -48,6 +48,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
   const [warningModal, setWarningModal] = useState<boolean>(false);
   const [approveModal, setApproveModal] = useState<boolean>(false);
   const [rejectModal, setRejectModal] = useState<boolean>(false);
+  const sectionsRef = useRef<ChecklistSection[]>([]);
 
   useEffect(() => {
     console.log(route.params);
@@ -62,6 +63,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
       setSections(
         checklist.datajson.map((section) => ChecklistSection.fromJSON(section))
       );
+      sectionsRef.current = checklist.datajson.map((section) => ChecklistSection.fromJSON(section));
     }
   }, [checklist]);
 
@@ -140,6 +142,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
       <ChecklistEditableProvider
         sections={sections}
         setSections={setSections}
+        sectionsRef={sectionsRef}
         isDisabled
       >
         <ChecklistEditableForm header={header} footer={footer} />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState, createContext, useRef } from "react";
 import {
   ModuleScreen,
   ModuleHeader,
@@ -49,6 +49,7 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   const [offlineModal, setOfflineModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const isOffline = useSelector<RootState, boolean>((state) => state.offline);
+  const sectionsRef = useRef<ChecklistSection[]>([]);
 
   // useEffect(() => {
   //     const subscribe = subscribeToConnectionChanges(setIsConnected);
@@ -79,6 +80,8 @@ const CompleteChecklistPage = ({ navigation, route }) => {
       setSections(
         checklist.datajson.map((section) => ChecklistSection.fromJSON(section))
       );
+
+      sectionsRef.current = checklist.datajson.map((section) => ChecklistSection.fromJSON(section));
     }
   }, [checklist]);
 
@@ -86,13 +89,13 @@ const CompleteChecklistPage = ({ navigation, route }) => {
     return sections.map((section) => section.toJSON());
   };
   const handleSubmit = () => {
-    if (!checkIfChecklistIsComplete(sections)) {
+    if (!checkIfChecklistIsComplete(sectionsRef.current)) {
       setIncompleteModal(true);
     } else {
       setIsSubmitting(true);
       setChecklist((prevChecklist) => {
         const newChecklist = { ...prevChecklist };
-        newChecklist.datajson = toDataJSON(sections);
+        newChecklist.datajson = toDataJSON(sectionsRef.current);
         return newChecklist;
       });
       // if (isConnected){
@@ -153,6 +156,7 @@ const CompleteChecklistPage = ({ navigation, route }) => {
       <ChecklistEditableProvider
         sections={sections}
         setSections={setSections}
+        sectionsRef={sectionsRef}
         isDisabled={false}
       >
         <ChecklistEditableForm header={header} footer={footer} />

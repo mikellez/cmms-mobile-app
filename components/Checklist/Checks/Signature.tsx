@@ -166,13 +166,14 @@ const SignatureEditableForm = ({check, sectionId, rowId}: {
     sectionId: string,
     rowId: string,
 }) => {
-    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled, sectionsRef } = useContext(ChecklistEditableFormContext);
     const [finalSignature, setSignature] = useState("");
     
 
     const onOK = (signature) => {
         // setSignature(signature);
-        updateSpecificCheck(sectionId, rowId, check.getId(), signature, setSections);
+        updateSpecificCheck(sectionId, rowId, check.getId(), signature, setSections, sectionsRef);
+        setSections(); // This is to force a re-render
     }
 
     return (

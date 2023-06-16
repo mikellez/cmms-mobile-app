@@ -18,11 +18,18 @@ const ChecklistCreator = ({header, footer}) => {
         setLevel(0);
     }
     
+    {/*const sectionElements = <FlatList ListHeaderComponent={header}
+                                    ListFooterComponent={footer}
+                                    data={sections}
+                                    keyExtractor={section => section.getId()}
+renderItem={({item}) => <ChecklistCreatorSection section={item}/>}/>*/}
+
+    //ChecklistCreatorSection is hidden for mobile on checklist creation
     const sectionElements = <FlatList ListHeaderComponent={header}
                                     ListFooterComponent={footer}
                                     data={sections}
                                     keyExtractor={section => section.getId()}
-                                    renderItem={({item}) => <ChecklistCreatorSection section={item}/>}/>
+                                    renderItem={({item}) => <></>}/>
     
     return (
         <VStack style={{marginBottom: 56}}>

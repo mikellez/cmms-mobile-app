@@ -15,6 +15,7 @@ const FormGroup = ({
   type = '',
   plant,
   asset,
+  formState,
   requestItems,
   requestTypes,
   onRequestTypeChange,
@@ -134,7 +135,7 @@ const FormGroup = ({
       isDisabled: action !== "create" ?? false, 
       items: faultTypes,
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: reqItems?.fault_id ?? '' }),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: formState.faultTypeID ? formState.faultTypeID : (reqItems?.fault_id ?? '') }),
       show: true
     },
     {
@@ -166,7 +167,7 @@ const FormGroup = ({
       isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false,
       items: plants,
       itemsConfig: { key: "plant_id", value: "plant_id", label: "plant_name"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (reqItems?.plant_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && plant) || (action === 'create' && type==='corrective')) && { selectedValue: formState.plantLocationID ? formState.plantLocationID : (plant ? plant : (reqItems?.plant_id || ''))}),
       show: true
     },
     {
@@ -182,7 +183,7 @@ const FormGroup = ({
       isDisabled: (action !== "create" || (action === 'create' && type==='guest')) ?? false,
       items: assetTags,
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
-      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (reqItems?.psa_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && asset) || (action === 'create' && type === 'corrective')) && { selectedValue: formState.taggedAssetID ? formState.taggedAssetID : (asset ? asset : (reqItems?.psa_id || ''))}),
       show: true
     },
     {
@@ -249,11 +250,11 @@ const FormGroup = ({
       label: "Completion Comment",
       name: "completionComment",
       placeholder: "Completion Comment",
-      defaultValue: reqItems?.completion_comments || '',
+      defaultValue: reqItems?.complete_comments || '',
       onChangeText: onCompletionCommentChange,
       isDisabled: action === "manage",
       isReadOnly: action === "manage",
-      valueCond: (action !== 'complete' && { value: reqItems?.completion_comments || 'NIL'}),
+      valueCond: (action !== 'complete' && { value: reqItems?.complete_comments || 'NIL'}),
       show: ['complete','manage'].includes(action)
     },
     {
@@ -370,7 +371,8 @@ const FormGroup = ({
           valueCond,
           bgColor,
           required,
-          requiredMessage
+          requiredMessage,
+          imageSource
         } = item.item;
       
         switch(type) {
@@ -490,7 +492,7 @@ const FormGroup = ({
             { show && 
               <>
               { hasError && <Text color={"rgb(220, 38, 38)"} fontSize={12} mt={3}>Please fill in all required fields</Text> }
-              <Button bgColor={bgColor} mt={5} mb={10} onPress={()=>handleSubmit(onPress)}>{ label }</Button>
+              <Button bgColor={bgColor} mt={5} mb={20} onPress={()=>handleSubmit(onPress)}>{ label }</Button>
               </>
             }
             </>

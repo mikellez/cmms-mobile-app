@@ -38,8 +38,6 @@ const ReportScreen = ({ route, navigation }) => {
     throw new Error("Function not implemented.");
   }
 
-  console.log(requestItems)
-
   return (
     <App navigation={navigation} >
 

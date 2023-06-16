@@ -84,13 +84,14 @@ const FileUploadEditableForm = ({check, sectionId, rowId}: {
     sectionId: string,
     rowId: string,
 }) => {
-    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled, sectionsRef } = useContext(ChecklistEditableFormContext);
 
     const handleImagePicker = async () => {
         const file = await NativeImagePicker();
     
         if(file) {
-            updateSpecificCheck(sectionId, rowId, check.getId(), file, setSections);
+            updateSpecificCheck(sectionId, rowId, check.getId(), file, setSections, sectionsRef);
+            setSections(); // This is to force a re-render
         }
     };
 

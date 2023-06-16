@@ -87,18 +87,18 @@ const MultiChoiceEditableForm = ({check, sectionId, rowId}: {
     rowId: string,
 }) => {
     
-    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled, sectionsRef } = useContext(ChecklistEditableFormContext);
     const handleChange = (value: string, isSelected: boolean) => {
         if (isSelected) {
             if (check.value.trim().length > 0) {
-                updateSpecificCheck(sectionId, rowId, check.getId(), check.value + "," + value, setSections); 
+                updateSpecificCheck(sectionId, rowId, check.getId(), check.value + "," + value, setSections, sectionsRef); 
             } else {
-                updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections);
+                updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections, sectionsRef);
             }
             
         } else {
             const newValues = [...values].filter(v => v != value);
-            updateSpecificCheck(sectionId, rowId, check.getId(), newValues.join(","), setSections);
+            updateSpecificCheck(sectionId, rowId, check.getId(), newValues.join(","), setSections, sectionsRef);
         }
     }
 
@@ -122,7 +122,7 @@ const MultiChoiceEditableForm = ({check, sectionId, rowId}: {
                                 size="sm" 
                                 isDisabled={isDisabled}
                                 onChange={(isSelected) => handleChange(item, isSelected)}
-                                isChecked={values.includes(item)}
+                                {...(values.includes(item) && {isChecked: values.includes(item)})}
                             >
                                 {item}
                             </Checkbox>

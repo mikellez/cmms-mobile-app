@@ -9,7 +9,7 @@ import { RootState } from '../redux/store';
 import { CMMSSubmitRequest } from '../redux/features/requestSlice';
 
 function OfflineHandling({ navigation }) {
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(true);
 
   const dispatch = useDispatch();
 
