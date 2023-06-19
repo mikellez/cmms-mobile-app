@@ -198,7 +198,9 @@ const FormGroup = ({
       onPress: onImagePicker,
       isDisabled: action !== "create" ?? false,
       value: reqItems?.image || '',
-      imageSource: (action !== 'create') && imageSource,
+      imageSource: (action !== 'create') || imageSource,
+      addImage: (action !== 'create') ? false : true,
+      isDisabled: false,
       bufferData: reqItems?.uploaded_file?.data,
       show: true
     },
@@ -241,6 +243,8 @@ const FormGroup = ({
       onPress: onCompletionImagePicker,
       imageSource: completionImageSource,
       bufferData: reqItems?.completion_file?.data,
+      addImage: (action === 'complete') ? true : false,
+      isDisabled: false,
       show: ['complete','manage'].includes(action)
     },
     {
@@ -372,7 +376,8 @@ const FormGroup = ({
           bgColor,
           required,
           requiredMessage,
-          imageSource
+          imageSource,
+          addImage
         } = item.item;
       
         switch(type) {
@@ -460,10 +465,7 @@ const FormGroup = ({
               <FormControl.Label>{label}</FormControl.Label>
               { bufferData 
                 ? <ImageComponent bufferData={bufferData}/> 
-                : 
-                <Pressable onPress={onPress}>
-                  <ImagePreview source={{ uri: imageSource }} alt="test" />
-                </Pressable>
+                : <ImagePreview source={{ uri: imageSource }} alt="test" onPress={onPress} addImage={addImage}/>
               }
               {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
             </FormControl>
@@ -477,8 +479,8 @@ const FormGroup = ({
             <>
             { show && 
               <HStack justifyContent="center">
-                <Button bgColor={items[0].bgColor} mr={5} mt={5} mb={10} onPress={items[0].onPress}>{ items[0].label }</Button>
-                <Button bgColor={items[1].bgColor} ml={5} mt={5} mb={10} onPress={items[1].onPress}>{ items[1].label }</Button>
+                <Button bgColor={items[0].bgColor} mr={5} mt={5} mb={20} onPress={items[0].onPress}>{ items[0].label }</Button>
+                <Button bgColor={items[1].bgColor} ml={5} mt={5} mb={20} onPress={items[1].onPress}>{ items[1].label }</Button>
               </HStack>
             }
             </>

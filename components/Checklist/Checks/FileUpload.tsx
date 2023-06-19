@@ -104,9 +104,7 @@ const FileUploadEditableForm = ({check, sectionId, rowId}: {
                     </Text>
                 </HStack>
 
-                <Pressable onPress={handleImagePicker} isDisabled={isDisabled}>
-                    <ImagePreview source={{uri: check.value}} alt="checklist image" />
-                </Pressable>
+                <ImagePreview source={{ uri: check.value }} alt="checklist image" addImage={true} onPress={handleImagePicker} isDisabled={isDisabled}/>
 
             </VStack>
         </ModuleCardContainer>
