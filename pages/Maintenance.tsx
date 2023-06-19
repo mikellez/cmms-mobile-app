@@ -20,7 +20,7 @@ import { _retrieveData, _clear, _storeData } from "../helper/AsyncStorage";
 import { checkConnection, subscribeToConnectionChanges } from "../helper/NetInfo";
 import ChecklistHistory from "../components/Checklist/ChecklistHistory";
 import { useIsFocused } from "@react-navigation/native";
-import { Role } from "../types/enums";
+import { ChecklistID, Role } from "../types/enums";
 import { useSelector } from "react-redux";
 import { set } from "react-native-reanimated";
 import { RootState } from "../redux/store";
@@ -107,20 +107,25 @@ const Maintenance = ({ navigation, route }) => {
           setIsLoading(false);
           setIsListLoading(false);
 
-          await storeFile(newData);
+          if(viewType === ChecklistID.Assigned.toString()) {
+            storeFile(newData);
+          }
 
           return response.data.rows;
         } catch (err) {
           console.log(err);
           console.log('Unable to call checklists')
+          setIsLoading(false);
+          setIsListLoading(false);
         }
 
       } else {
         const cachedChecklisting = await readFile();
         setData(JSON.parse(cachedChecklisting));
         setIsLoading(false);
-        setIsLoading(false);
+        setIsListLoading(false);
       }
+      
     };
 
     const handleLoadMore = () => {
@@ -217,10 +222,10 @@ const Maintenance = ({ navigation, route }) => {
   }, [viewType, isFocused, isOffline]);
 
   const handleActionChange = (e: GestureResponderEvent, value: string) => {
-    setViewType(value);
+    /*setViewType(value);
     setCurrentPage(1);
     setData([]);
-    setIsLoading(true);
+    setIsLoading(true);*/
   }
 
   const renderFooter = () => {
@@ -276,7 +281,7 @@ const Maintenance = ({ navigation, route }) => {
         items={checklistViews}
         value={viewType}
         setValue={setViewType}
-        onSelect={handleActionChange}
+        //onSelect={handleActionChange}
       />}
 
       <ModuleDivider/>
