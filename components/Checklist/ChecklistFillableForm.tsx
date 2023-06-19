@@ -17,7 +17,7 @@ const ChecklistEditableForm = ({header, footer}) => {
             <FlatList 
                 ListHeaderComponent={header}
                 ListFooterComponent={footer}
-                data={sectionsRef.current}
+                data={sectionsRef?.current}
                 keyExtractor={section => section.getId()}
                 renderItem={({ item }) => <ChecklistEditableFormSection section={item} />}
             />

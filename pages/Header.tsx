@@ -21,7 +21,7 @@ const Header = ({ navigation }) => {
     await instance.post(`/api/logout`)
     .then((res)=> {
       _clear();
-      alert('logout');
+      //alert('logout');
       navigation.navigate('Login');
     })
   }
@@ -29,7 +29,7 @@ const Header = ({ navigation }) => {
   const confirmLogout = async () => {
     await instance.post(`/api/logout`).then((res) => {
       _clear();
-      alert("logout");
+      //alert("logout");
       navigation.navigate("Login");
     });
   };

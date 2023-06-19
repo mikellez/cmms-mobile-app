@@ -181,7 +181,7 @@ const Login = ({ navigation }) => {
     .then(async (res)=> {
       dispatch(logout());
       await _storeData('user', "");
-      alert('logout');
+      //alert('logout');
     })
 
   };

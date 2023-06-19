@@ -9,6 +9,7 @@ import { ChecklistEditableFormContext } from "../../../context/checklistContext"
 import ImagePreview from "../../ImagePreview";
 import * as ImagePicker from 'expo-image-picker';
 import mime from "mime";
+import * as FileSystem from 'expo-file-system';
 
 
 class FileUploadType extends CheckType {
@@ -73,7 +74,7 @@ const FileUploadCreatorForm = ({deleteCheck, check, setChecks}: {
                         onPress={() => deleteCheck(check.getId())}
                     />
                 </HStack>
-                <ImagePreview source={{uri: ""}} alt="" />
+                <ImagePreview source={{uri: ""}} alt="" addImage={true} />
             </VStack>
         </ModuleCardContainer>
     )
@@ -90,10 +91,16 @@ const FileUploadEditableForm = ({check, sectionId, rowId}: {
         const file = await NativeImagePicker();
     
         if(file) {
-            updateSpecificCheck(sectionId, rowId, check.getId(), file, setSections, sectionsRef);
+        //console.log(file)
+            const base64Image = await convertImageToBase64(file);
+            const value = 'data:image/png;base64,'+base64Image;
+            //console.log('Base64 encoded image:', base64Image);
+
+            updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections, sectionsRef);
             setSections(); // This is to force a re-render
         }
     };
+    console.log(check.value)
 
     return (
         <ModuleCardContainer>
@@ -130,6 +137,19 @@ const NativeImagePicker = async () => {
 
     return result.assets[0].uri
 }
+
+const convertImageToBase64 = async (imageUri) => {
+  try {
+    const imageInfo = await FileSystem.getInfoAsync(imageUri);
+    const imageBase64 = await FileSystem.readAsStringAsync(imageUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    return imageBase64;
+  } catch (error) {
+    console.log('Image conversion error:', error);
+    throw error;
+  }
+};
 
 
 
