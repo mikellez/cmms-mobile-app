@@ -1,5 +1,8 @@
 import useSWR from "swr";
 import instance from "../../axios.config";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import NetInfo from '@react-native-community/netinfo';
 
 import {
   CMMSAsset,
@@ -14,6 +17,8 @@ import {
 
 // import { RequestProps } from "../pages/Request";
 // import { ChecklistProps } from "../pages/Checklist";
+
+
 
 function useRequest(
   request_type: "pending" | "assigned" | "review" | "approved",
@@ -150,7 +155,10 @@ function useCurrentUser() {
     employee_id: string
   }
 
-  const userFetcher = (url: string) =>
+  NetInfo.fetch()
+        .then(netInfoState => {
+          if (netInfoState.isConnected) {
+            const userFetcher = (url: string) =>
     instance
       .get<CMMSCurrentUser>(url)
       .then((response) => response.data)
@@ -162,6 +170,10 @@ function useCurrentUser() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
+          }
+        })
+        return null;
+  
 }
 
 function useSystemAsset(system_id: number | null) {

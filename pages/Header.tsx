@@ -31,6 +31,10 @@ const Header = ({ navigation }) => {
       _clear();
       alert("logout");
       navigation.navigate("Login");
+    })
+    .catch((err) => {
+      console.log(err);
+      console.log("Logout failed");
     });
   };
 

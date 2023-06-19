@@ -53,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
       "#FB2576",
     ];
 
-  console.log(url)
+  // console.log(url)
 
   return await instance
     .get(url)
@@ -68,7 +68,10 @@ const HomeScreen = ({ navigation }) => {
         });
       }
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      console.log("Fetch dashboard data failed")
+    });
 }
 
   const dashboardViews: ModuleActionSheetItem[] = [
@@ -185,6 +188,10 @@ const HomeScreen = ({ navigation }) => {
               setPlant(result[0].plant_id)
             }
         })
+        .catch(err => {
+          console.log(err.message)
+          console.log("Get userPlants failed")
+        });
 
       } else {
         setPlant(0);
