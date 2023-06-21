@@ -1,5 +1,5 @@
 import { FormControl, HStack, Radio, Select, CheckIcon, TextArea, Pressable, Button, Box, Text } from "native-base";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import ImagePreview from "../ImagePreview";
 import ImageComponent from "../Image";
 import { useEffect, useState } from "react";
@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { isEmpty } from "../../helper/utility";
 import instance from "../../axios.config";
 import { CMMSRequest } from "../../types/interfaces";
+import MultiSelect from "react-native-multiple-select";
+import { set } from "react-native-reanimated";
+import SelectPicker from "../SelectPicker";
 
 const FormGroup = ({
   action,
@@ -62,6 +65,7 @@ const FormGroup = ({
   const [errors, setErrors] = useState<object>({});
   const [hasError, setHasError] = useState<boolean>(false);
   const [reqItems, setReqItems] = useState<CMMSRequest>();
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const fetchRequest = async () => {
     if(id) {
@@ -200,7 +204,6 @@ const FormGroup = ({
       value: reqItems?.image || '',
       imageSource: (action !== 'create') || imageSource,
       addImage: (action !== 'create') ? false : true,
-      isDisabled: false,
       bufferData: reqItems?.uploaded_file?.data,
       show: true
     },
@@ -347,8 +350,14 @@ const FormGroup = ({
     action;
   }
 
+  const handleDropDownChange = (name, value, action) => {
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+    setSelectedItems(value);
+    action;
+  }
+
   return (
-    <>
+    <View style={{ flex: 1}}>
     <FlatList
       data={data}
       keyExtractor={(item) => item.id.toString()}
@@ -406,26 +415,23 @@ const FormGroup = ({
             break;
 
           case "select":
+            const options = items?.map((item) => {
+              return {
+                value: item[itemsConfig.value],
+                label: item[itemsConfig.label]
+              }
+            });
+
             return ( 
               <>
               { show && 
                 <FormControl isRequired={required} isInvalid={name in errors}>
                   <FormControl.Label>{ label }</FormControl.Label>
-                  <Select
-                    accessibilityLabel={accessibilityLabel}
-                    placeholder={placeholder}
-                    _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }}
-                    mt="1"
-                    onValueChange={(value) => handleChange(name, value, onValueChange(value))}
-                    isDisabled={isDisabled}
-                    {...selectedValueCond}
-                    >
-
-                    {items?.map((item) => {
-                      return (<Select.Item key={item[itemsConfig.key]} label={item[itemsConfig.label]} value={item[itemsConfig.value]} />)
-                    })}
-
-                  </Select>
+                  <SelectPicker 
+                    items={options} 
+                    placeholder={placeholder} 
+                    multiple={false}
+                    onValueChange={(value) => handleChange(name, value, onValueChange(value))} />
                   {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
                 </FormControl>
               }
@@ -465,7 +471,7 @@ const FormGroup = ({
               <FormControl.Label>{label}</FormControl.Label>
               { bufferData 
                 ? <ImageComponent bufferData={bufferData}/> 
-                : <ImagePreview source={{ uri: imageSource }} alt="test" onPress={onPress} addImage={addImage}/>
+                : <ImagePreview source={{ uri: imageSource }} alt="test" onPress={onPress} addImage={addImage} isDisabled={isDisabled}/>
               }
               {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
             </FormControl>
@@ -701,7 +707,7 @@ const FormGroup = ({
       { action !== 'manage' && <Button bgColor="#C8102E" mt={5} mb={10} onPress={onSubmit}>Submit</Button>}
     */}
 
-    </>
+    </View>
 
   )
 
