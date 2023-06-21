@@ -24,7 +24,6 @@ import { ChecklistID, Role } from "../types/enums";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { set } from "react-native-reanimated";
-import { RootState } from "../redux/store";
 import * as FileSystem from 'expo-file-system';
 
 const checklistViews: ModuleActionSheetItem[] = [
