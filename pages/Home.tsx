@@ -11,15 +11,16 @@ import { FlatGrid, SectionGrid } from 'react-native-super-grid';
 import { PieChart } from "react-native-charts-kit";
 
 import instance from "../axios.config";
-import { ModuleActionSheet, ModuleActionSheetItem, ModuleScreen } from "../components/ModuleLayout";
+import { ModuleActionSheet, ModuleActionSheetItem, ModuleDivider, ModuleScreen } from "../components/ModuleLayout";
 import { CMMSDashboardData, CMMSPlant, CMMSUser } from "../types/interfaces";
 import { _retrieveData } from "../helper/AsyncStorage";
 import { set } from "react-native-reanimated";
-import { Center } from "native-base";
+import { Center, Heading } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
 import { useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import Loading from "../components/Loading";
 
 const HomeScreen = ({ navigation }) => {
 
@@ -30,7 +31,8 @@ const HomeScreen = ({ navigation }) => {
   ];
 
   const [sections, setSections] = useState([
-    { title: "Title1", data: items },
+    { title: "Requests", data: items, chart: {}, total: 0 },
+    { title: "Checklists", data: items, chart: {}, total: 0 },
   ]);
 
   const [chartData, setChartData] = useState([ ]);
@@ -53,7 +55,6 @@ const HomeScreen = ({ navigation }) => {
       "#FB2576",
     ];
 
-  console.log(url)
 
   return await instance
     .get(url)
@@ -109,35 +110,20 @@ const HomeScreen = ({ navigation }) => {
   const [viewType, setViewType] = useState<string>(dashboardViews[0].value as string);
   const [total, setTotal] = useState<number>(0);
   const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
  const fetchRequests = async () => {
     const { datetype, date } = pickerwithtype; 
 
-    let promise1 = fetchData("request", plant, field, datetype, date).then((result) => {
-      if (result) setRequestData(result);
-    });
-
-    let promise2 = fetchData("request", plant, "status", datetype, date).then((result) => {
-      if(result) {
-        setRequest(prevState=> ({
-          ...prevState,
-          totalPendingRequest: result?.filter((data) => data.id === 1)[0]?.value || 0,
-          totalOutstandingRequest: 
-            result?.filter((data) => [2].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
-          totalClosedRequest: 
-            result?.filter((data) => [3, 4, 5, 6].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
-        }));
-
+    return await fetchData("request", plant, field, datetype, date).then((result) => {
+      if (result) {
+        setRequestData(result);
+        setIsRequestReady(true);
       }
-
-
     });
 
-    return Promise.all([promise1, promise2]);
   }
 
   const fetchChecklists = async () => {
@@ -149,15 +135,6 @@ const HomeScreen = ({ navigation }) => {
       if (result) {
         setChecklistData(result);
         setIsChecklistReady(true);
-        setChecklist({
-          totalPendingChecklist: result?.filter((data) => data.id === 1)[0]?.value || 0,
-          totalOutstandingChecklist:
-            result?.filter((data) => [2].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
-          totalClosedChecklist:
-            result?.filter((data) => [3, 4, 5, 6].includes(data.id))
-            ?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0,
-        });
       }
     });
   }
@@ -178,6 +155,7 @@ const HomeScreen = ({ navigation }) => {
       const { role_id } = user;
 
       setIsReady(false);
+      setLoading(true);
 
       if([3, 4].includes(role_id)) { // engineer, specialist
         getPlants("/api/getUserPlants").then(result => {
@@ -196,96 +174,75 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
 
     if(plant !== "") {
-      switch(viewType) {
-        case 'requests':
 
-          fetchRequests()
-          .then(()=> {
+      Promise.all([fetchRequests(), fetchChecklists()])
+      .then(()=> {
+          setSections(prevSections=> {
+            const newSections = [...prevSections];
 
             if(requestData && requestData.length > 0) {
-              setSections([ 
-              { title: "Title1", data: [
-                { name: 'Pending ', code: '#c21010', total: request.totalPendingRequest },
-                { name: 'Outstanding ', code: 'purple', total: request.totalOutstandingRequest },
-                { name: 'Completed ', code: '#367e18', total: request.totalClosedRequest },
-              ]}
-              ]); 
+              newSections[0].title = "Requests";
 
-              setChartData(requestData.map(item=> ({ 
+              newSections[0].data = [
+                { name: 'Pending ', code: '#c21010', total: requestData?.filter((data) => data.id === 1)[0]?.value || 0  },
+                { name: 'Outstanding ', code: 'purple', total: requestData?.filter((data) => [2].includes(data.id))?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0 },
+                { name: 'Completed ', code: '#367e18', total: requestData?.filter((data) => [3, 4, 5, 6].includes(data.id))?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0 },
+              ];
+
+              newSections[0].chart = requestData.map(item=> ({ 
                 name: item.name, 
                 population: item.value, 
                 color: item.fill, 
                 legendFontColor: "#7F7F7F", 
                 legendFontSize: 15,
                 total: item.value
-              })));
+              }));
+
+              const totalRequest = requestData?.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.value;
+              }, 0);
+
+              newSections[0].total = totalRequest;
             }
-
-          })
-          .then(()=> {
-            const totalRequest = requestData?.reduce((accumulator, currentValue) => {
-              return accumulator + currentValue.value;
-            }, 0);
-
-            setTotal(totalRequest)
-
-          });
-
-          break;
-
-        case 'checklists':
-
-          fetchChecklists()
-          .then(()=> {
 
             if(checklistData && checklistData.length > 0) {
-              setSections([ 
-              { title: "Title1", data: [
-                { name: 'Pending ', code: '#c21010', total: checklist.totalPendingChecklist },
-                { name: 'Outstanding ', code: 'purple', total: checklist.totalOutstandingChecklist },
-                { name: 'Completed ', code: '#367e18', total: checklist.totalClosedChecklist },
-              ]}
-              ]); 
+              newSections[1].title = "Checklists";
 
-              setChartData(checklistData.map(item=> ({ 
+              newSections[1].data = [
+                { name: 'Pending ', code: '#c21010', total: checklistData?.filter((data) => data.id === 1)[0]?.value || 0 },
+                { name: 'Outstanding ', code: 'purple', total: checklistData?.filter((data) => [2].includes(data.id))?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0 },
+                { name: 'Completed ', code: '#367e18', total: checklistData?.filter((data) => [3, 4, 5, 6].includes(data.id))?.reduce((accumulator, currentValue) => accumulator + currentValue.value, 0) || 0 },
+              ];
+
+              newSections[1].chart = checklistData.map(item=> ({ 
                 name: item.name, 
                 population: item.value, 
                 color: item.fill, 
                 legendFontColor: "#7F7F7F", 
                 legendFontSize: 15,
                 total: item.value
-              })));
+              }));
+
+              const totalChecklist = checklistData?.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.value;
+              }, 0);
+
+              newSections[1].total = totalChecklist;
             }
+
+            return newSections;
+
+
           })
-          .then(()=> {
-            const totalChecklist = checklistData?.reduce((accumulator, currentValue) => {
-              return accumulator + currentValue.value;
-            }, 0);
 
-            setTotal(totalChecklist)
+          setIsReady(true);
+          setLoading(false);
 
+        })
 
-          });
-
-          break;
-
-        case 'changeofparts':
-          break;
-      }
-      setIsReady(true);
     }
 
-  }, [plant, field, pickerwithtype, viewType, 
-    request?.totalClosedRequest, 
-    request?.totalOutstandingRequest, 
-    request?.totalPendingRequest, 
-    checklist?.totalClosedChecklist, 
-    checklist?.totalOutstandingChecklist, 
-    checklist?.totalPendingChecklist,
-    sections[0]?.data[0]?.total,
-    sections[0]?.data[1]?.total,
-    sections[0]?.data[3]?.total,
-  ]);
+  }, [plant, field, pickerwithtype, loading]);
 
   return (
     <ModuleScreen navigation={navigation}>
@@ -295,31 +252,37 @@ const HomeScreen = ({ navigation }) => {
           <View style={[styles.box, {backgroundColor: 'skyblue'}]} />
         </View>
         </View>*/}
-      <ModuleActionSheet 
+      {/*<ModuleActionSheet 
           items={dashboardViews}
           value={viewType}
           setValue={setViewType}
-      />
+      />*/}
       <SectionGrid
         itemDimension={100}
         style={styles.gridView}
         // staticDimension={300}
         // fixed
         spacing={10}
+        renderSectionHeader={({ section }) => (
+          <>
+            <Heading mt={10} size={"sm"}>{section.title}</Heading>
+          </>
+        )}
         renderItem={({ item }) => (
             <View style={[styles.itemContainer, { backgroundColor: '#eee' }]}>
-              <Text style={[styles.itemCount, { color: item.code }]}>{ item.total }</Text>
+              {loading ? <Loading/> : <Text style={[styles.itemCount, { color: item.code }]}>{ item.total }</Text>}
               <Text style={styles.itemName}>{item.name}</Text>
             </View>
           )
         } 
         sections={sections}      
-        renderSectionFooter={({ section }) => (
+        renderSectionFooter={({ section }) => {
+          return (
           <>
-            {!isReady && <Center><Text>Loading ...</Text></Center>}
-            {isReady && <CustomPieChart data={chartData} accessor="total" absolute={false} total={total}/> }
+            {!isReady && <Loading/>}
+            {isReady && section.total > 0 && <CustomPieChart data={section.chart} accessor="total" absolute={false} total={section.total}/> }
           </>
-        )}
+        )}}
         />
     </ModuleScreen>
   )

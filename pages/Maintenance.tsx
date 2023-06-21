@@ -25,6 +25,7 @@ import { useSelector } from "react-redux";
 import { set } from "react-native-reanimated";
 import { RootState } from "../redux/store";
 import * as FileSystem from 'expo-file-system';
+import Loading from "../components/Loading";
 
 const checklistViews: ModuleActionSheetItem[] = [
   {
@@ -287,7 +288,7 @@ const Maintenance = ({ navigation, route }) => {
       <ModuleDivider/>
 
       <View style={{ marginBottom: 90 }}>
-        <VStack space={3}>{isLoading ? <Text>Loading...</Text> : checklistElements}</VStack>
+        <VStack space={3}>{isLoading ? <Loading/> : checklistElements}</VStack>
       </View>
       <ModuleSimpleModal
         isOpen={sendCached}

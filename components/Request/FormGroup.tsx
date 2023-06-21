@@ -10,6 +10,7 @@ import { CMMSRequest } from "../../types/interfaces";
 import MultiSelect from "react-native-multiple-select";
 import { set } from "react-native-reanimated";
 import SelectPicker from "../SelectPicker";
+import Loading from "../Loading";
 
 const FormGroup = ({
   action,
@@ -66,8 +67,10 @@ const FormGroup = ({
   const [hasError, setHasError] = useState<boolean>(false);
   const [reqItems, setReqItems] = useState<CMMSRequest>();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchRequest = async () => {
+    setLoading(true);
     if(id) {
 
       await instance.get(`/api/request/${id}`)
@@ -82,6 +85,7 @@ const FormGroup = ({
           image: null
 
         });
+        setLoading(false);
       })
       .catch((err) => {
           console.log(err)
@@ -89,6 +93,7 @@ const FormGroup = ({
 
     } else {
       setReqItems(requestItems);
+      setLoading(false);
     }
   };
 
@@ -358,7 +363,8 @@ const FormGroup = ({
 
   return (
     <View style={{ flex: 1}}>
-    <FlatList
+    {loading && <Loading/>}
+    {!loading && <FlatList
       data={data}
       keyExtractor={(item) => item.id.toString()}
       renderItem={(item)=>{
@@ -431,6 +437,8 @@ const FormGroup = ({
                     items={options} 
                     placeholder={placeholder} 
                     multiple={false}
+                    {...selectedValueCond}
+                    disabled={isDisabled}
                     onValueChange={(value) => handleChange(name, value, onValueChange(value))} />
                   {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
                 </FormControl>
@@ -512,6 +520,7 @@ const FormGroup = ({
       }
       }
     />
+    }
     {/*<FormControl isRequired>
       <FormControl.Label>Request Type</FormControl.Label>
       <Radio.Group

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Flex, HStack, Icon, IconButton, NativeBaseProvider, Image, Center, Pressable, Text, VStack, Heading, Button, ScrollView, Box } from "native-base";
-import { FlatList, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -25,6 +25,9 @@ import { Role } from "../types/enums";
 import { set } from "react-native-reanimated";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { getRequestPriority, getRequestStatus } from "../helper";
+import Loading from "../components/Loading";
+
 
 const requestlistViews: ModuleActionSheetItem[] = [
   {
@@ -127,19 +130,6 @@ const ReportScreen = ({ navigation }) => {
   };
 
   const renderHeader = (item, _, isActive) => {
-    const STATUS = {
-      "PENDING": { color: "rgb(179, 6, 236);"},
-      "ASSIGNED": { color: "#0000FC"},
-      "COMPLETED": {color: "rgb(14, 189, 5);"},
-      "REJECTED": {color: "#ff0000"},
-      "APPROVED": {color: "color: rgb(14, 189, 5);"},
-    };
-
-    const PRIORITY = {
-      "HIGH": { color: "#C8102E", icon: "arrowup" },
-      "MEDIUM": { color: "#FFB300", icon: "minus" },
-      "LOW": {color: "#76B82A", icon: "arrowdown" }
-    };
 
     return (
       <Animatable.View
@@ -153,8 +143,8 @@ const ReportScreen = ({ navigation }) => {
             <HStack justifyContent="space-between" w="100%">
               <HStack alignItems="center" px={2}>
                 <VStack alignItems="center">
-                  <IconButton icon={<Icon size="md" as={AntDesign} name={item.priority && PRIORITY[item.priority].icon} color={item.priority && PRIORITY[item.priority].color} />} />
-                  <Text fontSize="10" color={item.priority && PRIORITY[item.priority].color}>{item.priority}</Text>
+                  <IconButton icon={<Icon size="md" as={AntDesign} name={item.priority && getRequestPriority(item.priority).icon} color={item.priority && getRequestPriority(item.priority).color} />} />
+                  <Text fontSize="10" color={item.priority && getRequestPriority(item.priority).color}>{item.priority}</Text>
                 </VStack>
               </HStack>
               <HStack alignItems="center" flex={3}>
@@ -167,7 +157,7 @@ const ReportScreen = ({ navigation }) => {
               </HStack>
               <HStack alignItems="center" flex={1} marginTop={3} marginBottom={3}>
                 <VStack alignItems={'center'}>
-                  <Text fontSize="12" color={item.status && STATUS[item.status].color} bold>{item.status}</Text>
+                  <Text fontSize="12" color={item.status && getRequestStatus(item.status).color} bold>{item.status}</Text>
                   <Icon size="lg" as={MaterialCommunityIcons} name={isActive ? 'chevron-up' : 'chevron-down'} color="#C8102E" />
                 </VStack>
               </HStack>
@@ -254,7 +244,8 @@ const ReportScreen = ({ navigation }) => {
         </Center>
       </Box>
 
-      {!isReady && !isOffline && <Center><Text>Loading ...</Text></Center>}
+      {/*!isReady && !isOffline && <Center><Text>Loading ...</Text></Center>*/}
+      {!isReady && !isOffline && <Loading/>}
       {isOffline && 
         <Center>
           <Icon as={MaterialCommunityIcons} name="wifi-off" size="lg" />

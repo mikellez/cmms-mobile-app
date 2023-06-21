@@ -1,3 +1,4 @@
+import { background } from "native-base/lib/typescript/theme/styled-system";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -7,7 +8,9 @@ interface SelectPickerProps {
   placeholder: string,
   onValueChange?: any
   onItemChange?: any
-  multiple?: boolean
+  multiple?: boolean,
+  selectedValue?: any,
+  disabled: boolean
 }
 
 const SelectPicker = (props: SelectPickerProps) => {
@@ -21,18 +24,21 @@ const SelectPicker = (props: SelectPickerProps) => {
     setItems(item);
   }
 
-  console.log('loading', loading)
-
   return (
     <>
     <DropDownPicker
+      disabled={props.disabled}
+      disabledStyle={{
+        opacity: 0.5,
+        backgroundColor: "#f5f5f5"
+      }}
       loading={loading}
       mode={props.multiple ? "BADGE" : "SIMPLE"}
       extendableBadgeContainer={props.multiple ? true : false}
       multiple={props.multiple ?? false}
       searchable={true}
       open={open}
-      value={value}
+      value={props.selectedValue}
       items={props.items}
       setOpen={setOpen}
       onOpen={()=>setLoading(true)}
@@ -43,11 +49,11 @@ const SelectPicker = (props: SelectPickerProps) => {
       onSelectItem={item=>props.multiple ? handleItemChange(item) : props.onValueChange(item.value)}
       setItems={setItems}
       placeholder={props.placeholder}
-      containerProps={{
+      /*containerProps={{
         height: open ? 250+(items.length*30) : null,
         backgroundColor: "#fff",
         borderColor: "#d6d3d1",
-      }}
+      }}*/
       style={{
         borderColor: "#d6d3d1",
       }}

@@ -7,6 +7,7 @@ import AssetHierachy from "../../components/Assets/AssetHierarchy";
 import { Table, Rows } from "react-native-table-component";
 import { Linking } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Loading from "../../components/Loading";
 //import RNFetchBlob from "react-native-fetch-blob";
 
 const Details = ({ route, navigation }) => {
@@ -107,9 +108,7 @@ const Details = ({ route, navigation }) => {
   if (isLoading) {
     return (
       <ModuleScreen navigation={navigation}>
-        <Center>
-          <Text>Loading...</Text>
-        </Center>
+        <Loading/>
       </ModuleScreen>
     );
   }

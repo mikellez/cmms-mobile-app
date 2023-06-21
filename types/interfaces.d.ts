@@ -153,6 +153,7 @@ interface CMMSRequest {
   total?: number;
   image?: string;
   completion_comments?: string;
+  activity_log?: CMMSActivitylog[];
 }
 
 interface CMMSRequestTypes {
@@ -304,6 +305,7 @@ interface CMMSActivitylog {
   user_id: string;
   description: string;
   event_time: string;
+  activity_type: string;
 }
 
 interface CMMSMasterSubmission {

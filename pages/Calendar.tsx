@@ -12,6 +12,7 @@ import { PlantSelect } from "../components/General";
 import { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
 import { Role } from "../types/enums";
+import Loading from "../components/Loading";
 
 export interface ChecklistScheduleInfo {
     assigned_fnames: string[];
@@ -263,7 +264,8 @@ const CalendarTab = ({ navigation }) => {
                 </HStack>
             </View>
             }
-
+            
+            {!isReady && <Loading/>}
             {isReady && isCalendarView && (
                 <View>
                     <Calendar 

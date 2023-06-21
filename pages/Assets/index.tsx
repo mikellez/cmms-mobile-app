@@ -4,6 +4,7 @@ import { Button, Center, Link, ScrollView, Text, VStack } from "native-base";
 import instance from "../../axios.config";
 import AssetLevels from "../../components/Assets/AssetLevels";
 import AssetLevelName from "../../components/Assets/AssetLevelName";
+import Loading from "../../components/Loading";
 
 const Assets = ({ navigation }) => {
   const inititalHierarchyState = {
@@ -136,9 +137,7 @@ const Assets = ({ navigation }) => {
   if (loading) {
     return (
       <ModuleScreen navigation={navigation}>
-        <Center>
-          <Text>Loading...</Text>
-        </Center>
+        <Loading/>
       </ModuleScreen>
     );
   }
