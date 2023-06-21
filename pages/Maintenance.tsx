@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, SafeAreaView, ActivityIndicator, GestureResponderEvent } from "react-native";
-import { HStack, Button, Icon, VStack, Text, IconButton, Center } from "native-base";
+import { HStack, Button, Icon, VStack, Text, IconButton, Center, Alert, Box } from "native-base";
 import MaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import {
@@ -22,8 +22,8 @@ import ChecklistHistory from "../components/Checklist/ChecklistHistory";
 import { useIsFocused } from "@react-navigation/native";
 import { ChecklistID, Role } from "../types/enums";
 import { useSelector } from "react-redux";
-import { set } from "react-native-reanimated";
 import { RootState } from "../redux/store";
+import { set } from "react-native-reanimated";
 import * as FileSystem from 'expo-file-system';
 import Loading from "../components/Loading";
 
@@ -139,16 +139,13 @@ const Maintenance = ({ navigation, route }) => {
     };
 
 
+
     const sendCachedChecklist = async () => {
         if(isOffline) return;
 
         const cachedChecklists = await _retrieveData("checklist");
         if (cachedChecklists != null) {
             const cachedChecklistsArray = JSON.parse(cachedChecklists);
-        // let error = false;
-        //   await checkConnection(setIsConnected);
-        //   console.log(isConnected);
-        //   if (isConnected) {
             for (const index in cachedChecklistsArray) {
                 try {
                     const checklist = cachedChecklistsArray[index];
@@ -277,6 +274,26 @@ const Maintenance = ({ navigation, route }) => {
           ></Button>
         </HStack>
       </ModuleHeader>
+      {isOffline && <Alert w="100%" status="danger">
+          <VStack space={1} flexShrink={1} w="100%" alignItems="center">
+            <Alert.Icon size="md" />
+            <Text fontSize="md" fontWeight="medium" _dark={{
+            color: "coolGray.800"
+          }}>
+              You are now in offline mode
+            </Text>
+
+            <Box _text={{
+            textAlign: "center"
+          }} _dark={{
+            _text: {
+              color: "coolGray.600"
+            }
+          }}>
+              You can still access and complete your checklists that have loaded.
+            </Box>
+          </VStack>
+        </Alert>}
 
       {user && user.role_id !== 4 && <ModuleActionSheet
         items={checklistViews}
@@ -287,8 +304,8 @@ const Maintenance = ({ navigation, route }) => {
 
       <ModuleDivider/>
 
-      <View style={{ marginBottom: 90 }}>
-        <VStack space={3}>{isLoading ? <Loading/> : checklistElements}</VStack>
+      <View style={{ marginBottom: isOffline? 200 : 90 }}>
+        <VStack space={3}>{isLoading ? <Text>Loading...</Text> : checklistElements}</VStack>
       </View>
       <ModuleSimpleModal
         isOpen={sendCached}

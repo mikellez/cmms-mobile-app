@@ -8,7 +8,7 @@ import instance from "../../axios.config";
 import { CMMSChecklist } from "../../types/interfaces";
 import ChecklistTemplate from "../../components/Checklist/ChecklistTemplate";
 import { ScrollView, StyleSheet } from "react-native";
-import { VStack, Text, Center, IconButton, HStack, Button } from "native-base";
+import { VStack, Text, Center, IconButton, HStack, Button, Alert, Box } from "native-base";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Table, Rows } from "react-native-table-component";
 import ChecklistDetails from "../../components/Checklist/ChecklistDetails";
@@ -131,11 +131,32 @@ const CompleteChecklistPage = ({ navigation, route }) => {
     setOfflineModal(false);
   };
 
-  const header = (
+  const header = 
+    
     <Center>
+      {isOffline &&<Alert w="100%" status="danger">
+          <VStack space={1} flexShrink={1} w="100%" alignItems="center">
+            <Alert.Icon size="md" />
+            <Text fontSize="md" fontWeight="medium" _dark={{
+            color: "coolGray.800"
+          }}>
+              You are now in offline mode
+            </Text>
+
+            <Box _text={{
+            textAlign: "center"
+          }} _dark={{
+            _text: {
+              color: "coolGray.600"
+            }
+          }}>
+              You can still complete and submit your checklist here.
+            </Box>
+          </VStack>
+        </Alert>}
       <ChecklistDetails checklist={checklist}></ChecklistDetails>
     </Center>
-  );
+  ;
   const footer = (
     <IconButton
       _icon={{
@@ -152,6 +173,7 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   return (
     <ModuleScreen navigation={navigation}>
       <ChecklistHeader navigation={navigation} header={"Complete Checklist"} />
+      
 
       <ChecklistEditableProvider
         sections={sections}
