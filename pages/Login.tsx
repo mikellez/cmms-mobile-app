@@ -15,8 +15,7 @@ import { _storeData, _retrieveData } from '../helper/AsyncStorage';
 import instance from '../axios.config';
 import { API_URL } from '@env';
 import { login, logout } from '../redux/features/userSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { useDispatch } from 'react-redux';
 
 const Login = ({ navigation }) => {
   const [errorSubmitting, setErrorSubmitting] = useState<string>("");
@@ -29,8 +28,6 @@ const Login = ({ navigation }) => {
   const [faultTypes, setFaultTypes] = useState([]);
   const [plants, setPlants] = useState([]);
   const [assets, setAssets] = useState([]);
-  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
-
 
   const dispatch = useDispatch();
 
@@ -150,10 +147,8 @@ const Login = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-    if (!isOffline) {
-
-      await instance.post(`/api/login`, {username, password})
-      .then(async (res)=> {
+    await instance.post(`/api/login`, {username, password})
+    .then(async (res)=> {
       await instance.get(`/api/user`)
       .then(async (res)=>{
         setIsError(false);
@@ -169,16 +164,15 @@ const Login = ({ navigation }) => {
 
         if(error.response.status === 429)
           reason = "Too many Login attempts. Try again later."
-          if(error.response.status === 401)
+        if(error.response.status === 401)
           reason = "Username and password combination does not match."
-          
-          setIsError(true);
-          setErrorSubmitting(reason);
-          
-        }
-      });
-    }
-      
+        
+        setIsError(true);
+        setErrorSubmitting(reason);
+
+      }
+		});
+
 
   };
 

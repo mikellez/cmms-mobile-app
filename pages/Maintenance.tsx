@@ -52,7 +52,7 @@ const Maintenance = ({ navigation, route }) => {
         checklistViews[0].value as string
     );
     const [sendCached, setSendCached] = useState<boolean>(false);
-    const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [isConnected, setIsConnected] = useState<boolean>(true);
     const [isHistory, setIsHistory] = useState<boolean>(false);
     const [historyCL, setHistoryCL] = useState<CMMSChecklist>();
     const [restricted, setRestricted] = useState<boolean>(false);
@@ -86,7 +86,6 @@ const Maintenance = ({ navigation, route }) => {
         return response.data.rows;
       } catch (err) {
         console.log(err);
-        console.log("Fetch checklist failed");
       }
     };
 
@@ -122,7 +121,6 @@ const Maintenance = ({ navigation, route }) => {
                     setSendCached(true);
                 } catch (e) {
                     console.log(e);
-                    console.log("Failed to send cached checklists");
                 }
             }
         }
@@ -140,22 +138,19 @@ const Maintenance = ({ navigation, route }) => {
     }
 
     useEffect(() => {
+        // const subscribe = subscribeToConnectionChanges(setIsConnected);
         if (!isOffline) {
-            sendCachedChecklist().then((res) => {
-                fetchChecklist(viewType).then((result) => {
-                  if (result) setChecklists(result);
-                  else setChecklists([]);
-                });
-              });
+            // sendCachedChecklist().then((res) => {
+            //     fetchChecklist(viewType).then((result) => {
+            //       if (result) setChecklists(result);
+            //       else setChecklists([]);
+            //     });
+            //   });
         }
     }, [isOffline])
 
     useEffect(() => {
-        // const subscribe = subscribeToConnectionChanges(setIsConnected);
 
-        // setTimeout(() => {
-
-        
         if (isFocused && !isOffline) {
             setIsLoading(true);
             setData([]);
@@ -169,11 +164,12 @@ const Maintenance = ({ navigation, route }) => {
                             if (result) setChecklists(result);
                             else setChecklists([]);
                             });
-                          }
-                        )} else { // Offline
+                        });
+                    } else { // Offline
                         offlineFilterChecklist();
                     }
-      }, [viewType, isFocused]);
+
+        }, [viewType, isFocused]);
 
   // const handleActionChange = (value: string) => {
   //   setViewType(value);
@@ -250,7 +246,7 @@ const Maintenance = ({ navigation, route }) => {
           </VStack>
         </Alert>}
 
-      {user&& user.data && user.data.role_id !== 4 && <ModuleActionSheet
+      {user.data && user.data.role_id !== 4 && <ModuleActionSheet
         items={checklistViews}
         value={viewType}
         setValue={setViewType}
@@ -259,7 +255,7 @@ const Maintenance = ({ navigation, route }) => {
 
       <ModuleDivider/>
 
-      <View style={{ marginBottom: isOffline? 160 : 50 }}>
+      <View style={{ marginBottom: isOffline? 200 : 90 }}>
         <VStack space={3}>{isLoading ? <Text>Loading...</Text> : checklistElements}</VStack>
       </View>
       <ModuleSimpleModal

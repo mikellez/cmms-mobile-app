@@ -37,7 +37,6 @@ const completeChecklist = async (checklist: CMMSChecklist) => {
     });
   } catch (err) {
     console.log(err);
-    console.log("Completing had an error");
   }
 };
 
