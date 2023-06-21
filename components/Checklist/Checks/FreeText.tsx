@@ -85,9 +85,9 @@ const FreeTextEditableForm = ({check, sectionId, rowId}: {
     rowId: string,
 }) => {
 
-    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled, sectionsRef } = useContext(ChecklistEditableFormContext);
     const handleTextChange = (text: string) => {
-        updateSpecificCheck(sectionId, rowId, check.getId(), text, setSections);
+        updateSpecificCheck(sectionId, rowId, check.getId(), text, setSections, sectionsRef);
     };
 
     return (
@@ -104,7 +104,7 @@ const FreeTextEditableForm = ({check, sectionId, rowId}: {
                     autoCompleteType={true} 
                     isDisabled={isDisabled} 
                     onChangeText={handleTextChange}
-                    value={check.value}
+                    {...(check.value !== '' && { value: check.value }) }
                 />
             </VStack>
         </ModuleCardContainer>

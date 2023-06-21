@@ -7,8 +7,11 @@ import { DateData, Calendar } from "react-native-calendars";
 import instance from "../axios.config";
 import { ModuleHeader, ModuleScreen, ModuleDivider } from "../components/ModuleLayout";
 import CalendarEventList from "../components/Calendar/CalendarEventList";
-import { CMMSChangeOfParts, CMMSSchedule } from "../types/interfaces";
+import { CMMSChangeOfParts, CMMSSchedule, CMMSUser } from "../types/interfaces";
 import { PlantSelect } from "../components/General";
+import { RootState } from "../redux/store";
+import { useSelector } from "react-redux";
+import { Role } from "../types/enums";
 
 export interface ChecklistScheduleInfo {
     assigned_fnames: string[];
@@ -71,6 +74,8 @@ const CalendarTab = ({ navigation }) => {
     const [COPItems, setCOPItems] = useState<CMMSChangeOfParts[]>([]);
     const [isCalendarView, setIsCalendarView] = useState<boolean>(true);
     const [dateSelected, setDateSelected] = useState<DateData>();
+    const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
+    const { role_id } = user;
 
     const checklistCalConfig = {key: 'checklist', color: 'green'};
     const copCalConfig = {key: 'cop', color: 'purple'};
@@ -221,8 +226,8 @@ const CalendarTab = ({ navigation }) => {
                     )}
                     <PlantSelect
                         onChange={(value) => plantFilter(+value)}
-                        accessControl
-                        selectAllPlants
+                        accessControl={[Role.Engineer, Role.Specialist].includes(role_id) ? true : false}
+                        selectAllPlants={[Role.Engineer, Role.Specialist].includes(role_id) ? false : true}
                         maxHeight={25}
                         minWidth={150}
                         style={{ height: 40 }}

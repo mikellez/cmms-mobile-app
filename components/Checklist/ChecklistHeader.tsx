@@ -13,7 +13,7 @@ const ChecklistHeader = ({navigation, header}) => {
                             <Icon as={AntDesign} name="arrowleft" size="sm"/>
                         } 
                         size="xs"
-                        onPress={() => navigation.pop()}
+                        onPress={() => navigation.goBack()}
                     ></Button>
                 </HStack>
             </ModuleHeader>

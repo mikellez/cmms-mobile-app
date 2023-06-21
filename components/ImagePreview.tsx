@@ -1,18 +1,28 @@
 import React, { CSSProperties } from 'react';
-import { Center, Container, Icon, IconButton, Image } from 'native-base';
+import { Center, Container, Icon, IconButton, Image, Pressable } from 'native-base';
 import { StyleSheet, Text, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const ImagePreview = ({ source, alt }) => {
+const ImagePreview = ({ source, alt, addImage, onPress, isDisabled }) => {
   return (
     <>
-      {
-        source.uri ? <Image source={source} style={styles.container} alt={alt}/>
-        : 
+      {addImage ? 
+        <Pressable onPress={onPress} isDisabled={isDisabled}>
+          {source.uri 
+          ? <Image source={source} style={styles.container} alt={alt}/>
+          :
+          <View style={styles.container}>
+            <Icon size="2xl" as={MaterialCommunityIcons} name="camera" color="#C8102E" />
+            <Text style={styles.text}>Add Image</Text>
+          </View>
+          }
+        </Pressable>
+        :
         <View style={styles.container}>
-          <IconButton icon={<Icon size="2xl" as={MaterialCommunityIcons} name="camera" color="#C8102E" />} />
-          <Text style={styles.text}>Add image</Text>
+          <IconButton icon={<Icon size="2xl" as={MaterialCommunityIcons} name="image" color="#C8102E" />} />
+          <Text style={styles.text}>No Image</Text>
         </View>
+
       }
     </>
   )

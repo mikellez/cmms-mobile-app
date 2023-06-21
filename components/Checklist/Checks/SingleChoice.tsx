@@ -91,9 +91,9 @@ const SingleChoiceEditableForm = ({check, sectionId, rowId}: {
     rowId: string,
 }) => {
 
-    const { setSections, isDisabled } = useContext(ChecklistEditableFormContext);
+    const { setSections, isDisabled, sectionsRef } = useContext(ChecklistEditableFormContext);
     const handleChange = (value: string) => {
-        updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections);
+        updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections, sectionsRef);
     };
     
     return <ModuleCardContainer>
@@ -106,7 +106,7 @@ const SingleChoiceEditableForm = ({check, sectionId, rowId}: {
                 <Radio.Group 
                     name="SingleChoice"
                     onChange={handleChange}
-                    value={check.value}
+                    {...(check.value !== '' && { value: check.value }) }
                 >
                     <FlatList
                     data={check.choices}

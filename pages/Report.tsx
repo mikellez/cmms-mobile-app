@@ -162,7 +162,7 @@ const ReportScreen = ({ navigation }) => {
                   <HStack w="100%" justifyContent="space-between">
                     <Text><Heading size="xs">Case ID:</Heading> {item.request_id}</Text>
                   </HStack>
-                  <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.asset_name}</Text>
+                  <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.fault_description}</Text>
                 </VStack>
               </HStack>
               <HStack alignItems="center" flex={1} marginTop={3} marginBottom={3}>
@@ -208,7 +208,7 @@ const ReportScreen = ({ navigation }) => {
                   
                   {
                     ['COMPLETED', 'REJECTED'].includes(item.status)
-                    && [1, 2].includes(role_id)
+                    && [1, 2, 3].includes(role_id)
                     && <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="sticker-check-outline" color="#C8102E" />} onPress={()=>navigation.navigate("ManageRequest", { id: item.request_id })}/>
                   }
 

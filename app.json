@@ -23,10 +23,18 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.cmmsmobileapp",
-      "runtimeVersion": "exposdk:48.0.0" 
+      "runtimeVersion": "exposdk:48.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
     }
   }
 }

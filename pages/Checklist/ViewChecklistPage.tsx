@@ -1,5 +1,5 @@
-import React, { useEffect, useState, createContext } from "react";
-import { ModuleScreen, ModuleHeader, ModuleSimpleModal, ModalIcons } from "../../components/ModuleLayout";
+import React, { useEffect, useState, createContext, useRef } from "react";
+import { ModuleScreen, ModuleHeader, ModuleSimpleModal } from "../../components/ModuleLayout";
 import { CMMSChecklist } from "../../types/interfaces";
 import { ScrollView, StyleSheet } from "react-native";
 import { VStack, Text, Center, TextArea, FormControl, Button, HStack, Modal } from "native-base";
@@ -13,6 +13,7 @@ import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 const ViewChecklistPage = ({navigation, route}) => {
     const [checklist, setChecklist] = useState<CMMSChecklist>({} as CMMSChecklist);
     const [sections, setSections] = useState<ChecklistSection[]>([]);
+    const sectionsRef = useRef<ChecklistSection[]>([]);
     
     useEffect(() => {
         console.log(route.params)
@@ -25,6 +26,7 @@ const ViewChecklistPage = ({navigation, route}) => {
         // console.log(checklist.datajson);
         if (checklist && checklist.datajson) {
             setSections(checklist.datajson.map(section => ChecklistSection.fromJSON(section)));
+            sectionsRef.current = checklist.datajson.map(section => ChecklistSection.fromJSON(section));
         }
     }, [checklist])
 
@@ -36,7 +38,7 @@ const ViewChecklistPage = ({navigation, route}) => {
         <ModuleScreen navigation={navigation}>
             <ChecklistHeader navigation={navigation} header={"View Checklist"}/>
             
-            <ChecklistEditableProvider sections={sections} setSections={setSections} isDisabled>
+            <ChecklistEditableProvider sections={sections} setSections={setSections} isDisabled sectionsRef={sectionsRef}>
                 <ChecklistEditableForm header={header} footer={null}/>
             </ChecklistEditableProvider>
         </ModuleScreen>

@@ -21,7 +21,7 @@ const Header = ({ navigation }) => {
     await instance.post(`/api/logout`)
     .then((res)=> {
       _clear();
-      alert('logout');
+      //alert('logout');
       navigation.navigate('Login');
     })
   }
@@ -29,7 +29,7 @@ const Header = ({ navigation }) => {
   const confirmLogout = async () => {
     await instance.post(`/api/logout`).then((res) => {
       _clear();
-      alert("logout");
+      //alert("logout");
       navigation.navigate("Login");
     });
   };
@@ -57,7 +57,7 @@ const Header = ({ navigation }) => {
           <Image
             size={"2xl"}
             style={{ resizeMode: "contain", width: 150, height: 20 }}
-            alt="fallback text"
+            alt=""
             source={require("../assets/keppellogo.png")}
           />
         </HStack>
@@ -69,10 +69,10 @@ const Header = ({ navigation }) => {
                 as={FontAwesome}
                 name="user-circle-o"
                 color={isOffline ? "gray.600" : "#C8102E"}
-                disabled={isOffline ? true : false}
               />
             }
             onPress={() => setModalVisible(!modalVisible)}
+            disabled={isOffline ? true : false}
           />
         </HStack>
       </HStack>

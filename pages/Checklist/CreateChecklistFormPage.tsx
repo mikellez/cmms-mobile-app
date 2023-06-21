@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
@@ -22,6 +22,7 @@ const fetchSpecificChecklist = async (
   type: ChecklistType
 ): Promise<CMMSChecklist | void> => {
   try {
+    console.log(`/api/checklist/${type}/${id}`)
     const response = instance.get(`/api/checklist/${type}/${id}`);
     return (await response).data;
   } catch (err) {
@@ -45,6 +46,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
   const [sections, setSections] = useState<ChecklistSection[]>([]);
   const [level, setLevel] = useState<number>();
   const [isSubmitting, setSubmitting] = useState<boolean>(false);
+  const sectionsRef = useRef<ChecklistSection[]>([]);
+  console.log(sections)
 
   const { checklistId, checklistType } = route.params;
 
@@ -89,9 +92,9 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
 
   useEffect(() => {
     if (loadingModal && isSubmitting) {
-      setTimeout(() => {
+      /*setTimeout(() => {
         setLevel(3);
-      }, 2000);
+      }, 2000);*/
     }
   }, [loadingModal, isSubmitting]);
 
@@ -141,7 +144,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
     }
 
     setSubmitting(false);
-  }, [checklist]);
+  }, [checklist, isSubmitting]);
 
   if (level === 0) {
     updateChecklistDataJSON();
@@ -163,6 +166,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
           setSections(
             data.datajson.map((section) => ChecklistSection.fromJSON(section))
           );
+
+          sectionsRef.current = data.datajson.map((section) => ChecklistSection.fromJSON(section));
         }
       });
     } else {
@@ -210,6 +215,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         setSections={setSections}
         level={level}
         setLevel={setLevel}
+        sectionsRef={sectionsRef}
       >
         <ChecklistCreator header={header} footer={footer} />
       </ChecklistCreateContextProvider>

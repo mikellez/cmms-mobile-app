@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState, createContext, useRef } from "react";
 import {
   ModuleScreen,
   ModuleHeader,
@@ -48,6 +48,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
   const [warningModal, setWarningModal] = useState<boolean>(false);
   const [approveModal, setApproveModal] = useState<boolean>(false);
   const [rejectModal, setRejectModal] = useState<boolean>(false);
+  const sectionsRef = useRef<ChecklistSection[]>([]);
 
   useEffect(() => {
     console.log(route.params);
@@ -62,6 +63,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
       setSections(
         checklist.datajson.map((section) => ChecklistSection.fromJSON(section))
       );
+      sectionsRef.current = checklist.datajson.map((section) => ChecklistSection.fromJSON(section));
     }
   }, [checklist]);
 
@@ -102,35 +104,42 @@ const ManageChecklistPage = ({ navigation, route }) => {
   );
 
   const footer = (
-    <KeyboardAvoidingView>
-      <VStack space={2} my={20}>
-        <FormControl.Label>Manager's Comments</FormControl.Label>
-        <TextArea
-          autoCompleteType={true}
-          value={managerComments}
-          onChangeText={(text) => setManagerComments(text)}
-        />
+    <VStack space={2} marginBottom={100}>
+      <FormControl.Label>Manager's Comments</FormControl.Label>
+      <TextArea
+        autoCompleteType={true}
+        value={managerComments}
+        onChangeText={(text) => setManagerComments(text)}
+      />
 
-        <HStack width="full">
-          <Button
-            width="45%"
-            backgroundColor="#E64848"
-            onPress={(e) => handleButtonPress(Action.Reject)}
-          >
-            Reject
-          </Button>
+      <HStack width="full">
+        <Button
+          width="45%"
+          backgroundColor="#E64848"
+          onPress={(e) => handleButtonPress(Action.Reject)}
+        >
+          Reject
+        </Button>
 
-          <Button
-            width="45%"
-            marginLeft="auto"
-            backgroundColor="#36AE7C"
-            onPress={(e) => handleButtonPress(Action.Approve)}
-          >
-            Approve
-          </Button>
-        </HStack>
-      </VStack>
-    </KeyboardAvoidingView>
+        <Button
+          width="45%"
+          marginLeft="auto"
+          backgroundColor="#36AE7C"
+          onPress={(e) => handleButtonPress(Action.Approve)}
+        >
+          Approve
+        </Button>
+      </HStack>
+      <HStack width="full">
+        <Text></Text>
+      </HStack>
+      <HStack width="full">
+        <Text></Text>
+      </HStack>
+      <HStack width="full">
+        <Text></Text>
+      </HStack>
+    </VStack>
   );
 
   return (
@@ -140,6 +149,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
       <ChecklistEditableProvider
         sections={sections}
         setSections={setSections}
+        sectionsRef={sectionsRef}
         isDisabled
       >
         <ChecklistEditableForm header={header} footer={footer} />

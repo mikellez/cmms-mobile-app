@@ -13,7 +13,7 @@ import {
   IconButton,
 } from "native-base";
 import EntypoIcon from "react-native-vector-icons/Entypo";
-import { CMMSChecklist } from "../../types/interfaces";
+import { CMMSChecklist, CMMSUser } from "../../types/interfaces";
 import { shortDate, getChecklistStatusColor } from "../../helper";
 import { ModuleCardContainer } from "../ModuleLayout";
 import {
@@ -21,10 +21,11 @@ import {
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
 import { ChecklistID } from "../../types/enums";
-import { useCurrentUser } from "../../helper/hooks/SWR";
 import { Role, ChecklistType } from "../../types/enums";
 import { ModuleSimpleModal } from "../ModuleLayout";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const ListBox = ({
   checklist,
@@ -37,7 +38,7 @@ const ListBox = ({
   setIsHistory: React.Dispatch<React.SetStateAction<boolean>>;
   setHistoryCL: React.Dispatch<React.SetStateAction<CMMSChecklist>>;
 }) => {
-  const user = useCurrentUser();
+  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
 
   const handlePress = () => {
     const clID = checklist.status_id;
@@ -45,7 +46,7 @@ const ListBox = ({
       navigation.navigate("CompleteChecklistPage", checklist);
     } else if (
       clID === ChecklistID.WorkDone &&
-      (user.data.role_id === Role.Manager || user.data.role_id === Role.Admin)
+      (user.role_id === Role.Manager || user.role_id === Role.Admin)
     ) {
       navigation.navigate("ManageChecklistPage", checklist);
     } else if (clID === ChecklistID.Pending) {

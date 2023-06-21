@@ -8,7 +8,8 @@ import { ChecklistEditableFormContext } from "../../context/checklistContext";
 import { ModuleDivider } from "../ModuleLayout";
 
 const ChecklistEditableForm = ({header, footer}) => {
-    const { sections, setSections } = useContext(ChecklistEditableFormContext);
+    const { sectionsRef, sections, setSections } = useContext(ChecklistEditableFormContext);
+    console.log('re-render')
 
     return (
         <SafeAreaView style={{marginBottom: 42}}>
@@ -16,7 +17,7 @@ const ChecklistEditableForm = ({header, footer}) => {
             <FlatList 
                 ListHeaderComponent={header}
                 ListFooterComponent={footer}
-                data={sections}
+                data={sectionsRef?.current}
                 keyExtractor={section => section.getId()}
                 renderItem={({ item }) => <ChecklistEditableFormSection section={item} />}
             />
@@ -44,7 +45,9 @@ const ChecklistEditableFormRow = ({sectionId, row}: {sectionId: string, row: Che
             <Text style={styles.rowTitle}>{row.description}</Text>
             <FlatList
                 data={row.checks}
-                renderItem={({ item }) => <React.Fragment>{item.renderEditableForm(sectionId, row.getId())}</React.Fragment>}
+                renderItem={({ item }) => {
+                    return (<React.Fragment>{item.renderEditableForm(sectionId, row.getId())}</React.Fragment>)}
+                }
                 keyExtractor={check => check.getId()}
             />
         </SafeAreaView>
@@ -58,8 +61,9 @@ const updateSpecificCheck = (
     checkId: string,
     value: string,
     setSections: React.Dispatch<SetStateAction<ChecklistSection[]>>,
+    sectionsRef: React.MutableRefObject<ChecklistSection[]>
 ) => {
-    setSections(prevSections => {
+    /*setSections(prevSections => {
         const newSections = [...prevSections];
 
         for (let i = 0; i < prevSections.length; i++) {
@@ -68,7 +72,13 @@ const updateSpecificCheck = (
             }
         }
         return newSections;
-    })
+    })*/
+    for(let i = 0; i < sectionsRef.current.length; i++) {
+        if (sectionsRef.current[i].getId() === sectionId) {
+            sectionsRef.current[i].updateSection(rowId, checkId, value);
+        }
+    }
+
 };
 
 const styles = StyleSheet.create({

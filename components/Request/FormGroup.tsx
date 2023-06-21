@@ -1,5 +1,5 @@
 import { FormControl, HStack, Radio, Select, CheckIcon, TextArea, Pressable, Button, Box, Text } from "native-base";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import ImagePreview from "../ImagePreview";
 import ImageComponent from "../Image";
 import { useEffect, useState } from "react";
@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { isEmpty } from "../../helper/utility";
 import instance from "../../axios.config";
 import { CMMSRequest } from "../../types/interfaces";
+import MultiSelect from "react-native-multiple-select";
+import { set } from "react-native-reanimated";
+import SelectPicker from "../SelectPicker";
 
 const FormGroup = ({
   action,
@@ -15,6 +18,7 @@ const FormGroup = ({
   type = '',
   plant,
   asset,
+  formState,
   requestItems,
   requestTypes,
   onRequestTypeChange,
@@ -61,6 +65,7 @@ const FormGroup = ({
   const [errors, setErrors] = useState<object>({});
   const [hasError, setHasError] = useState<boolean>(false);
   const [reqItems, setReqItems] = useState<CMMSRequest>();
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const fetchRequest = async () => {
     if(id) {
@@ -134,7 +139,7 @@ const FormGroup = ({
       isDisabled: action !== "create" ?? false, 
       items: faultTypes,
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: reqItems?.fault_id ?? '' }),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: formState.faultTypeID ? formState.faultTypeID : (reqItems?.fault_id ?? '') }),
       show: true
     },
     {
@@ -166,7 +171,7 @@ const FormGroup = ({
       isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false,
       items: plants,
       itemsConfig: { key: "plant_id", value: "plant_id", label: "plant_name"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && plant)) && { selectedValue: plant ? plant : (reqItems?.plant_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && plant) || (action === 'create' && type==='corrective')) && { selectedValue: formState.plantLocationID ? formState.plantLocationID : (plant ? plant : (reqItems?.plant_id || ''))}),
       show: true
     },
     {
@@ -182,7 +187,7 @@ const FormGroup = ({
       isDisabled: (action !== "create" || (action === 'create' && type==='guest')) ?? false,
       items: assetTags,
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
-      selectedValueCond: ((action !== 'create' || (action === 'create' && asset)) && { selectedValue: asset ? asset : (reqItems?.psa_id || '')}),
+      selectedValueCond: ((action !== 'create' || (action === 'create' && asset) || (action === 'create' && type === 'corrective')) && { selectedValue: formState.taggedAssetID ? formState.taggedAssetID : (asset ? asset : (reqItems?.psa_id || ''))}),
       show: true
     },
     {
@@ -197,7 +202,8 @@ const FormGroup = ({
       onPress: onImagePicker,
       isDisabled: action !== "create" ?? false,
       value: reqItems?.image || '',
-      imageSource: (action !== 'create') && imageSource,
+      imageSource: (action !== 'create') || imageSource,
+      addImage: (action !== 'create') ? false : true,
       bufferData: reqItems?.uploaded_file?.data,
       show: true
     },
@@ -240,6 +246,8 @@ const FormGroup = ({
       onPress: onCompletionImagePicker,
       imageSource: completionImageSource,
       bufferData: reqItems?.completion_file?.data,
+      addImage: (action === 'complete') ? true : false,
+      isDisabled: false,
       show: ['complete','manage'].includes(action)
     },
     {
@@ -249,11 +257,11 @@ const FormGroup = ({
       label: "Completion Comment",
       name: "completionComment",
       placeholder: "Completion Comment",
-      defaultValue: reqItems?.completion_comments || '',
+      defaultValue: reqItems?.complete_comments || '',
       onChangeText: onCompletionCommentChange,
       isDisabled: action === "manage",
       isReadOnly: action === "manage",
-      valueCond: (action !== 'complete' && { value: reqItems?.completion_comments || 'NIL'}),
+      valueCond: (action !== 'complete' && { value: reqItems?.complete_comments || 'NIL'}),
       show: ['complete','manage'].includes(action)
     },
     {
@@ -342,8 +350,14 @@ const FormGroup = ({
     action;
   }
 
+  const handleDropDownChange = (name, value, action) => {
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+    setSelectedItems(value);
+    action;
+  }
+
   return (
-    <>
+    <View style={{ flex: 1}}>
     <FlatList
       data={data}
       keyExtractor={(item) => item.id.toString()}
@@ -370,7 +384,9 @@ const FormGroup = ({
           valueCond,
           bgColor,
           required,
-          requiredMessage
+          requiredMessage,
+          imageSource,
+          addImage
         } = item.item;
       
         switch(type) {
@@ -399,26 +415,23 @@ const FormGroup = ({
             break;
 
           case "select":
+            const options = items?.map((item) => {
+              return {
+                value: item[itemsConfig.value],
+                label: item[itemsConfig.label]
+              }
+            });
+
             return ( 
               <>
               { show && 
                 <FormControl isRequired={required} isInvalid={name in errors}>
                   <FormControl.Label>{ label }</FormControl.Label>
-                  <Select
-                    accessibilityLabel={accessibilityLabel}
-                    placeholder={placeholder}
-                    _selectedItem={{ bg: "teal.600", endIcon: <CheckIcon size={5} /> }}
-                    mt="1"
-                    onValueChange={(value) => handleChange(name, value, onValueChange(value))}
-                    isDisabled={isDisabled}
-                    {...selectedValueCond}
-                    >
-
-                    {items?.map((item) => {
-                      return (<Select.Item key={item[itemsConfig.key]} label={item[itemsConfig.label]} value={item[itemsConfig.value]} />)
-                    })}
-
-                  </Select>
+                  <SelectPicker 
+                    items={options} 
+                    placeholder={placeholder} 
+                    multiple={false}
+                    onValueChange={(value) => handleChange(name, value, onValueChange(value))} />
                   {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
                 </FormControl>
               }
@@ -458,10 +471,7 @@ const FormGroup = ({
               <FormControl.Label>{label}</FormControl.Label>
               { bufferData 
                 ? <ImageComponent bufferData={bufferData}/> 
-                : 
-                <Pressable onPress={onPress}>
-                  <ImagePreview source={{ uri: imageSource }} alt="test" />
-                </Pressable>
+                : <ImagePreview source={{ uri: imageSource }} alt="test" onPress={onPress} addImage={addImage} isDisabled={isDisabled}/>
               }
               {name in errors && <FormControl.ErrorMessage>{requiredMessage}</FormControl.ErrorMessage>}
             </FormControl>
@@ -475,8 +485,8 @@ const FormGroup = ({
             <>
             { show && 
               <HStack justifyContent="center">
-                <Button bgColor={items[0].bgColor} mr={5} mt={5} mb={10} onPress={items[0].onPress}>{ items[0].label }</Button>
-                <Button bgColor={items[1].bgColor} ml={5} mt={5} mb={10} onPress={items[1].onPress}>{ items[1].label }</Button>
+                <Button bgColor={items[0].bgColor} mr={5} mt={5} mb={20} onPress={items[0].onPress}>{ items[0].label }</Button>
+                <Button bgColor={items[1].bgColor} ml={5} mt={5} mb={20} onPress={items[1].onPress}>{ items[1].label }</Button>
               </HStack>
             }
             </>
@@ -490,7 +500,7 @@ const FormGroup = ({
             { show && 
               <>
               { hasError && <Text color={"rgb(220, 38, 38)"} fontSize={12} mt={3}>Please fill in all required fields</Text> }
-              <Button bgColor={bgColor} mt={5} mb={10} onPress={()=>handleSubmit(onPress)}>{ label }</Button>
+              <Button bgColor={bgColor} mt={5} mb={20} onPress={()=>handleSubmit(onPress)}>{ label }</Button>
               </>
             }
             </>
@@ -697,7 +707,7 @@ const FormGroup = ({
       { action !== 'manage' && <Button bgColor="#C8102E" mt={5} mb={10} onPress={onSubmit}>Submit</Button>}
     */}
 
-    </>
+    </View>
 
   )
 

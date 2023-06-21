@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useEffect, useState, createContext, useRef } from "react";
 import {
   ModuleScreen,
   ModuleHeader,
@@ -24,8 +24,6 @@ import { _addToDataArray } from "../../helper/AsyncStorage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
-
-
 const completeChecklist = async (checklist: CMMSChecklist) => {
   try {
     await instance({
@@ -47,11 +45,11 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   const [sections, setSections] = useState<ChecklistSection[]>([]);
   const [incompleteModal, setIncompleteModal] = useState<boolean>(false);
   const [successModal, setSuccessModal] = useState<boolean>(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  //const [isConnected, setIsConnected] = useState<boolean>(false);
   const [offlineModal, setOfflineModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const isOffline = useSelector<RootState, boolean>((state) => state.offline);
-
+  const sectionsRef = useRef<ChecklistSection[]>([]);
 
   // useEffect(() => {
   //     const subscribe = subscribeToConnectionChanges(setIsConnected);
@@ -66,24 +64,24 @@ const CompleteChecklistPage = ({ navigation, route }) => {
 
   useEffect(() => {
     if (isSubmitting) {
-      checkConnection(setIsConnected).then(() => {
-        console.log("Connected: " + isConnected);
-        if (isConnected) {
-          setSuccessModal(true);
+      console.log("Connected: " + isOffline);
+      if (!isOffline) {
+        setSuccessModal(true);
 
-          completeChecklist(checklist).then((res) => {
-            navigation.navigate("Maintenance");
-          });
-        } else {
-          setOfflineModal(true);
-        }
-      });
+        completeChecklist(checklist).then((res) => {
+          navigation.navigate("Maintenance");
+        });
+      } else {
+        setOfflineModal(true);
+      }
     } else if (checklist && checklist.datajson) {
       console.log("hello");
       console.log(route.params);
       setSections(
         checklist.datajson.map((section) => ChecklistSection.fromJSON(section))
       );
+
+      sectionsRef.current = checklist.datajson.map((section) => ChecklistSection.fromJSON(section));
     }
   }, [checklist]);
 
@@ -91,13 +89,13 @@ const CompleteChecklistPage = ({ navigation, route }) => {
     return sections.map((section) => section.toJSON());
   };
   const handleSubmit = () => {
-    if (!checkIfChecklistIsComplete(sections)) {
+    if (!checkIfChecklistIsComplete(sectionsRef.current)) {
       setIncompleteModal(true);
     } else {
       setIsSubmitting(true);
       setChecklist((prevChecklist) => {
         const newChecklist = { ...prevChecklist };
-        newChecklist.datajson = toDataJSON(sections);
+        newChecklist.datajson = toDataJSON(sectionsRef.current);
         return newChecklist;
       });
       // if (isConnected){
@@ -180,6 +178,7 @@ const CompleteChecklistPage = ({ navigation, route }) => {
       <ChecklistEditableProvider
         sections={sections}
         setSections={setSections}
+        sectionsRef={sectionsRef}
         isDisabled={false}
       >
         <ChecklistEditableForm header={header} footer={footer} />
