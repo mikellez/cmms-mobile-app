@@ -274,6 +274,7 @@ const Maintenance = ({ navigation, route }) => {
             bg="#C8102E"
             leftIcon={<Icon as={AntDesign} name="addfile" size="sm" />}
             size="xs"
+            isDisabled={isOffline}
             onPress={() => navigation.navigate("ChecklistTemplatesPage")}
           ></Button>
         </HStack>
