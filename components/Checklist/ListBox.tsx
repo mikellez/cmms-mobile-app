@@ -22,7 +22,6 @@ import {
 } from "react-native-gesture-handler";
 import { ChecklistID } from "../../types/enums";
 import { Role, ChecklistType } from "../../types/enums";
-import { ModuleSimpleModal } from "../ModuleLayout";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -39,6 +38,7 @@ const ListBox = ({
   setHistoryCL: React.Dispatch<React.SetStateAction<CMMSChecklist>>;
 }) => {
   const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
+  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
 
   const handlePress = () => {
     const clID = checklist.status_id;
@@ -63,6 +63,7 @@ const ListBox = ({
     setHistoryCL(checklist);
     setIsHistory(true);
   };
+  console.log('offline', isOffline)
 
   return (
     <Pressable onPress={handlePress}>

@@ -108,7 +108,7 @@ const Maintenance = ({ navigation, route }) => {
           setIsLoading(false);
           setIsListLoading(false);
 
-          if(viewType === ChecklistID.Assigned.toString()) {
+          if(viewType === 'assigned') {
             storeFile(newData);
           }
 
@@ -123,6 +123,7 @@ const Maintenance = ({ navigation, route }) => {
       } else {
         const cachedChecklisting = await readFile();
         setData(JSON.parse(cachedChecklisting));
+        console.log('cachedChecklisting', cachedChecklisting)
         setIsLoading(false);
         setIsListLoading(false);
       }
@@ -176,9 +177,12 @@ const Maintenance = ({ navigation, route }) => {
         if (cachedChecklists != null) {
             const cachedChecklistsArray = JSON.parse(cachedChecklists) as CMMSChecklist[];
             const cachedChecklistsID = cachedChecklistsArray.map(cl => cl.checklist_id);
-            setChecklists(prev => {
+            /*setChecklists(prev => {
                 return prev.filter(cl => !cachedChecklistsID.includes(cl.checklist_id))
-            })
+            })*/
+            setData(prev => {
+              return prev.filter(cl => !cachedChecklistsID.includes(cl.checklist_id))
+            });
         }
     }
 
@@ -189,11 +193,11 @@ const Maintenance = ({ navigation, route }) => {
         await sendCachedChecklist();
 
         const result = await fetchChecklist(viewType);
-        if (result) {
+        /*if (result) {
           setChecklists(result);
         } else {
           setChecklists([]);
-        }
+        }*/
 
         if (isOffline) {
           offlineFilterChecklist();
