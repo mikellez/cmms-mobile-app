@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { getRequestPriority, getRequestStatus } from "../helper";
 import Loading from "../components/Loading";
+import moment from "moment";
 
 
 const requestlistViews: ModuleActionSheetItem[] = [
@@ -188,6 +189,7 @@ const ReportScreen = ({ navigation }) => {
               </HStack>
               <Text><Heading size="xs">Asset Name:</Heading> {item.asset_name}</Text>
               <Text><Heading size="xs">Requested By:</Heading> {item?.request_name ?? 'NIL'}</Text>
+              <Text><Heading size="xs">Created On:</Heading> {`${moment(new Date(item.created_date)).format('MMMM Do YYYY, h:mm:ss a')}`}</Text>
               <HStack justifyContent="center" w="100%" flex={1}>
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="eyeo" color="#C8102E" />} onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}/>
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>

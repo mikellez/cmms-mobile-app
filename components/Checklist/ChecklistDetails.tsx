@@ -2,6 +2,7 @@ import {Text} from "native-base";
 import { CMMSChecklist } from "../../types/interfaces";
 import { Table, Rows } from "react-native-table-component";
 import { StyleSheet } from "react-native";
+import moment from "moment";
 
 
 const ChecklistDetails = ({checklist} : {
@@ -10,7 +11,7 @@ const ChecklistDetails = ({checklist} : {
     const widthArr = [150,200];
     const tableData = [
     ['Description',checklist.description],
-    ['Created Date',checklist.created_date],
+    ['Created Date', moment(checklist.created_date).format('MMMM Do YYYY, h:mm:ss a')],
     ['Plant', checklist.plant_name],
     ['Assigned To', checklist.assigneduser],
     ['Created By', checklist.createdbyuser],
