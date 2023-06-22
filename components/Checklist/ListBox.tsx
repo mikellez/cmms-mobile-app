@@ -26,6 +26,7 @@ import { ModuleSimpleModal } from "../ModuleLayout";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import moment from "moment";
 
 const ListBox = ({
   checklist,
@@ -68,7 +69,7 @@ const ListBox = ({
     <Pressable onPress={handlePress}>
       <ModuleCardContainer>
         <VStack>
-          <HStack>
+          {/* <HStack>
             <VStack style={{ maxWidth: 250 }}>
               <Text
                 style={{ flex: 1, textAlign: "left" }}
@@ -78,9 +79,16 @@ const ListBox = ({
                 ID: {checklist.checklist_id}
               </Text>
             </VStack>
-          </HStack>
+          </HStack> */}
           <HStack>
-            <VStack style={{ maxWidth: 250 }}>
+            <VStack style={{ maxWidth: 225 }}>
+              <Text
+                style={{ flex: 1, textAlign: "left" }}
+                fontSize={14}
+                fontWeight={600}
+              >
+                ID: {checklist.checklist_id}
+              </Text>
               <Text
                 style={{ flex: 1, textAlign: "left" }}
                 fontSize={14}
@@ -88,22 +96,12 @@ const ListBox = ({
               >
                 {checklist.chl_name}
               </Text>
-            </VStack>
-            <VStack marginLeft="auto">
-              <Text marginLeft="auto">
-                {shortDate(new Date(checklist.created_date))}
-              </Text>
-            </VStack>
-          </HStack>
-          <HStack justifyContent="space-between">
-            <VStack style={{ alignSelf: "flex-start" }}>
               <HStack alignItems="center">
                 <Icon as={EntypoIcon} name="location-pin" size="sm"></Icon>
                 <Text fontSize={12} style={{ color: "#454545" }}>
                   {checklist.plant_name}
                 </Text>
               </HStack>
-
               <Text
                 fontSize={12}
                 fontWeight={600}
@@ -114,6 +112,43 @@ const ListBox = ({
 
               <Text>Created By: {checklist.createdbyuser}</Text>
               <Text>Assigned To: {checklist.assigneduser}</Text>
+              
+            </VStack>
+            <VStack style={{ maxWidth: 125, display: "flex", justifyContent: "space-evenly", alignItems: "center"}} marginLeft="auto">
+              <Text marginLeft="auto" textAlign="center">
+                {moment(new Date(checklist.created_date)).format('MMMM Do YYYY, h:mm:ss a')}
+              </Text>
+              <Button
+                w="30"
+                h="30"
+                bg="#C8102E"
+                leftIcon={
+                  <Icon as={MaterialCommunityIcons} name="history" size="sm" />
+                }
+                size="xs"
+                onPress={handleHistory}
+              ></Button>
+            </VStack>
+          </HStack>
+          <HStack justifyContent="space-between">
+            <VStack style={{ alignSelf: "flex-start" }}>
+              {/* <HStack alignItems="center">
+                <Icon as={EntypoIcon} name="location-pin" size="sm"></Icon>
+                <Text fontSize={12} style={{ color: "#454545" }}>
+                  {checklist.plant_name}
+                </Text>
+              </HStack> */}
+
+              {/* <Text
+                fontSize={12}
+                fontWeight={600}
+                style={{ color: getChecklistStatusColor(checklist.status_id) }}
+              >
+                {checklist.status}
+              </Text>
+
+              <Text>Created By: {checklist.createdbyuser}</Text>
+              <Text>Assigned To: {checklist.assigneduser}</Text> */}
             </VStack>
             <VStack justifyContent="space-around">
               {/* <Button mt={2} backgroundColor="#C70F2B" onPress={handleHistory}>
@@ -126,7 +161,7 @@ const ListBox = ({
                                 >
                                 </IconButton>
                             </Button> */}
-              <Button
+              {/* <Button
                 w="30"
                 h="30"
                 bg="#C8102E"
@@ -135,7 +170,7 @@ const ListBox = ({
                 }
                 size="xs"
                 onPress={handleHistory}
-              ></Button>
+              ></Button> */}
             </VStack>
           </HStack>
           {/* <VStack marginLeft="auto">

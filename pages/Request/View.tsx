@@ -39,9 +39,6 @@ const ReportScreen = ({ route, navigation }) => {
     fetchRequest();
   }, []);
 
-  function moment(arg0: string) {
-    throw new Error("Function not implemented.");
-  }
 
   const activityLogLastItem = (items) => {
     return items?.activity_log[items?.activity_log.length-1];
@@ -75,7 +72,7 @@ const ReportScreen = ({ route, navigation }) => {
 
           <ScrollView w="100%" h="200" px={3}>
 
-            <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date ? shortDateWithDay(new Date(requestItems?.created_date)) : 'NIL' }</Text>
+            <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date ? moment(requestItems.created_date).format('MMMM Do YYYY, h:mm:ss a') : "NIL" }</Text>
             <Text><Heading size="xs">Reported By: </Heading>{ requestItems?.assigned_user_name || 'NIL' }</Text>
             <Text><Heading size="xs">Assigned To: </Heading>{ requestItems?.created_by || 'NIL'}</Text>
 
