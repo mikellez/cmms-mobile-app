@@ -307,7 +307,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     borderRadius: 5,
-    padding: 10,
     height: 150,
   },
   itemCount: {

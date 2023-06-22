@@ -8,7 +8,7 @@ import {
   ModuleHeader,
   ModuleSimpleModal,
 } from "../../components/ModuleLayout";
-import { CMMSChecklist } from "../../types/interfaces";
+import { CMMSChecklist, CMMSUser } from "../../types/interfaces";
 import ChecklistForm from "../../components/Checklist/ChecklistForm";
 import ChecklistSection from "../../components/Checklist/classes/ChecklistSection";
 import ChecklistCreator from "../../components/Checklist/ChecklistCreator";
@@ -16,6 +16,8 @@ import instance from "../../axios.config";
 import { useCurrentUser } from "../../helper/hooks/SWR";
 import { ChecklistCreateContextProvider } from "../../context/checklistContext";
 import { ChecklistType } from "../../types/enums";
+import { RootState } from "../../redux/store";
+import { useSelector } from "react-redux";
 
 const fetchSpecificChecklist = async (
   id: number,
@@ -51,7 +53,7 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
 
   const { checklistId, checklistType } = route.params;
 
-  const user = useCurrentUser();
+  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
 
   const editChecklist = async (checklist: CMMSChecklist) => {
     try {
@@ -159,8 +161,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
         if (data) {
           setChecklist({
             ...data,
-            createdbyuser: user.data.name,
-            created_by_user_id: user.data.id,
+            createdbyuser: user.name,
+            created_by_user_id: user.id,
           });
 
           setSections(
@@ -172,8 +174,8 @@ const CreateChecklistFormPage = ({ navigation, route }) => {
       });
     } else {
       setChecklist({
-        createdbyuser: user.data.name,
-        created_by_user_id: user.data.id,
+        createdbyuser: user.name,
+        created_by_user_id: user.id,
       } as CMMSChecklist);
     }
   }, [checklistId, checklistType]);

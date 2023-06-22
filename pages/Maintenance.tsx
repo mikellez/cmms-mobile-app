@@ -305,7 +305,7 @@ const Maintenance = ({ navigation, route }) => {
       <ModuleDivider/>
 
       <View style={{ marginBottom: isOffline? 200 : 90 }}>
-        <VStack space={3}>{isLoading ? <Text>Loading...</Text> : checklistElements}</VStack>
+        <VStack space={3}>{isLoading ? <Loading/> : checklistElements}</VStack>
       </View>
       <ModuleSimpleModal
         isOpen={sendCached}
