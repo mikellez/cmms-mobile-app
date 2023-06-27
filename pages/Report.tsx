@@ -76,8 +76,17 @@ const ReportScreen = ({ navigation }) => {
 
 
   const fetchRequest = async (viewType) => {
+    const PARAMS = [
+      "request_id",
+      "fault_name",
+      "plant_name",
+      "asset_name",
+      "activity_log",
+      "created_date",
+      "status"
+    ]
 
-    const response = await instance.get(`/api/request/${viewType}`)
+    const response = await instance.get(`/api/request/${viewType}?expand=${PARAMS.join(',')}`)
 
     try {
       return response.data.rows;
@@ -153,7 +162,7 @@ const ReportScreen = ({ navigation }) => {
                   <HStack w="100%" justifyContent="space-between">
                     <Text><Heading size="xs">Case ID:</Heading> {item.request_id}</Text>
                   </HStack>
-                  <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.fault_description}</Text>
+                  <Text flexShrink={1}><Heading size="xs">Fault Type:</Heading> {item.fault_name}</Text>
                 </VStack>
               </HStack>
               <HStack alignItems="center" flex={1} marginTop={3} marginBottom={3}>

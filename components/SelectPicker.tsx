@@ -24,6 +24,12 @@ const SelectPicker = (props: SelectPickerProps) => {
     setItems(item);
   }
 
+  useEffect(() => {
+    if(!props.multiple && props.selectedValue){
+      props.onValueChange(props.selectedValue);
+    }
+  }, [])
+
   return (
     <>
     <DropDownPicker
@@ -45,7 +51,7 @@ const SelectPicker = (props: SelectPickerProps) => {
       setValue={setValue}
       dropDownDirection="AUTO"
       bottomOffset={100} 
-      //onChangeValue={value=>console.log('value', value)}
+      //onChangeValue={value=>props.onValueChange(value)}
       onSelectItem={item=>props.multiple ? handleItemChange(item) : props.onValueChange(item.value)}
       setItems={setItems}
       placeholder={props.placeholder}

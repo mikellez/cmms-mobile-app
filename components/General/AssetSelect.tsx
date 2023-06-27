@@ -91,11 +91,11 @@ const AssetMultiSelect = (props: AssetMultiSelectProps) => {
 
     const handleChange = (items: number[]) => {
         setSelectedItems(items);
-        props.onChange(items.map(item => item.value));
+        props.onChange(items.map(item => item));
     };
 
     return (
-        <SelectPicker items={options} placeholder={"Select Asset"} onItemChange={handleChange} multiple={true}/>
+        <SelectPicker items={options} placeholder={"Select Asset"} onItemChange={handleChange} multiple={true} disabled={false} selectedValue={selectedItems}/>
         /*<MultiSelect
             uniqueKey="id"
             items={options}

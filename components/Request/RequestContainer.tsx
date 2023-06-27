@@ -35,6 +35,8 @@ import { _storeData, _retrieveData } from '../../helper/AsyncStorage';
 import { ItemClick } from 'native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types';
 import { CMMSUser } from '../../types/interfaces';
 import { checkConnection, subscribeToConnectionChanges } from '../../helper/NetInfo';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 type FormValues = {
   name?: string;
@@ -140,6 +142,8 @@ const RequestContainer = ({
   const [asset, setAsset] = useState(route?.params?.asset);
   const [id, setId] = useState(route?.params?.id);
 
+  const isOffline = useSelector<RootState, boolean>((state) => state.offline);
+
   const createRequest = async () => {
     const formData = new FormData();
     if(type === 'guest' && user?.id) {
@@ -160,7 +164,7 @@ const RequestContainer = ({
     console.log('formData', formData);
     //setFormData(formData);
 
-    if(isConnected) {
+    if(!isOffline) {
       return await instance
         .post("/api/request/", formData, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -501,8 +505,6 @@ const RequestContainer = ({
   useEffect(() => {
     fetchUser();
 
-    const subscribe = subscribeToConnectionChanges(setIsConnected);
-
     const fetchData = async () => {
       try {
         await checkConnection(setIsConnected);
@@ -529,11 +531,7 @@ const RequestContainer = ({
 
     }
 
-    return () => {
-      subscribe();
-    };
-
-  }, [isConnected])
+  }, [isOffline])
 
   useEffect(() => {
 
@@ -547,14 +545,15 @@ const RequestContainer = ({
       fetchAssetTag(plant);
     }
 
-  }, [isConnected, plant, asset, requestItems?.plant_id]);
+  }, [isOffline, plant, asset, requestItems?.plant_id]);
 
+  console.log('re-render')
 
   return (
 
 
     <>
-      { !isConnected &&
+      { isOffline &&
         <Alert w="100%" status="danger">
           <VStack space={1} flexShrink={1} w="100%" alignItems="center">
             <Alert.Icon size="md" />

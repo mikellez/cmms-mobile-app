@@ -351,6 +351,7 @@ const FormGroup = ({
   };
 
   const handleChange = (name, value, action) => {
+    console.log('value change', name, value)
     setFormData(prevState => ({ ...prevState, [name]: value }));
     action;
   }
@@ -427,6 +428,7 @@ const FormGroup = ({
                 label: item[itemsConfig.label]
               }
             });
+            console.log('selectedValueCond', placeholder, selectedValueCond)
 
             return ( 
               <>

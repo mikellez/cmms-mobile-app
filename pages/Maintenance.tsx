@@ -64,6 +64,7 @@ const Maintenance = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isListLoading, setIsListLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [cachedData, setCachedData] = useState([]);
     const isOffline = useSelector<RootState, boolean>((state) => state.offline);
 
     const storeFile = async (checklist) => {
@@ -90,6 +91,13 @@ const Maintenance = ({ navigation, route }) => {
       }
     };
 
+    const cachedAssignedList = async (page: number) => {
+      const response = await instance.get(`/api/checklist/assigned?page=${currentPage}`);
+      const jsonData = response.data.rows;
+      const newData = [...cachedData, ...jsonData]; // Append new data to existing data array
+      setCachedData(newData);
+      storeFile(newData);
+    }
 
     const fetchChecklist = async (viewType: string) => {
       setIsListLoading(true);
@@ -98,7 +106,19 @@ const Maintenance = ({ navigation, route }) => {
         if (isEndReached) return;
 
         try {
-          const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}`);
+          const PARAMS = [
+            "checklist_id",
+            "chl_name",
+            "description",
+            "plant_name",
+            "createdbyuser",
+            "assigneduser",
+            "status",
+            "status_id",
+            "created_date",
+            "activity_log"
+          ]
+          const response = await instance.get(`/api/checklist/${viewType}?page=${currentPage}&expand=${PARAMS.join(',')}`);
           const jsonData = response.data.rows;
           const newData = [...data, ...jsonData]; // Append new data to existing data array
           //console.log(newData)
@@ -109,7 +129,7 @@ const Maintenance = ({ navigation, route }) => {
           setIsListLoading(false);
 
           if(viewType === 'assigned') {
-            storeFile(newData);
+            cachedAssignedList(currentPage);
           }
 
           return response.data.rows;
@@ -132,10 +152,7 @@ const Maintenance = ({ navigation, route }) => {
 
     const handleLoadMore = () => {
       if (!isLoading && !isOffline) {
-        fetchChecklist(viewType).then((result) => {
-          if (result) setChecklists(result);
-          else setChecklists([]);
-        });
+        fetchChecklist(viewType);
       }
     };
 

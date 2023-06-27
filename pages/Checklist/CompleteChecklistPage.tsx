@@ -23,6 +23,7 @@ import {
 import { _addToDataArray } from "../../helper/AsyncStorage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { fetch } from "@react-native-community/netinfo";
 
 const completeChecklist = async (checklist: CMMSChecklist) => {
   try {
@@ -57,9 +58,30 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   //         subscribe();
   //     }
   // }, [isConnected]);
+  const fetchSpecificChecklist = async (checklistId: number) => {
+    try {
+      const res = await instance.get(`/api/checklist/record/${checklistId}`);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      console.log('Unable to fetch specific checklists')
+    }
+  }
 
   useEffect(() => {
-    if (route.params) setChecklist(route.params);
+
+    if(route.params) {
+      console.log('params', route.params)
+      if(!isOffline) {
+        fetchSpecificChecklist(route.params.checklist_id).then((res) => {
+          setChecklist(res)
+        });
+      } else {
+        setChecklist(route.params);
+      }
+
+    }
+
   }, [route.params]);
 
   useEffect(() => {
