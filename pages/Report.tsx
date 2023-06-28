@@ -83,7 +83,8 @@ const ReportScreen = ({ navigation }) => {
       "asset_name",
       "activity_log",
       "created_date",
-      "status"
+      "status",
+      "associatedrequestid"
     ]
 
     const response = await instance.get(`/api/request/${viewType}?expand=${PARAMS.join(',')}`)
@@ -201,7 +202,7 @@ const ReportScreen = ({ navigation }) => {
               <Text><Heading size="xs">Created On:</Heading> {`${moment(new Date(item.created_date)).format('MMMM Do YYYY, h:mm:ss a')}`}</Text>
               <HStack justifyContent="center" w="100%" flex={1}>
                   <IconButton icon={<Icon size="lg" as={AntDesign} name="eyeo" color="#C8102E" />} onPress={()=>navigation.navigate("ViewRequest", { id: item.request_id })}/>
-                  <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>
+                  {!item.associatedrequestid && <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>}                  
                   {
                     ['PENDING', 'ASSIGNED'].includes(item.status)
                     && <IconButton icon={<Icon size="lg" as={AntDesign} name="adduser" color="#C8102E" />} onPress={()=>navigation.navigate("AssignRequest", { id: item.request_id })}/>
