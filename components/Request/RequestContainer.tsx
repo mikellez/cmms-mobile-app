@@ -300,6 +300,7 @@ const RequestContainer = ({
   }
 
   const handlePriorityChange = (value: string) => {
+    console.log('value', value)
     const selectedItem = priorities.find((item) => item.p_id === value);
     setPrioritySelected({ p_id: selectedItem.p_id, priority: selectedItem.priority });
   }
@@ -368,7 +369,7 @@ const RequestContainer = ({
   }
 
   const fetchFaultTypes = async () => {
-    if(isConnected) {
+    if(!isOffline) {
 
       await instance.get(`/api/fault/types`)
         .then(async (res)=> {
@@ -388,7 +389,7 @@ const RequestContainer = ({
   };
 
   const fetchRequestTypes = async () => {
-    if(isConnected) {
+    if(!isOffline) {
       await instance.get(`/api/request/types`)
       .then((res)=> {
         _storeData('requestTypes', res.data);
@@ -406,7 +407,7 @@ const RequestContainer = ({
   }
 
   const fetchPlants = async () => {
-    if(isConnected) {
+    if(!isOffline) {
       await instance.get(`/api/plants`)
       .then((res)=> {
         _storeData('plants', res.data);
@@ -423,7 +424,7 @@ const RequestContainer = ({
   }
 
   const fetchAssetTag = async (id: number) => {
-    if(isConnected) {
+    if(!isOffline) {
       await instance.get(`/api/asset/${id}`)
       .then((res)=> {
         setAssetTags(res.data);
@@ -443,9 +444,10 @@ const RequestContainer = ({
   }
 
   const fetchPriority = async () => {
-    if(isConnected) {
+    if(!isOffline) {
       await instance.get(`/api/request/priority`)
       .then((res)=> {
+        console.log(res.data)
         _storeData('priorities', res.data);
         setPriorities(res.data);
       })
@@ -460,7 +462,7 @@ const RequestContainer = ({
   }
 
   const fetchAssignUser = async (plant_id) => {
-    if(isConnected) {
+    if(!isOffline) {
       try {
 
         await instance.get(`/api/getAssignedUsers/${plant_id}`)
@@ -507,7 +509,6 @@ const RequestContainer = ({
 
     const fetchData = async () => {
       try {
-        await checkConnection(setIsConnected);
         // Do something else that depends on the network status
         fetchFaultTypes();
         fetchRequestTypes();

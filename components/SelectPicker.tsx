@@ -46,7 +46,7 @@ const SelectPicker = (props: SelectPickerProps) => {
       multiple={props.multiple ?? false}
       searchable={true}
       open={open}
-      value={value || props.selectedValue}
+      value={props.selectedValue}
       items={props.items}
       setOpen={setOpen}
       onOpen={()=>setLoading(true)}

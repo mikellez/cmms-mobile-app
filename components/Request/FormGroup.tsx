@@ -160,10 +160,10 @@ const FormGroup = ({
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
       //((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: formState.faultTypeID ? formState.faultTypeID : (reqItems?.fault_id ?? '') }),
       selectedValueCond: (()=> {
-        if ((isCreateAction || isCorrectiveType) && formState.faultTypeID) {
+        if ((!isCreateAction || (isCreateAction && isCorrectiveType)) && formState.faultTypeID) {
           selectedValue = formState.faultTypeID || reqItems?.fault_id || '';
         } else {
-          selectedValue = '';
+          selectedValue = null;
         }
 
         return {selectedValue }
@@ -216,7 +216,7 @@ const FormGroup = ({
         if ( (!isCreateAction || (isCreateAction && (hasPlant || isCorrectiveType))) && formState.plantLocationID) {
           selectedValue = formState.plantLocationID || plant || reqItems?.plant_id || '';
         } else {
-          selectedValue = '';
+          selectedValue = null;
         }
 
         return { selectedValue };
@@ -238,10 +238,10 @@ const FormGroup = ({
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
       selectedValueCond: (() => {
       //((action !== 'create' || (action === 'create' && asset) || (action === 'create' && type === 'corrective')) && { selectedValue: formState.taggedAssetID ? formState.taggedAssetID : (asset ? asset : (reqItems?.psa_id || ''))}),
-      if (isCreateAction && (hasAsset || isCorrectiveType)) {
+      if ((!isCreateAction || (isCreateAction && (hasAsset || isCorrectiveType)))) {
         selectedValue = formState.taggedAssetID || asset || reqItems?.psa_id || '';
       } else {
-        selectedValue = '';
+        selectedValue = null;
       }
 
       return { selectedValue };
@@ -276,9 +276,9 @@ const FormGroup = ({
       name: "assignUserID",
       onValueChange: onAssignUserChange,
       items: assignUsers,
-      itemsConfig: { key: "id", value: "id", label: "detail" },
-      selectedValueCond: { value: assignUserSelected?.value ?? reqItems?.assigned_user_id },
-      show: action === 'assign'
+      itemsConfig: { key: "id", value: "id", label: "name,email" },
+      selectedValueCond: { selectedValue: assignUserSelected?.value ?? reqItems?.assigned_user_id },
+      show: isAssignAction
     },
     {
       id: 9,
@@ -291,8 +291,8 @@ const FormGroup = ({
       onValueChange: onPriorityChange,
       items: priorities,
       itemsConfig: { key: "p_id", value: "p_id", label: "priority" },
-      selectedValueCond: {value: prioritySelected?.p_id ?? reqItems?.priority_id},
-      show: action === 'assign'
+      selectedValueCond: {selectedValue: prioritySelected?.p_id ?? reqItems?.priority_id},
+      show: isAssignAction
     },
     {
       id: 10,
@@ -476,12 +476,19 @@ const FormGroup = ({
 
           case "select":
             const options = items?.map((item) => {
-              return {
-                value: item[itemsConfig.value],
-                label: item[itemsConfig.label]
+              const value = item[itemsConfig.value];
+              let label = item[itemsConfig.label];
+
+              if (itemsConfig.label.includes(',')) {
+                const labels = itemsConfig.label.split(',');
+                label = `${item[labels[0]]} | ${item[labels[1]]}`;
               }
+
+              return {
+                value,
+                label,
+              };
             });
-            console.log('selectedValueCond', placeholder, selectedValueCond)
 
             return ( 
               <>
