@@ -97,7 +97,7 @@ const FileUploadEditableForm = ({check, sectionId, rowId}: {
             //console.log('Base64 encoded image:', base64Image);
 
             updateSpecificCheck(sectionId, rowId, check.getId(), value, setSections, sectionsRef);
-            setSections(); // This is to force a re-render
+            setSections(prev=>prev+1); // This is to force a re-render
         }
     };
 
