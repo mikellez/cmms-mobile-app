@@ -73,8 +73,17 @@ const ReportScreen = ({ route, navigation }) => {
           <ScrollView w="100%" h="200" px={3}>
 
             <Text><Heading size="xs">Created On: </Heading>{ requestItems?.created_date ? moment(requestItems.created_date).format('MMMM Do YYYY, h:mm:ss a') : "NIL" }</Text>
-            <Text><Heading size="xs">Reported By: </Heading>{ requestItems?.assigned_user_name || 'NIL' }</Text>
-            <Text><Heading size="xs">Assigned To: </Heading>{ requestItems?.created_by || 'NIL'}</Text>
+            <Text><Heading size="xs">Reported By: </Heading>{ requestItems?.created_by }</Text>
+            {requestItems?.guestfullname && <Text><Heading size="xs">Guest name: </Heading>{ requestItems?.guestfullname }</Text>}
+            <Text><Heading size="xs">Assigned To: </Heading>{ (requestItems?.assigned_user_name || '').trim() || 'NIL'}</Text>
+
+            <Heading size="sm" pt="3" pb="1" color="#C8102E">
+              Fault Type
+            </Heading>
+
+            <Divider w="100%" mb="3"/>
+
+            <Text>{requestItems?.fault_name ?? 'No text'}</Text>
 
             <Heading size="sm" pt="3" pb="1" color="#C8102E">
               Fault Description

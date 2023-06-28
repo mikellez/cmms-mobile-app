@@ -50,10 +50,22 @@ const ManageChecklistPage = ({ navigation, route }) => {
   const [rejectModal, setRejectModal] = useState<boolean>(false);
   const sectionsRef = useRef<ChecklistSection[]>([]);
 
+  const fetchSpecificChecklist = async (checklistId: number) => {
+    try {
+      const res = await instance.get(`/api/checklist/record/${checklistId}`);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      console.log('Unable to fetch specific checklists')
+    }
+  }
+
   useEffect(() => {
     console.log(route.params);
     if (route.params) {
-      setChecklist(route.params);
+      fetchSpecificChecklist(route.params.checklist_id).then((res) => {
+        setChecklist(res)
+      });
     }
   }, [route.params]);
 
@@ -99,7 +111,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
 
   const header = (
     <Center>
-      <ChecklistDetails checklist={route.params}></ChecklistDetails>
+      <ChecklistDetails checklist={checklist}></ChecklistDetails>
     </Center>
   );
 

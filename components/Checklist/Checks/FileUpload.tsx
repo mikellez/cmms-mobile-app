@@ -100,7 +100,6 @@ const FileUploadEditableForm = ({check, sectionId, rowId}: {
             setSections(); // This is to force a re-render
         }
     };
-    console.log(check.value)
 
     return (
         <ModuleCardContainer>

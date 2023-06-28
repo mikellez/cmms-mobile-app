@@ -10,6 +10,7 @@ import { ModuleDivider } from "../ModuleLayout";
 const ChecklistEditableForm = ({header, footer}) => {
     const { sectionsRef, sections, setSections } = useContext(ChecklistEditableFormContext);
     console.log('re-render')
+    console.log('seciontsref', sectionsRef.current)
 
     return (
         <SafeAreaView style={{marginBottom: 42}}>

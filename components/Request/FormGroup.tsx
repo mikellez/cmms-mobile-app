@@ -102,6 +102,19 @@ const FormGroup = ({
     fetchRequest();
   }, []);
 
+  let selectedValue;
+
+  const isCreateAction = action === 'create';
+  const isAssignAction = action === 'assign';
+  const isCompleteAction = action === 'complete';
+  const isManageAction = action === 'manage';
+
+  const isCorrectiveType = type === 'corrective';
+  const isGuestType = type === 'guest';
+
+  const hasPlant = Boolean(plant);
+  const hasAsset = Boolean(asset);
+
   const data = [
     {
       id: 0,
@@ -113,7 +126,7 @@ const FormGroup = ({
       placeholder: "Reporter Name",
       accessibilityLabel: "Reporter Name",
       onChangeText: onNameChange,
-      show: action === "create" && type==='guest' && !user
+      show: isCreateAction && isGuestType && !user
     },
     {
       id: 1, 
@@ -127,8 +140,9 @@ const FormGroup = ({
       onChange: onRequestTypeChange, 
       value: (reqItems?.req_id ?? ''), 
       items: requestTypes, 
-      itemsConfig: { key: "req_id", value: "req_id", label: "request", isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false},
-      selectedValueCond: (action !== 'create' && { value: reqItems?.req_id ?? ''}),
+      itemsConfig: { key: "req_id", value: "req_id", label: "request", 
+      isDisabled: (!isCreateAction || (isCreateAction && isGuestType)) ?? false},
+      selectedValueCond: (!isCreateAction && { value: reqItems?.req_id ?? ''}),
       show: true
     },
     {
@@ -141,10 +155,19 @@ const FormGroup = ({
       name: "faultTypeID",
       placeholder: "Choose Fault Type", 
       onValueChange: onFaultTypeChange, 
-      isDisabled: action !== "create" ?? false, 
+      isDisabled: !isCreateAction ?? false, 
       items: faultTypes,
       itemsConfig: { key: "fault_id", value: "fault_id", label: "fault_type"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: formState.faultTypeID ? formState.faultTypeID : (reqItems?.fault_id ?? '') }),
+      //((action !== 'create' || (action === 'create' && type === 'corrective')) && { selectedValue: formState.faultTypeID ? formState.faultTypeID : (reqItems?.fault_id ?? '') }),
+      selectedValueCond: (()=> {
+        if ((isCreateAction || isCorrectiveType) && formState.faultTypeID) {
+          selectedValue = formState.faultTypeID || reqItems?.fault_id || '';
+        } else {
+          selectedValue = '';
+        }
+
+        return {selectedValue }
+      })(),
       show: true
     },
     {
@@ -156,7 +179,18 @@ const FormGroup = ({
       placeholder: "Fault Description",
       accessibilityLabel: "Fault Description",
       name: "faultDescription",
-      defaultValue: (action !== 'create' || (action === 'create' && type === 'corrective')) && (action === 'create' && type ==='corrective' ? `[Corrective Request] ${reqItems?.fault_description ?? ''}` : (reqItems?.fault_description ?? '')),
+      //(action !== 'create' || (action === 'create' && type === 'corrective')) && (action === 'create' && type ==='corrective' ? `[Corrective Request] ${reqItems?.fault_description ?? ''}` : (reqItems?.fault_description ?? '')),
+      defaultValue: (()=> {
+        let defaultValue;
+
+        if ((isCreateAction || isCorrectiveType) && isCreateAction && isCorrectiveType) {
+          defaultValue = `[Corrective Request] ${reqItems?.fault_description || ''}`;
+        } else {
+          defaultValue = reqItems?.fault_description || '';
+        }
+
+        return defaultValue;
+      })(),
       onChangeText: onFaultDescriptionChange,
       isDisabled: action !== "create" ?? false,
       isReadOnly: action !== "create" ?? false,
@@ -173,10 +207,20 @@ const FormGroup = ({
       name: "plantLocationID",
       placeholder: "Choose Plant Location", 
       onValueChange: onPlantLocationChange, 
-      isDisabled: (action !== "create" || (action === 'create' && type === 'guest')) ?? false,
+      isDisabled: (!isCreateAction || (isCreateAction && isGuestType)) ?? false,
       items: plants,
       itemsConfig: { key: "plant_id", value: "plant_id", label: "plant_name"},
-      selectedValueCond: ((action !== 'create' || (action === 'create' && plant) || (action === 'create' && type==='corrective')) && { selectedValue: formState.plantLocationID ? formState.plantLocationID : (plant ? plant : (reqItems?.plant_id || ''))}),
+      //((action !== 'create' || (action === 'create' && plant) || (action === 'create' && type==='corrective')) && { selectedValue: formState.plantLocationID ? formState.plantLocationID : (plant ? plant : (reqItems?.plant_id || ''))}),
+      selectedValueCond: (() => {
+
+        if ( (!isCreateAction || (isCreateAction && (hasPlant || isCorrectiveType))) && formState.plantLocationID) {
+          selectedValue = formState.plantLocationID || plant || reqItems?.plant_id || '';
+        } else {
+          selectedValue = '';
+        }
+
+        return { selectedValue };
+      })(),
       show: true
     },
     {
@@ -189,10 +233,19 @@ const FormGroup = ({
       name: "taggedAssetID",
       placeholder: "Choose Asset Tag",
       onValueChange: onAssetTagChange,
-      isDisabled: (action !== "create" || (action === 'create' && type==='guest')) ?? false,
+      isDisabled: (!isCreateAction || (isCreateAction && isGuestType)) ?? false,
       items: assetTags,
       itemsConfig: { key: "psa_id", value: "psa_id", label: "asset_name" },
-      selectedValueCond: ((action !== 'create' || (action === 'create' && asset) || (action === 'create' && type === 'corrective')) && { selectedValue: formState.taggedAssetID ? formState.taggedAssetID : (asset ? asset : (reqItems?.psa_id || ''))}),
+      selectedValueCond: (() => {
+      //((action !== 'create' || (action === 'create' && asset) || (action === 'create' && type === 'corrective')) && { selectedValue: formState.taggedAssetID ? formState.taggedAssetID : (asset ? asset : (reqItems?.psa_id || ''))}),
+      if (isCreateAction && (hasAsset || isCorrectiveType)) {
+        selectedValue = formState.taggedAssetID || asset || reqItems?.psa_id || '';
+      } else {
+        selectedValue = '';
+      }
+
+      return { selectedValue };
+      })(),
       show: true
     },
     {
@@ -205,10 +258,10 @@ const FormGroup = ({
       name: "image",
       defaultValue: reqItems?.image || '',
       onPress: onImagePicker,
-      isDisabled: action !== "create" ?? false,
+      isDisabled: !isCreateAction ?? false,
       value: reqItems?.image || '',
-      imageSource: (action !== 'create') || imageSource,
-      addImage: (action !== 'create') ? false : true,
+      imageSource: !isCreateAction || imageSource,
+      addImage: isCreateAction,
       bufferData: reqItems?.uploaded_file?.data,
       show: true
     },
@@ -224,7 +277,7 @@ const FormGroup = ({
       onValueChange: onAssignUserChange,
       items: assignUsers,
       itemsConfig: { key: "id", value: "id", label: "detail" },
-      selectedValueCond: { value: assignUserSelected?.value ? assignUserSelected?.value : reqItems?.assigned_user_id },
+      selectedValueCond: { value: assignUserSelected?.value ?? reqItems?.assigned_user_id },
       show: action === 'assign'
     },
     {
@@ -238,7 +291,7 @@ const FormGroup = ({
       onValueChange: onPriorityChange,
       items: priorities,
       itemsConfig: { key: "p_id", value: "p_id", label: "priority" },
-      selectedValueCond: {value: prioritySelected?.p_id ? prioritySelected?.p_id : reqItems?.priority_id},
+      selectedValueCond: {value: prioritySelected?.p_id ?? reqItems?.priority_id},
       show: action === 'assign'
     },
     {
@@ -251,7 +304,7 @@ const FormGroup = ({
       onPress: onCompletionImagePicker,
       imageSource: completionImageSource,
       bufferData: reqItems?.completion_file?.data,
-      addImage: (action === 'complete') ? true : false,
+      addImage: isCompleteAction,
       isDisabled: false,
       show: ['complete','manage'].includes(action)
     },
@@ -264,9 +317,9 @@ const FormGroup = ({
       placeholder: "Completion Comment",
       defaultValue: reqItems?.complete_comments || '',
       onChangeText: onCompletionCommentChange,
-      isDisabled: action === "manage",
-      isReadOnly: action === "manage",
-      valueCond: (action !== 'complete' && { value: reqItems?.complete_comments || 'NIL'}),
+      isDisabled: isManageAction,
+      isReadOnly: isManageAction,
+      valueCond: (!isCompleteAction && { value: reqItems?.complete_comments || 'NIL'}),
       show: ['complete','manage'].includes(action)
     },
     {
@@ -291,14 +344,14 @@ const FormGroup = ({
         onPress: ()=>onStatusAction(5),
         bgColor: '#C8102E'
       }],
-      show: action === 'manage'
+      show: isManageAction
     },
     {
       id: 14,
       type: "button",
       label: "Submit",
       bgColor: "#C8102E",
-      show: action !== 'manage',
+      show: !isManageAction,
       onPress: onSubmit
     }
 

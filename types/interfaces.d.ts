@@ -130,6 +130,7 @@ interface CMMSRequest {
   created_date: Date;
   created_by: string;
   fullname: string;
+  guestfullname: string;
   fault_name: string;
   fault_id?: number;
   asset_name: string;

@@ -20,8 +20,10 @@ const SelectPicker = (props: SelectPickerProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleItemChange = (item) =>{
-    props.onItemChange(item);
-    setItems(item);
+    console.log('item', item);
+    props.onItemChange(item.map(i=>i.value));
+    //setItems(item.map(i=>i.value));
+    //setValue(item);
   }
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const SelectPicker = (props: SelectPickerProps) => {
       multiple={props.multiple ?? false}
       searchable={true}
       open={open}
-      value={props.selectedValue}
+      value={value || props.selectedValue}
       items={props.items}
       setOpen={setOpen}
       onOpen={()=>setLoading(true)}
