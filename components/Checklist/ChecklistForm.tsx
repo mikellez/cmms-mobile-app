@@ -72,6 +72,7 @@ const ChecklistForm = (props: ChecklistFormProps) => {
                 onChange={value => updateChecklist(+value, "assigned_user_id")}
                 plantId={props.checklist.plant_id}
                 placeholder=""
+                value={props.checklist.assigned_user_id ? props.checklist.assigned_user_id.toString() : null}
             />
 
             <FormControl.Label>Sign Off By</FormControl.Label>
