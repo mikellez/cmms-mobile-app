@@ -173,7 +173,7 @@ const SignatureEditableForm = ({check, sectionId, rowId}: {
     const onOK = (signature) => {
         // setSignature(signature);
         updateSpecificCheck(sectionId, rowId, check.getId(), signature, setSections, sectionsRef);
-        setSections(); // This is to force a re-render
+        setSections(prev=>prev+1); // This is to force a re-render
     }
 
     return (
