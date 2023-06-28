@@ -8,6 +8,7 @@ import ChecklistSection from "../../components/Checklist/classes/ChecklistSectio
 import ChecklistEditableProvider from "../../context/checklistContext";
 import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
 import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
+import { fetchSpecificChecklist } from "../../api";
 
 
 const ViewChecklistPage = ({navigation, route}) => {
@@ -18,7 +19,9 @@ const ViewChecklistPage = ({navigation, route}) => {
     useEffect(() => {
         console.log(route.params)
         if (route.params) {
-            setChecklist(route.params);
+            fetchSpecificChecklist(route.params.checklist_id).then(res => {
+                setChecklist(res)
+            });
         }
     }, [route.params])
 
@@ -30,8 +33,10 @@ const ViewChecklistPage = ({navigation, route}) => {
         }
     }, [checklist])
 
+    console.log('checklist', checklist)
+
     const header =<Center>
-        <ChecklistDetails checklist={route.params}></ChecklistDetails>
+        <ChecklistDetails checklist={checklist}></ChecklistDetails>
     </Center>
 
     return (

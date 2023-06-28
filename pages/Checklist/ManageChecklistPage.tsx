@@ -26,6 +26,7 @@ import ChecklistEditableProvider from "../../context/checklistContext";
 import ChecklistEditableForm from "../../components/Checklist/ChecklistFillableForm";
 import ChecklistHeader from "../../components/Checklist/ChecklistHeader";
 import { Action } from "../../types/enums";
+import { fetchSpecificChecklist } from "../../api";
 
 const manageChecklist = async (
   url: "approve" | "reject",
@@ -50,15 +51,6 @@ const ManageChecklistPage = ({ navigation, route }) => {
   const [rejectModal, setRejectModal] = useState<boolean>(false);
   const sectionsRef = useRef<ChecklistSection[]>([]);
 
-  const fetchSpecificChecklist = async (checklistId: number) => {
-    try {
-      const res = await instance.get(`/api/checklist/record/${checklistId}`);
-      return res.data;
-    } catch (err) {
-      console.log(err);
-      console.log('Unable to fetch specific checklists')
-    }
-  }
 
   useEffect(() => {
     console.log(route.params);
