@@ -185,7 +185,7 @@ const CompleteChecklistPage = ({ navigation, route }) => {
   );
 
   return (
-    <ModuleScreen navigation={navigation}>
+    <ModuleScreen navigation={navigation} layout={"form"}>
       <ChecklistHeader navigation={navigation} header={"Complete Checklist"} />
       
 

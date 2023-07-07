@@ -147,7 +147,7 @@ const ManageChecklistPage = ({ navigation, route }) => {
   );
 
   return (
-    <ModuleScreen navigation={navigation}>
+    <ModuleScreen navigation={navigation} layout={"form"}>
       <ChecklistHeader navigation={navigation} header={"Manage Checklist"} />
 
       <ChecklistEditableProvider
