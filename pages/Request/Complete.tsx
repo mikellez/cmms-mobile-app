@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "react-native-vector-icons";
 
 const CompleteRequest = ({ route, navigation }) => {
   return (
-    <ModuleScreen navigation={navigation}>
+    <ModuleScreen navigation={navigation} layout="form">
       <ModuleHeader header="Complete Request">
         <HStack >
           <Button padding={2} bg="#C8102E" leftIcon={<Icon as={MaterialCommunityIcons} name="arrow-left" size="sm"/>} size="xs" onPress={()=>navigation.goBack()}/>

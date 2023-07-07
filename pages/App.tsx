@@ -7,27 +7,76 @@ import { subscribeToConnectionChanges } from "../helper/NetInfo";
 import OfflineHandling from "../components/OfflineHandling";
 import { setOfflineMode } from "../redux/features/offlineSlice";
 import { useDispatch } from "react-redux";
-
+import { Keyboard, KeyboardAvoidingView, Platform } from "react-native";
+import React from "react";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const App = ({ children, navigation, layout }) => {
   const insets = useSafeAreaInsets();
 
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  const renderWithoutHeaderAndFooter = () => (
+    children 
+  )
+
+  const renderWithHeaderAndFooter = () => (
+    <>
+      <Header navigation={navigation}/> 
+      { children } 
+      <Footer navigation={navigation}/>
+    </>
+  );
+
+  const renderWithHeaderFooterAwareScrollView = () => (
+    <>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Header navigation={navigation}/> 
+          { children }
+        <Footer navigation={navigation}/>
+      </KeyboardAwareScrollView>
+    </>
+  );
+
+  console.log(layout)
+
   return (
     <NativeBaseProvider>
-      <Flex flex={1} justifyContent="space-between" backgroundColor={"white"} paddingTop={insets.top}>
-        <OfflineHandling navigation={navigation}/>
-        {!(layout && layout === 'empty')
-        ? ( 
-          <>
-            <Header navigation={navigation}/> 
-            {children} 
-            <Footer navigation={navigation}/>
-          </>
-        )
-        : 
-        ( children )
-        }
-      </Flex> 
+       <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          enabled
+        >
+          <Flex flex={1} justifyContent="space-between" backgroundColor={"white"} paddingTop={insets.top}>
+            <OfflineHandling navigation={navigation}/>
+            {
+              (layout && layout === 'empty') ? ( 
+                renderWithoutHeaderAndFooter() 
+              )
+              : layout && layout === 'form' ? (
+                renderWithHeaderFooterAwareScrollView()
+              )
+              : renderWithHeaderAndFooter() 
+            }
+          </Flex> 
+        </KeyboardAvoidingView>
     </NativeBaseProvider>
   );
 }
