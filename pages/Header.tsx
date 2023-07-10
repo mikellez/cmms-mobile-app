@@ -10,6 +10,7 @@ import { navigationRef } from "../RootNavigation";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { CMMSOffline } from "../types/interfaces";
+import { Platform } from "react-native";
 
 const Header = ({ navigation }) => {
   //console.log(DeviceInfo.getDeviceId())
@@ -40,6 +41,7 @@ const Header = ({ navigation }) => {
         bg="#D9D9D9"
         px="1"
         py="3"
+        paddingTop={Platform.OS === 'ios' ? 8 : 5}
         justifyContent="space-between"
         alignItems="center"
         w="100%"

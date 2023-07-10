@@ -64,7 +64,12 @@ const App = ({ children, navigation, layout }) => {
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           enabled
         >
-          <Flex flex={1} justifyContent="space-between" backgroundColor={"white"} paddingTop={insets.top}>
+          <Flex 
+            flex={1} 
+            justifyContent="space-between" 
+            backgroundColor={"white"} 
+            //paddingTop={insets.top}
+            >
             <OfflineHandling navigation={navigation}/>
             {
               (layout && layout === 'empty') ? ( 
