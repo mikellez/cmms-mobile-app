@@ -1,9 +1,12 @@
 import axios from "axios";
-import { API_URL } from "@env";
 import * as RootNavigation from "./RootNavigation.js";
+import Constants from 'expo-constants';
+
+// Access the variables
+const apiBaseUrl = Constants?.expoConfig?.extra?.API_BASE_URL
 
 const instance = axios.create({
-        baseURL: `http://10.0.2.2:3001`
+        baseURL: `${apiBaseUrl}`
 });
 
 // Add an interceptor to catch errors

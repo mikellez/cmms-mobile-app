@@ -11,7 +11,7 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 
 import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
-import Constants from 'expo-constants';
+//import Constants from 'expo-constants';
 import { useIsFocused } from '@react-navigation/native';
 import { Table, Rows } from "react-native-table-component";
 
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
-    paddingTop: Constants.statusBarHeight,
+    //paddingTop: Constants.statusBarHeight,
   },
   title: {
     textAlign: 'center',

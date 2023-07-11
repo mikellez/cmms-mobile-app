@@ -8,6 +8,10 @@ import { Table, Rows } from "react-native-table-component";
 import { Linking } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Loading from "../../components/Loading";
+import Constants from 'expo-constants';
+
+// Access the variables
+const apiBaseUrl = Constants?.expoConfig?.extra?.API_BASE_URL
 //import RNFetchBlob from "react-native-fetch-blob";
 
 const Details = ({ route, navigation }) => {
@@ -39,7 +43,7 @@ const Details = ({ route, navigation }) => {
   }
 
   const downloadFile = async (index: number) => {
-    const fileUrl = `http://192.168.20.93:3001/api/asset/mobile/${psaId}/uploadedFile/${index}`;
+    const fileUrl = `${apiBaseUrl}/api/asset/mobile/${psaId}/uploadedFile/${index}`;
 
     try {
       // Open the file URL using the device's default app for handling the file type
