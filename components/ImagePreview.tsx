@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const ImagePreview = ({ source, alt, addImage, onPress, isDisabled }) => {
+  console.log('source', source)
   return (
     <>
       {addImage ? 

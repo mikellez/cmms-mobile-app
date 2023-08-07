@@ -46,7 +46,7 @@ const SelectPicker = (props: SelectPickerProps) => {
       multiple={props.multiple ?? false}
       searchable={true}
       open={open}
-      value={props.selectedValue}
+      value={props.selectedValue ?? value}
       items={props.items}
       setOpen={setOpen}
       onOpen={()=>setLoading(true)}
@@ -55,6 +55,7 @@ const SelectPicker = (props: SelectPickerProps) => {
       bottomOffset={100} 
       //onChangeValue={value=>props.onValueChange(value)}
       onSelectItem={item=>props.multiple ? handleItemChange(item) : props.onValueChange(item.value)}
+      //onSelectItem={item=> props.onValueChange(item.value)}
       setItems={setItems}
       placeholder={props.placeholder}
       /*containerProps={{

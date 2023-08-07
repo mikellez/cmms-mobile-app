@@ -1,6 +1,7 @@
 import { HStack, Icon, IconButton, Image, Button } from "native-base";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { _clear } from "../helper/AsyncStorage";
 //import DeviceInfo from 'react-native-device-info';
 import { ModuleSimpleModal } from "../components/ModuleLayout";
@@ -49,11 +50,12 @@ const Header = ({ navigation }) => {
         borderBottomWidth={2}
       >
         <HStack alignItems="center">
-          {/*<IconButton
+          {<IconButton
             icon={
-              <Icon size="lg" as={MaterialIcons} name="menu" color="#C8102E" />
+              <Icon size="lg" as={MaterialCommunityIcons} name="qrcode-scan" color="#C8102E" />
             }
-          />*/}
+            onPress={()=>navigation.navigate("QRScan")}
+          />}
         </HStack>
         <HStack alignItems="center">
           <Image

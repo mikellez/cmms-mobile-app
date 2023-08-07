@@ -15,11 +15,15 @@ function OfflineHandling({ navigation }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const subscribe = subscribeToConnectionChanges(setIsConnected);
 
-    dispatch(setOfflineMode(!isConnected));
+     const subscribe = subscribeToConnectionChanges(setIsConnected);
+    return () => {
+      // Unsubscribe from the connection changes when the component unmounts
+      subscribe();
+    };
+    console.log('isConnected', isConnected)
 
-  }, [isConnected]);
+  }, []);
 
   const fetchOfflineRequests = async () => {
     let result = await _retrieveData('offlineRequests')
@@ -61,8 +65,10 @@ function OfflineHandling({ navigation }) {
   }
 
   useEffect(() => {
+    dispatch(setOfflineMode(!isConnected));
 
-    if(isConnected) {
+    /*if(isConnected) {
+      console.log('OfflineHandling')
       fetchOfflineRequests()
       .then((res)=> {
         console.log(res)
@@ -72,7 +78,7 @@ function OfflineHandling({ navigation }) {
         }
       })
 
-    } 
+    } */
 
   }, [isConnected]);
 

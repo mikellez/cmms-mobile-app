@@ -211,7 +211,8 @@ const RequestContainer = ({
       console.log('newRequest', newRequest)
       data.push(newRequest);
       await _storeData('offlineRequests', data);
-      navigation.navigate("OfflineRequest");
+      navigation.navigate("Report");
+      alert("Your requests is pending to be submitted. We will submit your requests once you are back online.");
     }
 
   }

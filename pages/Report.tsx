@@ -11,7 +11,6 @@ import EntypoIcon from 'react-native-vector-icons/Entypo';
 
 import Accordion from 'react-native-collapsible/Accordion';
 import * as Animatable from 'react-native-animatable';
-//import Constants from 'expo-constants';
 import { useIsFocused } from '@react-navigation/native';
 import { Table, Rows } from "react-native-table-component";
 
@@ -19,7 +18,7 @@ import instance from "../axios.config";
 import ListBox from "../components/Request/ListBox";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleHeader, ModuleScreen, ModuleSimpleModal } from "../components/ModuleLayout";
 import App from "./App";
-import { _retrieveData } from "../helper/AsyncStorage";
+import { _retrieveData, _storeData } from "../helper/AsyncStorage";
 import { CMMSUser, CMMSRequest, CMMSOffline } from "../types/interfaces";
 import { Role } from "../types/enums";
 import { set } from "react-native-reanimated";
@@ -73,6 +72,61 @@ const ReportScreen = ({ navigation }) => {
       }
     }
   }, [user.role_id]);
+
+  const fetchOfflineRequests = async () => {
+    let result = await _retrieveData('offlineRequests')
+    return JSON.parse(result);
+  }
+
+  const submitOfflineRequests = async (requests) => {
+    await 
+    requests.map(async item=> {
+      const formData = new FormData();
+      formData.append("description", item.description);
+      formData.append("faultTypeID", item.faultTypeID.toString());
+      formData.append("plantLocationID", item.plantLocationID.toString());
+      formData.append("requestTypeID", item.requestTypeID.toString());
+      formData.append("taggedAssetID", item.taggedAssetID.toString());
+      if (item.image) formData.append("image", item.image);
+
+      console.log('formData', formData);
+      //setFormData(formData);
+
+      return await instance
+        .post("/api/request/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((response) => {
+          alert("Cached Request created successfully");
+          
+          navigation.navigate("Report");
+          return response.data;
+        })
+        .catch((e) => {
+          console.log("error creating request");
+          console.log(e);
+          return null;
+        });
+    })
+
+    return true;
+  }
+
+  useEffect(() => {
+
+    if(!isOffline) {
+      fetchOfflineRequests()
+      .then((res)=> {
+        console.log(res)
+        if(res && res.length > 0) {
+          submitOfflineRequests(res);
+          _storeData('offlineRequests', []);
+        }
+      })
+
+    } 
+
+  }, [isOffline]);
 
 
   const fetchRequest = async (viewType) => {
@@ -330,7 +384,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
-    //paddingTop: Constants.statusBarHeight,
   },
   title: {
     textAlign: 'center',

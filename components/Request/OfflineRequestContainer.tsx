@@ -116,13 +116,16 @@ const OfflineRequestContainer = ({ navigation, route }) => {
                 <Text><Heading size="xs">Plant Location:</Heading> {item.plantLocationID || 'NIL'}</Text>
                 <Text><Heading size="xs">Assets:</Heading> {item.taggedAssetID || 'NIL'}</Text>
                 <Text><Heading size="xs">Description:</Heading> {item.description || 'NIL'}</Text>
-                <ImagePreview source={{ uri: item?.image?.uri }} alt="test" />
+                <ImagePreview source={{ uri: item?.image?.uri }} alt="test" addImage={true} onPress={undefined} isDisabled={undefined} />
               </ModuleCardContainer>
             )}
             ListFooterComponent={() => (
               <VStack>
-                <Button marginTop="5" padding={2} bg="#C8102E" size="xs" onPress={()=>navigation.navigate('CreateRequest')}>
+                {/*<Button marginTop="5" padding={2} bg="#C8102E" size="xs" onPress={()=>navigation.navigate('CreateRequest')}>
                   Submit Again
+            </Button>*/}
+                <Button marginTop="5" padding={2} bg="#C8102E" size="xs" onPress={()=>navigation.navigate('Report')}>
+                  Back to Home
                 </Button>
                 <Pressable py="10" mb="10" flex={1} onPress={()=>navigation.navigate("QRScan")}>
                   <Center>

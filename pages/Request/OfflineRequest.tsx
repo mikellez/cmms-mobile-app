@@ -6,7 +6,7 @@ import OfflineRequestContainer from '../../components/Request/OfflineRequestCont
 const OfflineRequest = ({ route, navigation }) => {
 
   return (
-    <App navigation={navigation} layout="empty">
+    <App navigation={navigation} layout="offline">
       <OfflineRequestContainer navigation={navigation} route={route}/>
     </App>
 
