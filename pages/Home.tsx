@@ -13,7 +13,7 @@ import { PieChart } from "react-native-charts-kit";
 import instance from "../axios.config";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleDivider, ModuleScreen } from "../components/ModuleLayout";
 import { CMMSDashboardData, CMMSPlant, CMMSUser } from "../types/interfaces";
-import { _retrieveData, _storeData } from "../helper/AsyncStorage";
+import { _retrieveData } from "../helper/AsyncStorage";
 import { set } from "react-native-reanimated";
 import { Center, Heading } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
@@ -21,7 +21,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Loading from "../components/Loading";
-import NetInfo from '@react-native-community/netinfo';
 
 const HomeScreen = ({ navigation }) => {
 
@@ -127,120 +126,8 @@ const HomeScreen = ({ navigation }) => {
   const [total, setTotal] = useState<number>(0);
   const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [requestTypes, setRequestTypes] = useState([]);
-  const [faultTypes, setFaultTypes] = useState([]);
-  const [plants, setPlants] = useState([]);
-  const [assets, setAssets] = useState([]);
 
   const isFocused = useIsFocused();
-
-  const fetchFaultTypes = async () => {
-    if(isConnected) {
-
-      await instance.get(`/api/fault/types`)
-        .then(async (res)=> {
-          _storeData('faultTypes', res.data);
-          setFaultTypes(res.data);
-        })
-        .catch((err) => {
-            console.log(err)
-          console.log('Unable to fetch fault types')
-        });
-
-    } else {
-      const value = await _retrieveData('faultTypes');
-      if(value) setFaultTypes(JSON.parse(value));
-
-    }
-  };
-
-  const fetchRequestTypes = async () => {
-    if(isConnected) {
-      await instance.get(`/api/request/types`)
-      .then((res)=> {
-        _storeData('requestTypes', res.data);
-        setRequestTypes(res.data);
-      })
-      .catch((err) => {
-        console.log(err)
-          console.log('Unable to fetch request types')
-      });
-
-    } else {
-      const value = await _retrieveData('requestTypes');
-      if(value) setRequestTypes(JSON.parse(value));
-    }
-  }
-
-  const fetchPlants = async () => {
-    if(isConnected) {
-      await instance.get(`/api/plants`)
-      .then((res)=> {
-        _storeData('plants', res.data);
-        setPlants(res.data);
-      })
-      .catch((err) => {
-          console.log(err)
-          console.log('Unable to fetch plants')
-      });
-    } else {
-      const value = await _retrieveData('plants');
-      if(value) setPlants(JSON.parse(value));
-    }
-  }
-
-  const fetchAssets = async () => {
-    if(isConnected) {
-      await instance.get(`/api/assets`)
-      .then((res)=> {
-        _storeData('assetTags', res.data);
-        setAssets(res.data);
-      })
-      .catch((err) => {
-          console.log(err)
-          console.log('Unable to fetch assets')
-      });
-
-    } else {
-      const value = await _retrieveData('assetTags');
-      if(value) setAssets(JSON.parse(value));
-    }
-  }
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      const netInfoState = await NetInfo.fetch();
-      setIsConnected(netInfoState.isConnected);
-    };
-
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsConnected(state.isConnected);
-    });
-
-    const fetchData = async () => {
-      try {
-        await checkConnection();
-        // Do something else that depends on the network status
-        fetchFaultTypes();
-        fetchRequestTypes();
-        fetchPlants();
-        fetchAssets();
-
-        const result = await _retrieveData('assetTags');
-
-      } catch (error) {
-        console.log('Error fetching data: ', error);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      unsubscribe();
-    };
-
-  }, [isConnected])
 
  const fetchRequests = async () => {
     const { datetype, date } = pickerwithtype; 

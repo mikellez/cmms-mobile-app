@@ -13,6 +13,7 @@ import NetInfo from '@react-native-community/netinfo';
 
 import { _storeData, _retrieveData } from '../helper/AsyncStorage';
 import instance from '../axios.config';
+import { API_URL } from '@env';
 import { login, logout } from '../redux/features/userSlice';
 import { useDispatch } from 'react-redux';
 
@@ -30,6 +31,112 @@ const Login = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
+  const fetchFaultTypes = async () => {
+    if(isConnected) {
+
+      await instance.get(`/api/fault/types`)
+        .then(async (res)=> {
+          _storeData('faultTypes', res.data);
+          setFaultTypes(res.data);
+        })
+        .catch((err) => {
+            console.log(err)
+          console.log('Unable to fetch fault types')
+        });
+
+    } else {
+      const value = await _retrieveData('faultTypes');
+      if(value) setFaultTypes(JSON.parse(value));
+
+    }
+  };
+
+  const fetchRequestTypes = async () => {
+    if(isConnected) {
+      await instance.get(`/api/request/types`)
+      .then((res)=> {
+        _storeData('requestTypes', res.data);
+        setRequestTypes(res.data);
+      })
+      .catch((err) => {
+        console.log(err)
+          console.log('Unable to fetch request types')
+      });
+
+    } else {
+      const value = await _retrieveData('requestTypes');
+      if(value) setRequestTypes(JSON.parse(value));
+    }
+  }
+
+  const fetchPlants = async () => {
+    if(isConnected) {
+      await instance.get(`/api/plants`)
+      .then((res)=> {
+        _storeData('plants', res.data);
+        setPlants(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable to fetch plants')
+      });
+    } else {
+      const value = await _retrieveData('plants');
+      if(value) setPlants(JSON.parse(value));
+    }
+  }
+
+  const fetchAssets = async () => {
+    if(isConnected) {
+      await instance.get(`/api/assets`)
+      .then((res)=> {
+        _storeData('assetTags', res.data);
+        setAssets(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable to fetch assets')
+      });
+
+    } else {
+      const value = await _retrieveData('assetTags');
+      if(value) setAssets(JSON.parse(value));
+    }
+  }
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setIsConnected(netInfoState.isConnected);
+    };
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    const fetchData = async () => {
+      try {
+        await checkConnection();
+        // Do something else that depends on the network status
+        fetchFaultTypes();
+        fetchRequestTypes();
+        fetchPlants();
+        fetchAssets();
+
+        const result = await _retrieveData('assetTags');
+
+      } catch (error) {
+        console.log('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      unsubscribe();
+    };
+
+  }, [isConnected])
 
   const setData = async (key, value) => {
     try {
