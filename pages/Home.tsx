@@ -13,7 +13,7 @@ import { PieChart } from "react-native-charts-kit";
 import instance from "../axios.config";
 import { ModuleActionSheet, ModuleActionSheetItem, ModuleDivider, ModuleScreen } from "../components/ModuleLayout";
 import { CMMSDashboardData, CMMSPlant, CMMSUser } from "../types/interfaces";
-import { _retrieveData } from "../helper/AsyncStorage";
+import { _retrieveData, _storeData } from "../helper/AsyncStorage";
 import { set } from "react-native-reanimated";
 import { Center, Heading } from "native-base";
 import CustomPieChart from "../components/CustomPieChart";
@@ -21,6 +21,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Loading from "../components/Loading";
+import NetInfo from '@react-native-community/netinfo';
 
 const HomeScreen = ({ navigation }) => {
 
@@ -33,6 +34,9 @@ const HomeScreen = ({ navigation }) => {
   const [sections, setSections] = useState([
     { title: "Requests", data: items, chart: {}, total: 0 },
     { title: "Checklists", data: items, chart: {}, total: 0 },
+    { title: "Change of Parts", data: items, chart: {}, total: 0 },
+    { title: "Feedback", data: items, chart: {}, total: 0 },
+    { title: "License", data: items, chart: {}, total: 0 },
   ]);
 
   const [chartData, setChartData] = useState([ ]);
@@ -43,9 +47,15 @@ const HomeScreen = ({ navigation }) => {
     plant: number | string,
     field: string,
     datetype: string,
-    date: string
+    date: string,
+    params?: []
   ): Promise<CMMSDashboardData[]> =>{
-    const url = `/api/${type}/counts/${field}/${plant}/${datetype}/${date}`;
+    let extra = "";
+    if(params){
+      extra = `?expand=${params.join(",")}`; 
+    }
+
+    const url = `/api/${type}/counts/${field}/${plant}/${datetype}/${date}${extra}`;
     const colors = [
       "#03C988",
       "#FFAC41",
@@ -87,6 +97,9 @@ const HomeScreen = ({ navigation }) => {
   const [active, setActive] = useState("");
   const [isReady, setIsReady] = useState<boolean>(false);
   const [isChecklistReady, setIsChecklistReady] = useState<boolean>(false);
+  const [isCOPReady, setIsCOPReady] = useState<boolean>(false);
+  const [isFeedbackReady, setIsFeedbackReady] = useState<boolean>(false);
+  const [isLicenseReady, setIsLicenseReady] = useState<boolean>(false);
   const [isRequestReady, setIsRequestReady] = useState<boolean>(false);
   const [plant, setPlant] = useState<number | string>("");
   const [field, setField] = useState<string>("status");
@@ -104,6 +117,9 @@ const HomeScreen = ({ navigation }) => {
     totalOutstandingChecklist: number;
     totalClosedChecklist: number;
   }>({ totalPendingChecklist: 0, totalOutstandingChecklist: 0, totalClosedChecklist: 0 });
+  const [copData, setCOPData] = useState<CMMSDashboardData[]>();
+  const [feedbackData, setFeedbackData] = useState<CMMSDashboardData[]>();
+  const [licenseData, setLicenseData] = useState<CMMSDashboardData[]>();
   const [checklistData, setChecklistData] = useState<CMMSDashboardData[]>();
   const [requestData, setRequestData] = useState<CMMSDashboardData[]>([]);
   const [loadUser, setLoadUser] = useState<boolean>(false);
@@ -111,13 +127,126 @@ const HomeScreen = ({ navigation }) => {
   const [total, setTotal] = useState<number>(0);
   const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [requestTypes, setRequestTypes] = useState([]);
+  const [faultTypes, setFaultTypes] = useState([]);
+  const [plants, setPlants] = useState([]);
+  const [assets, setAssets] = useState([]);
 
   const isFocused = useIsFocused();
 
+  const fetchFaultTypes = async () => {
+    if(isConnected) {
+
+      await instance.get(`/api/fault/types`)
+        .then(async (res)=> {
+          _storeData('faultTypes', res.data);
+          setFaultTypes(res.data);
+        })
+        .catch((err) => {
+            console.log(err)
+          console.log('Unable to fetch fault types')
+        });
+
+    } else {
+      const value = await _retrieveData('faultTypes');
+      if(value) setFaultTypes(JSON.parse(value));
+
+    }
+  };
+
+  const fetchRequestTypes = async () => {
+    if(isConnected) {
+      await instance.get(`/api/request/types`)
+      .then((res)=> {
+        _storeData('requestTypes', res.data);
+        setRequestTypes(res.data);
+      })
+      .catch((err) => {
+        console.log(err)
+          console.log('Unable to fetch request types')
+      });
+
+    } else {
+      const value = await _retrieveData('requestTypes');
+      if(value) setRequestTypes(JSON.parse(value));
+    }
+  }
+
+  const fetchPlants = async () => {
+    if(isConnected) {
+      await instance.get(`/api/plants`)
+      .then((res)=> {
+        _storeData('plants', res.data);
+        setPlants(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable to fetch plants')
+      });
+    } else {
+      const value = await _retrieveData('plants');
+      if(value) setPlants(JSON.parse(value));
+    }
+  }
+
+  const fetchAssets = async () => {
+    if(isConnected) {
+      await instance.get(`/api/assets`)
+      .then((res)=> {
+        _storeData('assetTags', res.data);
+        setAssets(res.data);
+      })
+      .catch((err) => {
+          console.log(err)
+          console.log('Unable to fetch assets')
+      });
+
+    } else {
+      const value = await _retrieveData('assetTags');
+      if(value) setAssets(JSON.parse(value));
+    }
+  }
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const netInfoState = await NetInfo.fetch();
+      setIsConnected(netInfoState.isConnected);
+    };
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    const fetchData = async () => {
+      try {
+        await checkConnection();
+        // Do something else that depends on the network status
+        fetchFaultTypes();
+        fetchRequestTypes();
+        fetchPlants();
+        fetchAssets();
+
+        const result = await _retrieveData('assetTags');
+
+      } catch (error) {
+        console.log('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      unsubscribe();
+    };
+
+  }, [isConnected])
+
  const fetchRequests = async () => {
     const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
 
-    return await fetchData("request", plant, field, datetype, date).then((result) => {
+    return await fetchData("request", plant, field, datetype, date, PARAMS).then((result) => {
       if (result) {
         setRequestData(result);
         setIsRequestReady(true);
@@ -128,15 +257,155 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchChecklists = async () => {
     const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
 
     setIsChecklistReady(false);
 
-    return await fetchData("checklist", plant, "status", datetype, date).then((result) => {
+    return await fetchData("checklist", plant, "status", datetype, date, PARAMS).then((result) => {
       if (result) {
         setChecklistData(result);
         setIsChecklistReady(true);
       }
     });
+  }
+
+  const fetchCOPs = async () => {
+    const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
+
+    setIsCOPReady(false);
+
+    const getScheduledCOP = instance.get(
+      `/api/changeOfParts/scheduled/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getCompletedCOP = instance.get(
+      `/api/changeOfParts/completed/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getAllCOP = await Promise.all([getScheduledCOP, getCompletedCOP]);
+
+    const scheduleData = getAllCOP[0].data;
+    const completedData = getAllCOP[1].data;
+
+    const totalScheduledCOP = scheduleData?.length || 0;
+    const totalCompletedCOP = completedData?.length || 0;
+
+    // console.log('scheduled', getAllCOP)
+
+    setCOPData([
+      { name: "Scheduled", value: totalScheduledCOP, fill: "#C74B50", id: 1 },
+      { name: "Completed", value: totalCompletedCOP, fill: "#03C988", id: 2 },
+    ]);
+
+  }
+
+  const fetchFeedbacks = async () => {
+    const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
+
+    setIsFeedbackReady(false);
+
+    const getPendingFeedback = instance.get(
+      `/api/feedback/pending/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getOutstandingFeedback = instance.get(
+      `/api/feedback/outstanding/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getCompletedFeedback = instance.get(
+      `/api/feedback/completed/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getAllFeedback = await Promise.all([getPendingFeedback, getOutstandingFeedback, getCompletedFeedback]);
+
+    const pendingData = getAllFeedback[0].data.rows;
+    const outstandingData = getAllFeedback[1].data.rows;
+    const completedData = getAllFeedback[2].data.rows;
+
+    const totalPendingFeedback = pendingData?.length || 0;
+    const totalOutstandingFeedback = outstandingData?.length || 0;
+    const totalCompletedFeedback = completedData?.length || 0;
+
+    // console.log('scheduled', getAllCOP)
+
+    setFeedbackData([
+      { name: "Pending", value: totalPendingFeedback, fill: "#C74B50", id: 1 },
+      { name: "Outstanding", value: totalOutstandingFeedback, fill: "#C74B50", id: 2 },
+      { name: "Completed", value: totalCompletedFeedback, fill: "#03C988", id: 3 },
+    ]);
+
+  }
+
+  const fetchLicenses = async () => {
+    const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
+
+    setIsLicenseReady(false);
+
+    const getPendingLicense = instance.get(
+      `/api/license/pending/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getOutstandingLicense = instance.get(
+      `/api/license/outstanding/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getCompletedLicense = instance.get(
+      `/api/license/completed/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+        const getDraftLicense = instance.get(
+      `/api/license/draft/${plant}/${datetype}/${date}?expand=${PARAMS.join(
+        ","
+      )}`
+    );
+    const getAcquiredLicense = instance.get(
+      `/api/license/acquired/${plant}/${datetype}/${date}?expand=${PARAMS.join(
+        ","
+      )}`
+    );
+    const getLicenseExpiredIn30 = instance.get(
+      `/api/license/expired/${plant}/${datetype}/${date}/30?expand=${PARAMS.join(
+        ","
+      )}`
+    );
+    const getLicenseExpiredIn60 = instance.get(
+      `/api/license/expired/${plant}/${datetype}/${date}/60?expand=${PARAMS.join(
+        ","
+      )}`
+    );
+    const getLicenseExpiredIn90 = instance.get(
+      `/api/license/expired/${plant}/${datetype}/${date}/90?expand=${PARAMS.join(
+        ","
+      )}`
+    );
+
+    const getAllLicense = await Promise.all([
+      getDraftLicense,
+      getAcquiredLicense,
+      getLicenseExpiredIn30,
+      getLicenseExpiredIn60,
+      getLicenseExpiredIn90,
+    ]);
+
+    const draftLicense = getAllLicense[0].data?.rows;
+    const acquiredLicense = getAllLicense[1].data?.rows;
+    const licenseExpiredIn30 = getAllLicense[2].data?.rows;
+    const licenseExpiredIn60 = getAllLicense[3].data?.rows;
+    const licenseExpiredIn90 = getAllLicense[4].data?.rows;
+
+    const totalDraftLicense = draftLicense?.length || 0;
+    const totalAcquiredLicense = acquiredLicense?.length || 0;
+
+    // console.log('scheduled', getAllCOP)
+
+    setLicenseData([
+      { name: "Draft", value: totalDraftLicense, fill: "#C74B50", id: 1 },
+      { name: "Acquired", value: totalAcquiredLicense, fill: "#03C988", id: 3 },
+    ]);
+
   }
 
   const getPlants = async (url: string) => {
@@ -175,11 +444,14 @@ const HomeScreen = ({ navigation }) => {
 
     if(plant !== "") {
 
-      Promise.all([fetchRequests(), fetchChecklists()])
+      Promise.all([fetchRequests(), fetchChecklists(), fetchCOPs(), fetchFeedbacks(), fetchLicenses()])
       .then(()=> {
           setSections(prevSections=> {
             const newSections = [...prevSections];
 
+            /**
+             * Set Request
+             */
             if(requestData && requestData.length > 0) {
               newSections[0].title = "Requests";
 
@@ -205,6 +477,9 @@ const HomeScreen = ({ navigation }) => {
               newSections[0].total = totalRequest;
             }
 
+            /**
+             * Set Checklist
+             */
             if(checklistData && checklistData.length > 0) {
               newSections[1].title = "Checklists";
 
@@ -228,6 +503,88 @@ const HomeScreen = ({ navigation }) => {
               }, 0);
 
               newSections[1].total = totalChecklist;
+            }
+
+            /**
+             * Set Change of Parts
+             */
+            if(copData && copData.length > 0) {
+              newSections[2].title = "Change of Parts";
+
+              newSections[2].data = [
+                { name: 'Scheduled ', code: '#c21010', total: copData.filter(data => data.id === 1)[0]?.value || 0 },
+                { name: 'Completed ', code: '#367e18', total: copData.filter(data => data.id === 2)[0]?.value || 0 },
+              ];
+
+              newSections[2].chart = copData.map(item=> ({ 
+                name: item.name, 
+                population: item.value, 
+                color: item.fill, 
+                legendFontColor: "#7F7F7F", 
+                legendFontSize: 15,
+                total: item.value
+              }));
+
+              const totalCOP = copData?.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.value;
+              }, 0);
+
+              newSections[2].total = totalCOP;
+            }
+
+            /**
+             * Set Feedbacks
+             */
+            if(feedbackData && feedbackData.length > 0) {
+              newSections[3].title = "Feedback";
+
+              newSections[3].data = [
+                { name: 'Pending ', code: '#c21010', total: feedbackData?.filter((data) => data.id === 1)[0]?.value || 0 },
+                { name: 'Outstanding ', code: 'purple', total: feedbackData?.filter((data) => data.id === 2)[0]?.value || 0},
+                { name: 'Completed ', code: '#367e18', total: feedbackData?.filter((data) => data.id === 3)[0]?.value || 0},
+              ];
+
+              newSections[3].chart = feedbackData.map(item=> ({ 
+                name: item.name, 
+                population: item.value, 
+                color: item.fill, 
+                legendFontColor: "#7F7F7F", 
+                legendFontSize: 15,
+                total: item.value
+              }));
+
+              const totalFeedback = feedbackData?.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.value;
+              }, 0);
+
+              newSections[3].total = totalFeedback;
+            }
+
+            /**
+             * Set Licenses
+             */
+            if(licenseData && licenseData.length > 0) {
+              newSections[4].title = "License";
+
+              newSections[4].data = [
+                { name: 'Draft ', code: '#c21010', total: licenseData?.filter((data) => data.id === 1)[0]?.value || 0 },
+                { name: 'Acquired ', code: '#367e18', total: licenseData?.filter((data) => data.id === 2)[0]?.value || 0},
+              ];
+
+              newSections[4].chart = licenseData.map(item=> ({ 
+                name: item.name, 
+                population: item.value, 
+                color: item.fill, 
+                legendFontColor: "#7F7F7F", 
+                legendFontSize: 15,
+                total: item.value
+              }));
+
+              const totalLicense = licenseData?.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.value;
+              }, 0);
+
+              newSections[4].total = totalLicense;
             }
 
             return newSections;
