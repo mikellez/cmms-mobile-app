@@ -35,7 +35,7 @@
       "eas": {
         "projectId": "87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
       },
-      "API_BASE_URL": "http://192.168.20.93:3001"
+      "API_BASE_URL": "http://192.168.20.93:3000"
     },
     "updates": {
       "url": "https://u.expo.dev/87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
