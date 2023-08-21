@@ -1,5 +1,6 @@
 {
   "expo": {
+    "owner": "mikellez.zuyao@gmail.com",
     "name": "cmms-mobile-app",
     "slug": "cmms-mobile-app",
     "version": "1.0.0",
