@@ -21,8 +21,11 @@ import { useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import Loading from "../components/Loading";
+import { Role } from "../types/enums";
 
 const HomeScreen = ({ navigation }) => {
+  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
+  const { role_id } = user;
 
   const items = [
     { name: 'Pending ', code: '#c21010', total: 0 },
@@ -35,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
     { title: "Checklists", data: items, chart: {}, total: 0 },
     { title: "Change of Parts", data: items, chart: {}, total: 0 },
     { title: "Feedback", data: items, chart: {}, total: 0 },
-    { title: "License", data: items, chart: {}, total: 0 },
+    role_id !== Role.Specialist && { title: "License", data: items, chart: {}, total: 0 }
   ]);
 
   const [chartData, setChartData] = useState([ ]);
@@ -124,12 +127,11 @@ const HomeScreen = ({ navigation }) => {
   const [loadUser, setLoadUser] = useState<boolean>(false);
   const [viewType, setViewType] = useState<string>(dashboardViews[0].value as string);
   const [total, setTotal] = useState<number>(0);
-  const user: CMMSUser = useSelector<RootState, CMMSUser>((state) => state.user);
   const [loading, setLoading] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
- const fetchRequests = async () => {
+  /*const fetchRequests = async () => {
     const { datetype, date } = pickerwithtype; 
     const PARAMS = ["id"];
 
@@ -140,9 +142,47 @@ const HomeScreen = ({ navigation }) => {
       }
     });
 
+  }*/
+
+  const fetchRequests = async () => {
+    const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["id"];
+
+    setIsRequestReady(false);
+
+    const getPendingRequest = instance.get(
+      `/api/request/pending/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getOutstandingRequest = instance.get(
+      `/api/request/outstanding/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getCompletedRequest = instance.get(
+      `/api/request/completed/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getAllRequest = await Promise.all([getPendingRequest, getOutstandingRequest, getCompletedRequest]);
+
+    const pendingData = getAllRequest[0].data.rows;
+    const outstandingData = getAllRequest[1].data.rows;
+    const completedData = getAllRequest[2].data.rows;
+
+    const totalPendingRequest = pendingData?.length || 0;
+    const totalOutstandingRequest = outstandingData?.length || 0;
+    const totalCompletedRequest = completedData?.length || 0;
+
+    // console.log('scheduled', getAllCOP)
+
+    setRequestData([
+      { name: "Pending", value: totalPendingRequest, fill: "#C74B50", id: 1 },
+      { name: "Outstanding", value: totalOutstandingRequest, fill: "#C74B50", id: 2 },
+      { name: "Completed", value: totalCompletedRequest, fill: "#03C988", id: 3 },
+    ]);
+
   }
 
-  const fetchChecklists = async () => {
+  /*const fetchChecklists = async () => {
     const { datetype, date } = pickerwithtype; 
     const PARAMS = ["id"];
 
@@ -154,6 +194,46 @@ const HomeScreen = ({ navigation }) => {
         setIsChecklistReady(true);
       }
     });
+  }*/
+
+  const fetchChecklists = async () => {
+    const { datetype, date } = pickerwithtype; 
+    const PARAMS = ["checklist_id"];
+
+    setIsChecklistReady(false);
+
+    const getPendingChecklist = instance.get(
+      `/api/checklist/pending/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getOutstandingChecklist = instance.get(
+      `/api/checklist/outstanding/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getCompletedChecklist = instance.get(
+      `/api/checklist/completed/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`
+    );
+
+    const getAllChecklist = await Promise.all([getPendingChecklist, getOutstandingChecklist, getCompletedChecklist]);
+
+    const pendingData = getAllChecklist[0].data.rows;
+    const outstandingData = getAllChecklist[1].data.rows;
+    const completedData = getAllChecklist[2].data.rows;
+
+    const totalPendingChecklist = pendingData?.length || 0;
+    const totalOutstandingChecklist = outstandingData?.length || 0;
+    const totalCompletedChecklist = completedData?.length || 0;
+
+    console.log('plants', `/api/checklist/outstanding/${plant}/${datetype}/${date}?expand=${PARAMS.join(",")}`);
+     console.log('scheduled', getAllChecklist[1].data.rows)
+     console.log(user)
+
+    setChecklistData([
+      { name: "Pending", value: totalPendingChecklist, fill: "#C74B50", id: 1 },
+      { name: "Outstanding", value: totalOutstandingChecklist, fill: "#C74B50", id: 2 },
+      { name: "Completed", value: totalCompletedChecklist, fill: "#03C988", id: 3 },
+    ]);
+
   }
 
   const fetchCOPs = async () => {
@@ -524,7 +604,7 @@ const HomeScreen = ({ navigation }) => {
           return (
           <>
             {!isReady && <Loading/>}
-            {isReady && section.total > 0 && <CustomPieChart data={section.chart} accessor="total" absolute={false} total={section.total}/> }
+            {isReady && section.total > 0 && role_id !== Role.Specialist && <CustomPieChart data={section.chart} accessor="total" absolute={false} total={section.total}/> }
           </>
         )}}
         />

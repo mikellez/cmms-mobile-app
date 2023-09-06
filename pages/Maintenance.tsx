@@ -100,6 +100,7 @@ const Maintenance = ({ navigation, route }) => {
     }
 
     const fetchChecklist = async (viewType: string) => {
+      console.log('viewType', viewType)
       setIsListLoading(true);
 
       if(!isOffline) {

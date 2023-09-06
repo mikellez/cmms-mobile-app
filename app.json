@@ -1,6 +1,6 @@
 {
   "expo": {
-    "owner": "mikellez.zuyao@gmail.com",
+    "owner": "azendian-solutions",
     "name": "cmms-mobile-app",
     "slug": "cmms-mobile-app",
     "version": "1.0.0",
@@ -34,12 +34,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
+        "projectId": "6be901d1-ac96-492d-81f7-039f86e4beb6"
       },
       "API_BASE_URL": "http://192.168.20.93:3000"
     },
     "updates": {
-      "url": "https://u.expo.dev/87b5edbb-86d7-4e9b-8c74-1a93ca79c3fc"
+      "url": "https://u.expo.dev/6be901d1-ac96-492d-81f7-039f86e4beb6"
     }
   }
 }

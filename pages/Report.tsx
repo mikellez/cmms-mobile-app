@@ -259,12 +259,13 @@ const ReportScreen = ({ navigation }) => {
                   {!item.associatedrequestid && <IconButton icon={<Icon size="lg" as={AntDesign} name="link" color="#C8102E" />} onPress={()=>navigation.navigate("CorrectiveRequest", { id: item.request_id, plant: item.plant_id, asset: item.psa_id, fault: item.fault_id })}/>}                  
                   {
                     ['PENDING', 'ASSIGNED'].includes(item.status)
+                    && Role.Specialist !== role_id 
                     && <IconButton icon={<Icon size="lg" as={AntDesign} name="adduser" color="#C8102E" />} onPress={()=>navigation.navigate("AssignRequest", { id: item.request_id })}/>
                   }
                   
                   {
                     ['COMPLETED', 'REJECTED'].includes(item.status)
-                    && [1, 2, 3].includes(role_id)
+                    && Role.Specialist !== role_id
                     && <IconButton icon={<Icon size="lg" as={MaterialCommunityIcons} name="sticker-check-outline" color="#C8102E" />} onPress={()=>navigation.navigate("ManageRequest", { id: item.request_id })}/>
                   }
 
