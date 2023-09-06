@@ -46,7 +46,7 @@ const ListBox = ({
       navigation.navigate("CompleteChecklistPage", checklist);
     } else if (
       clID === ChecklistID.WorkDone &&
-      (user.role_id === Role.Manager || user.role_id === Role.Admin)
+      (user.role_id !== Role.Specialist)
     ) {
       navigation.navigate("ManageChecklistPage", checklist);
     } else if (clID === ChecklistID.Pending) {
