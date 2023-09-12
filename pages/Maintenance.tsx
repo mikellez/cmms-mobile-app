@@ -95,8 +95,23 @@ const Maintenance = ({ navigation, route }) => {
       const response = await instance.get(`/api/checklist/assigned?page=${currentPage}`);
       const jsonData = response.data.rows;
       const newData = [...cachedData, ...jsonData]; // Append new data to existing data array
+
+      // Create an empty object to keep track of unique objects by their ID
+      const uniqueMap = {};
+
+      // Filter the array, only keeping objects with unique IDs
+      const uniqueData = newData.filter((item) => {
+        if (!uniqueMap[item.checklist_id]) {
+          uniqueMap[item.checklist_id] = true; // Mark this ID as seen
+          return true; // Include this object in the result
+        }
+        return false; // Duplicate, exclude from the result
+      });
+
       setCachedData(newData);
-      storeFile(newData);
+      storeFile(uniqueData);
+      console.log('checklist offline data', uniqueData)
+      console.log('checklist length', uniqueData.length)
     }
 
     const fetchChecklist = async (viewType: string) => {
